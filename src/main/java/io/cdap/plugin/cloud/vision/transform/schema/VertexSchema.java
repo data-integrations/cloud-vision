@@ -24,21 +24,19 @@ import io.cdap.cdap.api.data.schema.Schema;
  */
 public class VertexSchema {
 
-  private VertexSchema() {
-    throw new AssertionError("Should not instantiate static utility class.");
-  }
-
   /**
    * X coordinate.
    */
   public static final String X_FIELD_NAME = "x";
-
   /**
    * Y coordinate.
    */
   public static final String Y_FIELD_NAME = "y";
-
   public static final Schema SCHEMA = Schema.recordOf("vertex-record",
-    Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
-    Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
+          Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
+          Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
+
+  private VertexSchema() {
+    throw new AssertionError("Should not instantiate static utility class.");
+  }
 }

@@ -16,16 +16,11 @@
 
 package io.cdap.plugin.cloud.vision.transform.transformer;
 
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.Block;
-import com.google.cloud.vision.v1.Page;
-import com.google.cloud.vision.v1.Paragraph;
-import com.google.cloud.vision.v1.Symbol;
-import com.google.cloud.vision.v1.TextAnnotation;
-import com.google.cloud.vision.v1.Word;
+import com.google.cloud.vision.v1.*;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.FullTextAnnotationSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +39,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     TextAnnotation annotation = annotateImageResponse.getFullTextAnnotation();
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractHandwritingAnnotation(annotation))
-      .build();
+            .set(outputFieldName, extractHandwritingAnnotation(annotation))
+            .build();
   }
 
   private StructuredRecord extractHandwritingAnnotation(TextAnnotation annotation) {
@@ -59,8 +54,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (pagesField != null) {
       Schema pageSchema = getComponentSchema(pagesField);
       List<StructuredRecord> pages = annotation.getPagesList().stream()
-        .map(v -> extractPage(v, pageSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractPage(v, pageSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.PAGES_FIELD_NAME, pages);
     }
 
@@ -71,14 +66,14 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextPage.TEXT_FIELD_NAME) != null) {
       String pageText = page.getBlocksList().stream()
-        .map(Block::getParagraphsList)
-        .flatMap(List::stream)
-        .map(Paragraph::getWordsList)
-        .flatMap(List::stream)
-        .map(Word::getSymbolsList)
-        .flatMap(List::stream)
-        .map(Symbol::getText)
-        .collect(Collectors.joining());
+              .map(Block::getParagraphsList)
+              .flatMap(List::stream)
+              .map(Paragraph::getWordsList)
+              .flatMap(List::stream)
+              .map(Word::getSymbolsList)
+              .flatMap(List::stream)
+              .map(Symbol::getText)
+              .collect(Collectors.joining());
       builder.set(FullTextAnnotationSchema.TextPage.TEXT_FIELD_NAME, pageText);
     }
     if (schema.getField(FullTextAnnotationSchema.TextPage.WIDTH_FIELD_NAME) != null) {
@@ -94,8 +89,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (languagesField != null) {
       Schema langSchema = getComponentSchema(languagesField);
       List<StructuredRecord> languages = page.getProperty().getDetectedLanguagesList().stream()
-        .map(l -> extractDetectedLanguage(l, langSchema))
-        .collect(Collectors.toList());
+              .map(l -> extractDetectedLanguage(l, langSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextPage.DETECTED_LANGUAGES_FIELD_NAME, languages);
     }
     if (schema.getField(FullTextAnnotationSchema.TextPage.DETECTED_BREAK_FIELD_NAME) != null) {
@@ -106,8 +101,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (blocksField != null) {
       Schema blockSchema = getComponentSchema(blocksField);
       List<StructuredRecord> blocks = page.getBlocksList().stream()
-        .map(v -> extractBlock(v, blockSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractBlock(v, blockSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextPage.BLOCKS_FIELD_NAME, blocks);
     }
 
@@ -118,12 +113,12 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextBlock.TEXT_FIELD_NAME) != null) {
       String blockText = block.getParagraphsList().stream()
-        .map(Paragraph::getWordsList)
-        .flatMap(List::stream)
-        .map(Word::getSymbolsList)
-        .flatMap(List::stream)
-        .map(Symbol::getText)
-        .collect(Collectors.joining());
+              .map(Paragraph::getWordsList)
+              .flatMap(List::stream)
+              .map(Word::getSymbolsList)
+              .flatMap(List::stream)
+              .map(Symbol::getText)
+              .collect(Collectors.joining());
       builder.set(FullTextAnnotationSchema.TextBlock.TEXT_FIELD_NAME, blockText);
     }
     if (schema.getField(FullTextAnnotationSchema.TextBlock.BLOCK_TYPE_FIELD_NAME) != null) {
@@ -136,8 +131,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (languagesField != null) {
       Schema langSchema = getComponentSchema(languagesField);
       List<StructuredRecord> languages = block.getProperty().getDetectedLanguagesList().stream()
-        .map(l -> extractDetectedLanguage(l, langSchema))
-        .collect(Collectors.toList());
+              .map(l -> extractDetectedLanguage(l, langSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextBlock.DETECTED_LANGUAGES_FIELD_NAME, languages);
     }
     if (schema.getField(FullTextAnnotationSchema.TextBlock.DETECTED_BREAK_FIELD_NAME) != null) {
@@ -148,16 +143,16 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (paragraphsField != null) {
       Schema paragraphSchema = getComponentSchema(paragraphsField);
       List<StructuredRecord> paragraphs = block.getParagraphsList().stream()
-        .map(v -> extractParagraph(v, paragraphSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractParagraph(v, paragraphSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextBlock.PARAGRAPHS_FIELD_NAME, paragraphs);
     }
     Schema.Field boxField = schema.getField(FullTextAnnotationSchema.TextBlock.BOUNDING_BOX_FIELD_NAME);
     if (boxField != null) {
       Schema vertexSchema = getComponentSchema(boxField);
       List<StructuredRecord> paragraphs = block.getBoundingBox().getVerticesList().stream()
-        .map(v -> extractVertex(v, vertexSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, vertexSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextBlock.BOUNDING_BOX_FIELD_NAME, paragraphs);
     }
 
@@ -168,10 +163,10 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextParagraph.TEXT_FIELD_NAME) != null) {
       String paragraphText = paragraph.getWordsList().stream()
-        .map(Word::getSymbolsList)
-        .flatMap(List::stream)
-        .map(Symbol::getText)
-        .collect(Collectors.joining());
+              .map(Word::getSymbolsList)
+              .flatMap(List::stream)
+              .map(Symbol::getText)
+              .collect(Collectors.joining());
       builder.set(FullTextAnnotationSchema.TextParagraph.TEXT_FIELD_NAME, paragraphText);
     }
     if (schema.getField(FullTextAnnotationSchema.TextParagraph.CONFIDENCE_FIELD_NAME) != null) {
@@ -181,8 +176,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (languagesField != null) {
       Schema langSchema = getComponentSchema(languagesField);
       List<StructuredRecord> languages = paragraph.getProperty().getDetectedLanguagesList().stream()
-        .map(l -> extractDetectedLanguage(l, langSchema))
-        .collect(Collectors.toList());
+              .map(l -> extractDetectedLanguage(l, langSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextParagraph.DETECTED_LANGUAGES_FIELD_NAME, languages);
     }
     if (schema.getField(FullTextAnnotationSchema.TextParagraph.DETECTED_BREAK_FIELD_NAME) != null) {
@@ -193,16 +188,16 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (wordsField != null) {
       Schema wordSchema = getComponentSchema(wordsField);
       List<StructuredRecord> words = paragraph.getWordsList().stream()
-        .map(v -> extractWord(v, wordSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractWord(v, wordSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextParagraph.WORDS_FIELD_NAME, words);
     }
     Schema.Field boxField = schema.getField(FullTextAnnotationSchema.TextParagraph.BOUNDING_BOX_FIELD_NAME);
     if (boxField != null) {
       Schema vertexSchema = getComponentSchema(boxField);
       List<StructuredRecord> paragraphs = paragraph.getBoundingBox().getVerticesList().stream()
-        .map(v -> extractVertex(v, vertexSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, vertexSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextParagraph.BOUNDING_BOX_FIELD_NAME, paragraphs);
     }
 
@@ -213,8 +208,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextWord.TEXT_FIELD_NAME) != null) {
       String wordText = word.getSymbolsList().stream()
-        .map(Symbol::getText)
-        .collect(Collectors.joining());
+              .map(Symbol::getText)
+              .collect(Collectors.joining());
       builder.set(FullTextAnnotationSchema.TextWord.TEXT_FIELD_NAME, wordText);
     }
     if (schema.getField(FullTextAnnotationSchema.TextWord.CONFIDENCE_FIELD_NAME) != null) {
@@ -224,8 +219,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (languagesField != null) {
       Schema langSchema = getComponentSchema(languagesField);
       List<StructuredRecord> languages = word.getProperty().getDetectedLanguagesList().stream()
-        .map(l -> extractDetectedLanguage(l, langSchema))
-        .collect(Collectors.toList());
+              .map(l -> extractDetectedLanguage(l, langSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextWord.DETECTED_LANGUAGES_FIELD_NAME, languages);
     }
     if (schema.getField(FullTextAnnotationSchema.TextWord.DETECTED_BREAK_FIELD_NAME) != null) {
@@ -236,16 +231,16 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (symbolsField != null) {
       Schema symbolSchema = getComponentSchema(symbolsField);
       List<StructuredRecord> words = word.getSymbolsList().stream()
-        .map(v -> extractSymbol(v, symbolSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractSymbol(v, symbolSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextWord.SYMBOLS_FIELD_NAME, words);
     }
     Schema.Field boxField = schema.getField(FullTextAnnotationSchema.TextWord.BOUNDING_BOX_FIELD_NAME);
     if (boxField != null) {
       Schema vertexSchema = getComponentSchema(boxField);
       List<StructuredRecord> paragraphs = word.getBoundingBox().getVerticesList().stream()
-        .map(v -> extractVertex(v, vertexSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, vertexSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextWord.BOUNDING_BOX_FIELD_NAME, paragraphs);
     }
 
@@ -264,8 +259,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (languagesField != null) {
       Schema langSchema = getComponentSchema(languagesField);
       List<StructuredRecord> languages = symbol.getProperty().getDetectedLanguagesList().stream()
-        .map(l -> extractDetectedLanguage(l, langSchema))
-        .collect(Collectors.toList());
+              .map(l -> extractDetectedLanguage(l, langSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextSymbol.DETECTED_LANGUAGES_FIELD_NAME, languages);
     }
     if (schema.getField(FullTextAnnotationSchema.TextSymbol.DETECTED_BREAK_FIELD_NAME) != null) {
@@ -276,8 +271,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     if (boxField != null) {
       Schema vertexSchema = getComponentSchema(boxField);
       List<StructuredRecord> paragraphs = symbol.getBoundingBox().getVerticesList().stream()
-        .map(v -> extractVertex(v, vertexSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, vertexSchema))
+              .collect(Collectors.toList());
       builder.set(FullTextAnnotationSchema.TextSymbol.BOUNDING_BOX_FIELD_NAME, paragraphs);
     }
 
@@ -305,6 +300,6 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
   private Schema getHandwritingAnnotationSchema() {
     Schema handwritingAnnotationsFieldSchema = schema.getField(outputFieldName).getSchema();
     return handwritingAnnotationsFieldSchema.isNullable() ? handwritingAnnotationsFieldSchema.getNonNullable()
-      : handwritingAnnotationsFieldSchema;
+            : handwritingAnnotationsFieldSchema;
   }
 }

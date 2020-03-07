@@ -21,6 +21,7 @@ import com.google.cloud.vision.v1.LocalizedObjectAnnotation;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.LocalizedObjectAnnotationSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,14 +39,14 @@ public class LocalizedObjectAnnotationsToRecordTransformer extends ImageAnnotati
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractLocalizedObjectAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractLocalizedObjectAnnotations(annotateImageResponse))
+            .build();
   }
 
   private List<StructuredRecord> extractLocalizedObjectAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getLocalizedObjectAnnotationsList().stream()
-      .map(this::extractLocalizedObjectAnnotationRecord)
-      .collect(Collectors.toList());
+            .map(this::extractLocalizedObjectAnnotationRecord)
+            .collect(Collectors.toList());
   }
 
   private StructuredRecord extractLocalizedObjectAnnotationRecord(LocalizedObjectAnnotation annotation) {
@@ -70,8 +71,8 @@ public class LocalizedObjectAnnotationsToRecordTransformer extends ImageAnnotati
     if (posField != null) {
       Schema positionSchema = getComponentSchema(posField);
       List<StructuredRecord> position = annotation.getBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
       builder.set(LocalizedObjectAnnotationSchema.POSITION_FIELD_NAME, position);
     }
 

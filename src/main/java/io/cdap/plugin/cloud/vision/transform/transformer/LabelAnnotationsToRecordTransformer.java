@@ -23,6 +23,7 @@ import com.google.cloud.vision.v1.Property;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,14 +41,14 @@ public class LabelAnnotationsToRecordTransformer extends ImageAnnotationToRecord
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractLabelAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractLabelAnnotations(annotateImageResponse))
+            .build();
   }
 
   private List<StructuredRecord> extractLabelAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getLabelAnnotationsList().stream()
-      .map(this::extractAnnotation)
-      .collect(Collectors.toList());
+            .map(this::extractAnnotation)
+            .collect(Collectors.toList());
   }
 
   protected StructuredRecord extractAnnotation(EntityAnnotation annotation) {
@@ -72,16 +73,16 @@ public class LabelAnnotationsToRecordTransformer extends ImageAnnotationToRecord
     if (locField != null) {
       Schema locationSchema = getComponentSchema(locField);
       List<StructuredRecord> location = annotation.getLocationsList().stream()
-        .map(v -> extractLocation(v, locationSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractLocation(v, locationSchema))
+              .collect(Collectors.toList());
       builder.set(EntityAnnotationSchema.LOCATIONS_FIELD_NAME, location);
     }
     Schema.Field propField = labelSchema.getField(EntityAnnotationSchema.PROPERTIES_FIELD_NAME);
     if (propField != null) {
       Schema propertySchema = getComponentSchema(propField);
       List<StructuredRecord> location = annotation.getPropertiesList().stream()
-        .map(v -> extractProperty(v, propertySchema))
-        .collect(Collectors.toList());
+              .map(v -> extractProperty(v, propertySchema))
+              .collect(Collectors.toList());
       builder.set(EntityAnnotationSchema.PROPERTIES_FIELD_NAME, location);
     }
 

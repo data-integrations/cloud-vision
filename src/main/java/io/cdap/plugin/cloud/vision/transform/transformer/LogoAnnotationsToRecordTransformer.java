@@ -37,13 +37,13 @@ public class LogoAnnotationsToRecordTransformer extends LandmarkAnnotationsToRec
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractLogoAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractLogoAnnotations(annotateImageResponse))
+            .build();
   }
 
   private List<StructuredRecord> extractLogoAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getLogoAnnotationsList().stream()
-      .map(this::extractAnnotation)
-      .collect(Collectors.toList());
+            .map(this::extractAnnotation)
+            .collect(Collectors.toList());
   }
 }

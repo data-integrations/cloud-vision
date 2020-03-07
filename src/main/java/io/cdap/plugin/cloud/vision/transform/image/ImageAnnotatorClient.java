@@ -17,19 +17,13 @@
 package io.cdap.plugin.cloud.vision.transform.image;
 
 import com.google.api.client.util.Strings;
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageContext;
-import com.google.cloud.vision.v1.ImageSource;
-import com.google.cloud.vision.v1.ProductSearchParams;
+import com.google.cloud.vision.v1.*;
 import io.cdap.plugin.cloud.vision.exception.CloudVisionExecutionException;
 import io.cdap.plugin.cloud.vision.transform.CloudVisionClient;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
-import java.util.Collections;
+
 import javax.annotation.Nullable;
+import java.util.Collections;
 
 /**
  * Provides handy methods to access Google Cloud Vision.
@@ -59,7 +53,7 @@ public class ImageAnnotatorClient extends CloudVisionClient {
       AnnotateImageResponse annotateImageResponse = response.getResponses(SINGLE_RESPONSE_INDEX);
       if (annotateImageResponse.hasError()) {
         String errorMessage = String.format("Unable to extract '%s' feature of image '%s' due to: '%s'", featureType,
-          gcsPath, annotateImageResponse.getError().getMessage());
+                gcsPath, annotateImageResponse.getError().getMessage());
         throw new CloudVisionExecutionException(errorMessage);
       }
 
@@ -76,8 +70,8 @@ public class ImageAnnotatorClient extends CloudVisionClient {
     }
     // Product Search parameters
     ProductSearchParams.Builder productSearchParams = ProductSearchParams.newBuilder()
-      .setProductSet(config.getProductSet())
-      .addProductCategories(config.getProductCategory().getName());
+            .setProductSet(config.getProductSet())
+            .addProductCategories(config.getProductCategory().getName());
     if (!Strings.isNullOrEmpty(config.getFilter())) {
       productSearchParams.setFilter(config.getFilter());
     }

@@ -21,6 +21,7 @@ import com.google.cloud.vision.v1.Vertex;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.VertexSchema;
+
 import java.util.Objects;
 
 

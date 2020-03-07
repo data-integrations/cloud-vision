@@ -24,6 +24,7 @@ import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import io.cdap.plugin.cloud.vision.transform.schema.LocalizedObjectAnnotationSchema;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.List;
 
 /**
@@ -32,27 +33,27 @@ import java.util.List;
 public class LocalizedObjectAnnotationsToRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   private static final LocalizedObjectAnnotation LOCALIZED_OBJECT_ANNOTATION = LocalizedObjectAnnotation.newBuilder()
-    .setMid("/m/01bqk0")
-    .setName("Bicycle wheel")
-    .setLanguageCode("en")
-    .setScore(0.89648587f)
-    .setBoundingPoly(POSITION)
-    .build();
+          .setMid("/m/01bqk0")
+          .setName("Bicycle wheel")
+          .setLanguageCode("en")
+          .setScore(0.89648587f)
+          .setBoundingPoly(POSITION)
+          .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .addLocalizedObjectAnnotations(LOCALIZED_OBJECT_ANNOTATION)
-    .build();
+          .addLocalizedObjectAnnotations(LOCALIZED_OBJECT_ANNOTATION)
+          .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String outputFieldName = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, ImageFeature.OBJECT_LOCALIZATION.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(outputFieldName, ImageFeature.OBJECT_LOCALIZATION.getSchema()));
 
     LocalizedObjectAnnotationsToRecordTransformer transformer =
-      new LocalizedObjectAnnotationsToRecordTransformer(schema, outputFieldName);
+            new LocalizedObjectAnnotationsToRecordTransformer(schema, outputFieldName);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
 
     Assert.assertNotNull(transformed);
@@ -68,16 +69,16 @@ public class LocalizedObjectAnnotationsToRecordTransformerTest extends BaseAnnot
   public void testTransformEmptyAnnotation() {
     String outputFieldName = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, ImageFeature.OBJECT_LOCALIZATION.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(outputFieldName, ImageFeature.OBJECT_LOCALIZATION.getSchema()));
 
     LocalizedObjectAnnotationsToRecordTransformer transformer =
-      new LocalizedObjectAnnotationsToRecordTransformer(schema, outputFieldName);
+            new LocalizedObjectAnnotationsToRecordTransformer(schema, outputFieldName);
 
     LocalizedObjectAnnotation emptyAnnotation = LocalizedObjectAnnotation.newBuilder().build();
     AnnotateImageResponse response = AnnotateImageResponse.newBuilder()
-      .addLocalizedObjectAnnotations(emptyAnnotation)
-      .build();
+            .addLocalizedObjectAnnotations(emptyAnnotation)
+            .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, response);
 
     Assert.assertNotNull(transformed);
@@ -93,13 +94,13 @@ public class LocalizedObjectAnnotationsToRecordTransformerTest extends BaseAnnot
   public void testTransformSingleField() {
     String outputFieldName = "extracted";
     Schema singleFieldSchema = Schema.recordOf("single-field", Schema.Field.of(
-      LocalizedObjectAnnotationSchema.NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+            LocalizedObjectAnnotationSchema.NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, Schema.arrayOf(singleFieldSchema)));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(outputFieldName, Schema.arrayOf(singleFieldSchema)));
 
     LocalizedObjectAnnotationsToRecordTransformer transformer =
-      new LocalizedObjectAnnotationsToRecordTransformer(schema, outputFieldName);
+            new LocalizedObjectAnnotationsToRecordTransformer(schema, outputFieldName);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
 
     Assert.assertNotNull(transformed);
@@ -110,18 +111,18 @@ public class LocalizedObjectAnnotationsToRecordTransformerTest extends BaseAnnot
     // actual record has single-field schema
     Assert.assertEquals(singleFieldSchema, actual.getSchema());
     Assert.assertEquals(LOCALIZED_OBJECT_ANNOTATION.getName(),
-      actual.get(LocalizedObjectAnnotationSchema.NAME_FIELD_NAME));
+            actual.get(LocalizedObjectAnnotationSchema.NAME_FIELD_NAME));
   }
 
   private void assertAnnotationEquals(LocalizedObjectAnnotation expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getMid(),
-      actual.get(LocalizedObjectAnnotationSchema.MID_FIELD_NAME));
+            actual.get(LocalizedObjectAnnotationSchema.MID_FIELD_NAME));
     Assert.assertEquals(expected.getName(),
-      actual.get(LocalizedObjectAnnotationSchema.NAME_FIELD_NAME));
+            actual.get(LocalizedObjectAnnotationSchema.NAME_FIELD_NAME));
 
     Assert.assertEquals(expected.getScore(),
-      actual.<Float>get(LocalizedObjectAnnotationSchema.SCORE_FIELD_NAME),
-      DELTA);
+            actual.<Float>get(LocalizedObjectAnnotationSchema.SCORE_FIELD_NAME),
+            DELTA);
 
     List<StructuredRecord> position = actual.get(LocalizedObjectAnnotationSchema.POSITION_FIELD_NAME);
     assertPositionEqual(expected.getBoundingPoly(), position);

@@ -24,45 +24,40 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConstants;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * Config class for {@link TextExtractorAction}.
  */
 public class TextExtractorActionConfig extends PluginConfig {
 
-  @Name(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
-  @Description("Path on the local file system of the service account key used "
-    + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
-    + "When running on other clusters, the file must be present on every node in the cluster.")
-  @Macro
-  private String serviceFilePath;
-
   @Name(ActionConstants.SOURCE_PATH)
   @Macro
   @Description("Path to the location of the directory on GCS where the input files are stored.")
   private final String sourcePath;
-
   @Name(ActionConstants.DESTINATION_PATH)
   @Macro
   @Description("Path to the location of the directory on GCS where output files should be stored.")
   private final String destinationPath;
-
   @Name(CloudVisionConstants.MIME_TYPE)
   @Description("Document type.")
   private final String mimeType;
-
   @Name(ActionConstants.BATCH_SIZE)
   @Description("The max number of responses.")
   private final Integer batchSize;
-
   @Name(CloudVisionConstants.LANGUAGE_HINTS)
   @Nullable
   @Description("Optional hints to provide to Cloud Vision API.")
   private final String languageHints;
+  @Name(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
+  @Description("Path on the local file system of the service account key used "
+          + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
+          + "When running on other clusters, the file must be present on every node in the cluster.")
+  @Macro
+  private String serviceFilePath;
 
   public TextExtractorActionConfig(String serviceFilePath, String sourcePath, String destinationPath, String mimeType,
                                    Integer batchSize, @Nullable String languageHints) {
@@ -145,17 +140,17 @@ public class TextExtractorActionConfig extends PluginConfig {
   public void validate(FailureCollector collector) {
     if (!containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH) && Strings.isNullOrEmpty(serviceFilePath)) {
       collector.addFailure("Service account file path must be specified.", null)
-        .withConfigProperty(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
+              .withConfigProperty(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
     }
 
     if (!containsMacro(ActionConstants.SOURCE_PATH) && Strings.isNullOrEmpty(sourcePath)) {
       collector.addFailure("Source path must be specified.", null)
-        .withConfigProperty(ActionConstants.SOURCE_PATH);
+              .withConfigProperty(ActionConstants.SOURCE_PATH);
     }
 
     if (!containsMacro(ActionConstants.DESTINATION_PATH) && Strings.isNullOrEmpty(destinationPath)) {
       collector.addFailure("Destination path must be specified.", null)
-        .withConfigProperty(ActionConstants.DESTINATION_PATH);
+              .withConfigProperty(ActionConstants.DESTINATION_PATH);
     }
   }
 

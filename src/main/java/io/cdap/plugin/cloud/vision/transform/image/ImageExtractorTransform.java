@@ -22,17 +22,11 @@ import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
-import io.cdap.cdap.etl.api.Emitter;
-import io.cdap.cdap.etl.api.FailureCollector;
-import io.cdap.cdap.etl.api.InvalidEntry;
-import io.cdap.cdap.etl.api.PipelineConfigurer;
-import io.cdap.cdap.etl.api.StageConfigurer;
-import io.cdap.cdap.etl.api.StageSubmitterContext;
-import io.cdap.cdap.etl.api.Transform;
-import io.cdap.cdap.etl.api.TransformContext;
+import io.cdap.cdap.etl.api.*;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.transformer.ImageAnnotationToRecordTransformer;
 import io.cdap.plugin.cloud.vision.transform.transformer.TransformerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,8 +98,8 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
       emitter.emit(transformed);
     } catch (Exception e) {
       StructuredRecord errorRecord = StructuredRecord.builder(ExtractorTransformConfig.ERROR_SCHEMA)
-        .set("error", e.getMessage())
-        .build();
+              .set("error", e.getMessage())
+              .build();
       emitter.emitError(new InvalidEntry<>(400, e.getMessage(), errorRecord));
     }
   }

@@ -21,6 +21,7 @@ import com.google.cloud.vision.v1.ColorInfo;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.ColorInfoSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,14 +39,14 @@ public class ImagePropertiesAnnotationsToRecordTransformer extends ImageAnnotati
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractDominantColors(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractDominantColors(annotateImageResponse))
+            .build();
   }
 
   private List<StructuredRecord> extractDominantColors(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getImagePropertiesAnnotation().getDominantColors().getColorsList().stream()
-      .map(this::extractColorInfoRecord)
-      .collect(Collectors.toList());
+            .map(this::extractColorInfoRecord)
+            .collect(Collectors.toList());
   }
 
   private StructuredRecord extractColorInfoRecord(ColorInfo colorInfo) {

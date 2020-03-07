@@ -18,16 +18,7 @@ package io.cdap.plugin.cloud.vision.action;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.Credentials;
-import com.google.cloud.vision.v1.AsyncAnnotateFileRequest;
-import com.google.cloud.vision.v1.AsyncBatchAnnotateFilesRequest;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.GcsDestination;
-import com.google.cloud.vision.v1.GcsSource;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.ImageAnnotatorSettings;
-import com.google.cloud.vision.v1.ImageContext;
-import com.google.cloud.vision.v1.InputConfig;
-import com.google.cloud.vision.v1.OutputConfig;
+import com.google.cloud.vision.v1.*;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
@@ -73,53 +64,53 @@ public class TextExtractorAction extends Action {
 
     Credentials credentials = CredentialsHelper.getCredentials(config.getServiceAccountFilePath());
     ImageAnnotatorSettings imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder()
-      .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
-      .build();
+            .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
+            .build();
 
     try (ImageAnnotatorClient client = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
       List<AsyncAnnotateFileRequest> requests = new ArrayList<>();
 
       GcsSource gcsSource = GcsSource.newBuilder()
-        .setUri(config.getSourcePath())
-        .build();
+              .setUri(config.getSourcePath())
+              .build();
 
       GcsDestination gcsDestination = GcsDestination.newBuilder()
-        .setUri(config.getDestinationPath())
-        .build();
+              .setUri(config.getDestinationPath())
+              .build();
 
       InputConfig inputConfig = InputConfig.newBuilder()
-        .setMimeType(config.getMimeType())
-        .setGcsSource(gcsSource)
-        .build();
+              .setMimeType(config.getMimeType())
+              .setGcsSource(gcsSource)
+              .build();
 
       OutputConfig outputConfig = OutputConfig.newBuilder()
-        .setBatchSize(config.getBatchSize())
-        .setGcsDestination(gcsDestination)
-        .build();
+              .setBatchSize(config.getBatchSize())
+              .setGcsDestination(gcsDestination)
+              .build();
 
       Feature feature = Feature.newBuilder()
-        .setType(Feature.Type.DOCUMENT_TEXT_DETECTION)
-        .build();
+              .setType(Feature.Type.DOCUMENT_TEXT_DETECTION)
+              .build();
 
       ImageContext context = ImageContext.newBuilder()
-        .addAllLanguageHints(config.getLanguageHintsList())
-        .build();
+              .addAllLanguageHints(config.getLanguageHintsList())
+              .build();
 
       AsyncAnnotateFileRequest request = AsyncAnnotateFileRequest.newBuilder()
-        .addFeatures(feature)
-        .setImageContext(context)
-        .setInputConfig(inputConfig)
-        .setOutputConfig(outputConfig)
-        .build();
+              .addFeatures(feature)
+              .setImageContext(context)
+              .setInputConfig(inputConfig)
+              .setOutputConfig(outputConfig)
+              .build();
 
       requests.add(request);
       AsyncBatchAnnotateFilesRequest asyncRequest = AsyncBatchAnnotateFilesRequest.newBuilder()
-        .addAllRequests(requests)
-        .build();
+              .addAllRequests(requests)
+              .build();
 
       client.asyncBatchAnnotateFilesAsync(asyncRequest)
-        .getInitialFuture()
-        .get();
+              .getInitialFuture()
+              .get();
     }
   }
 }

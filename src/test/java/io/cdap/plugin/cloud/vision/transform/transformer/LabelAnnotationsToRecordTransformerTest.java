@@ -27,6 +27,7 @@ import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationSchema;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.List;
 
 /**
@@ -35,41 +36,41 @@ import java.util.List;
 public class LabelAnnotationsToRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   protected static final LocationInfo LOCATION = LocationInfo.newBuilder()
-    .setLatLng(LatLng.newBuilder().setLatitude(55.75).setLongitude(37.62).build())
-    .build();
+          .setLatLng(LatLng.newBuilder().setLatitude(55.75).setLongitude(37.62).build())
+          .build();
 
   protected static final Property PROPERTY_1 = Property.newBuilder()
-    .setName("name")
-    .setValue("value")
-    .build();
+          .setName("name")
+          .setValue("value")
+          .build();
 
   protected static final Property PROPERTY_2 = Property.newBuilder()
-    .setName("name2")
-    .setUint64Value(Long.MAX_VALUE)
-    .build();
+          .setName("name2")
+          .setUint64Value(Long.MAX_VALUE)
+          .build();
 
   private static final EntityAnnotation LABEL_ANNOTATION = EntityAnnotation.newBuilder()
-    .setMid("/m/0dx1j")
-    .setDescription("Some Label")
-    .setLocale("en")
-    .setScore(0.87f)
-    .setTopicality(0.21f)
-    .addLocations(LOCATION)
-    .addProperties(PROPERTY_1)
-    .addProperties(PROPERTY_2)
-    .build();
+          .setMid("/m/0dx1j")
+          .setDescription("Some Label")
+          .setLocale("en")
+          .setScore(0.87f)
+          .setTopicality(0.21f)
+          .addLocations(LOCATION)
+          .addProperties(PROPERTY_1)
+          .addProperties(PROPERTY_2)
+          .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .addLabelAnnotations(LABEL_ANNOTATION)
-    .build();
+          .addLabelAnnotations(LABEL_ANNOTATION)
+          .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String outputFieldName = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, ImageFeature.LABELS.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(outputFieldName, ImageFeature.LABELS.getSchema()));
 
     LabelAnnotationsToRecordTransformer transformer = new LabelAnnotationsToRecordTransformer(schema, outputFieldName);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -87,15 +88,15 @@ public class LabelAnnotationsToRecordTransformerTest extends BaseAnnotationsToRe
   public void testTransformEmptyAnnotation() {
     String outputFieldName = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, ImageFeature.LABELS.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(outputFieldName, ImageFeature.LABELS.getSchema()));
 
     LabelAnnotationsToRecordTransformer transformer = new LabelAnnotationsToRecordTransformer(schema, outputFieldName);
 
     EntityAnnotation emptyAnnotation = EntityAnnotation.newBuilder().build();
     AnnotateImageResponse emptyLabelAnnotation = AnnotateImageResponse.newBuilder()
-      .addLabelAnnotations(emptyAnnotation)
-      .build();
+            .addLabelAnnotations(emptyAnnotation)
+            .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, emptyLabelAnnotation);
 
     Assert.assertNotNull(transformed);
@@ -111,10 +112,10 @@ public class LabelAnnotationsToRecordTransformerTest extends BaseAnnotationsToRe
   public void testTransformSingleField() {
     String outputFieldName = "extracted";
     Schema labelAnnotationSingleFieldSchema = Schema.recordOf("single-label-field", Schema.Field.of(
-      EntityAnnotationSchema.DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+            EntityAnnotationSchema.DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, Schema.arrayOf(labelAnnotationSingleFieldSchema)));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(outputFieldName, Schema.arrayOf(labelAnnotationSingleFieldSchema)));
 
     LabelAnnotationsToRecordTransformer transformer = new LabelAnnotationsToRecordTransformer(schema, outputFieldName);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -127,21 +128,21 @@ public class LabelAnnotationsToRecordTransformerTest extends BaseAnnotationsToRe
     // actual record has single-field schema
     Assert.assertEquals(labelAnnotationSingleFieldSchema, actual.getSchema());
     Assert.assertEquals(LABEL_ANNOTATION.getDescription(),
-      actual.get(EntityAnnotationSchema.DESCRIPTION_FIELD_NAME));
+            actual.get(EntityAnnotationSchema.DESCRIPTION_FIELD_NAME));
   }
 
   protected void assertAnnotationEquals(EntityAnnotation expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getMid(), actual.get(EntityAnnotationSchema.MID_FIELD_NAME));
     Assert.assertEquals(expected.getDescription(),
-      actual.get(EntityAnnotationSchema.DESCRIPTION_FIELD_NAME));
+            actual.get(EntityAnnotationSchema.DESCRIPTION_FIELD_NAME));
     Assert.assertEquals(expected.getLocale(),
-      actual.get(EntityAnnotationSchema.LOCALE_FIELD_NAME));
+            actual.get(EntityAnnotationSchema.LOCALE_FIELD_NAME));
     Assert.assertEquals(expected.getScore(),
-      actual.<Float>get(EntityAnnotationSchema.SCORE_FIELD_NAME),
-      DELTA);
+            actual.<Float>get(EntityAnnotationSchema.SCORE_FIELD_NAME),
+            DELTA);
     Assert.assertEquals(expected.getTopicality(),
-      actual.<Float>get(EntityAnnotationSchema.TOPICALITY_FIELD_NAME),
-      DELTA);
+            actual.<Float>get(EntityAnnotationSchema.TOPICALITY_FIELD_NAME),
+            DELTA);
 
     List<StructuredRecord> locations = actual.get(EntityAnnotationSchema.LOCATIONS_FIELD_NAME);
     assertLocationsEqual(expected.getLocationsList(), locations);
@@ -159,11 +160,11 @@ public class LabelAnnotationsToRecordTransformerTest extends BaseAnnotationsToRe
       Assert.assertNotNull(actualLocation);
 
       Assert.assertEquals(locationInfo.getLatLng().getLatitude(),
-        actualLocation.<Double>get(EntityAnnotationSchema.LocationInfo.LATITUDE_FIELD_NAME),
-        DELTA);
+              actualLocation.<Double>get(EntityAnnotationSchema.LocationInfo.LATITUDE_FIELD_NAME),
+              DELTA);
       Assert.assertEquals(locationInfo.getLatLng().getLongitude(),
-        actualLocation.<Double>get(EntityAnnotationSchema.LocationInfo.LONGITUDE_FIELD_NAME),
-        DELTA);
+              actualLocation.<Double>get(EntityAnnotationSchema.LocationInfo.LONGITUDE_FIELD_NAME),
+              DELTA);
     }
   }
 
@@ -178,7 +179,7 @@ public class LabelAnnotationsToRecordTransformerTest extends BaseAnnotationsToRe
       Assert.assertEquals(property.getName(), actualProperty.get(EntityAnnotationSchema.Property.NAME_FIELD_NAME));
       Assert.assertEquals(property.getValue(), actualProperty.get(EntityAnnotationSchema.Property.VALUE_FIELD_NAME));
       Assert.assertEquals(property.getUint64Value(),
-        (long) actualProperty.get(EntityAnnotationSchema.Property.UINT_64_VALUE_FIELD_NAME));
+              (long) actualProperty.get(EntityAnnotationSchema.Property.UINT_64_VALUE_FIELD_NAME));
     }
   }
 }

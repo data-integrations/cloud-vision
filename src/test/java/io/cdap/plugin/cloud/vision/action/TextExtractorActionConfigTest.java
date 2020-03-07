@@ -28,12 +28,12 @@ import org.junit.Test;
 public class TextExtractorActionConfigTest {
   private static final String MOCK_STAGE = "mockStage";
   private static final TextExtractorActionConfig VALID_CONFIG = new TextExtractorActionConfig(
-    "/path",
-    "/path",
-    "/path",
-    "application/pdf",
-    2,
-    null
+          "/path",
+          "/path",
+          "/path",
+          "application/pdf",
+          2,
+          null
   );
 
   @Test
@@ -46,20 +46,20 @@ public class TextExtractorActionConfigTest {
   @Test
   public void testEmptyServiceFilePath() {
     TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
-      .setServiceFilePath("")
-      .build();
+            .setServiceFilePath("")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
     ValidationAssertions.assertPropertyValidationFailed(failureCollector,
-                                                        CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
+            CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
   }
 
   @Test
   public void testEmptySourcePath() {
     TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
-      .setSourcePath("")
-      .build();
+            .setSourcePath("")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -69,8 +69,8 @@ public class TextExtractorActionConfigTest {
   @Test
   public void testEmptyDestinationPath() {
     TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
-      .setDestinationPath("")
-      .build();
+            .setDestinationPath("")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);

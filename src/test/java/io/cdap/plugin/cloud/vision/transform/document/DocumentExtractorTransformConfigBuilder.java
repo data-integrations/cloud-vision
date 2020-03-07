@@ -17,13 +17,14 @@ package io.cdap.plugin.cloud.vision.transform.document;
 
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfigBuilder;
+
 import javax.annotation.Nullable;
 
 /**
  * Builder class that provides handy methods to construct {@link ExtractorTransformConfig} for testing.
  */
 public class DocumentExtractorTransformConfigBuilder
-  extends ExtractorTransformConfigBuilder<DocumentExtractorTransformConfigBuilder> {
+        extends ExtractorTransformConfigBuilder<DocumentExtractorTransformConfigBuilder> {
 
   @Nullable
   private String contentField;
@@ -36,18 +37,18 @@ public class DocumentExtractorTransformConfigBuilder
 
   public static DocumentExtractorTransformConfigBuilder builder(DocumentExtractorTransformConfig original) {
     return new DocumentExtractorTransformConfigBuilder()
-      .setProject(original.getProject())
-      .setServiceFilePath(original.getServiceAccountFilePath())
-      .setPathField(original.getPathField())
-      .setOutputField(original.getOutputField())
-      .setFeatures(original.getFeatures())
-      .setLanguageHints(original.getLanguageHints())
-      .setAspectRatios(original.getAspectRatios())
-      .setIncludeGeoResults(original.isIncludeGeoResults())
-      .setContentField(original.getContentField())
-      .setMimeType(original.getMimeType())
-      .setPages(original.getPages())
-      .setSchema(original.getSchema());
+            .setProject(original.getProject())
+            .setServiceFilePath(original.getServiceAccountFilePath())
+            .setPathField(original.getPathField())
+            .setOutputField(original.getOutputField())
+            .setFeatures(original.getFeatures())
+            .setLanguageHints(original.getLanguageHints())
+            .setAspectRatios(original.getAspectRatios())
+            .setIncludeGeoResults(original.isIncludeGeoResults())
+            .setContentField(original.getContentField())
+            .setMimeType(original.getMimeType())
+            .setPages(original.getPages())
+            .setSchema(original.getSchema());
   }
 
   public DocumentExtractorTransformConfigBuilder setContentField(@Nullable String contentField) {
@@ -68,6 +69,6 @@ public class DocumentExtractorTransformConfigBuilder
   @Override
   public DocumentExtractorTransformConfig build() {
     return new DocumentExtractorTransformConfig(project, serviceFilePath, pathField, outputField, features,
-      languageHints, aspectRatios, includeGeoResults, schema, contentField, mimeType, pages);
+            languageHints, aspectRatios, includeGeoResults, schema, contentField, mimeType, pages);
   }
 }

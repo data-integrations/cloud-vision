@@ -24,6 +24,7 @@ import io.cdap.plugin.cloud.vision.transform.document.DocumentExtractorTransform
 import io.cdap.plugin.cloud.vision.transform.document.DocumentExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.transformer.ImageAnnotationToRecordTransformer;
 import io.cdap.plugin.cloud.vision.transform.transformer.TransformerFactory;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,10 +35,10 @@ import java.util.stream.Collectors;
 public class FileAnnotationToRecordTransformer {
 
   private static final Schema SINGLE_FIELD_RECORD_SCHEMA = Schema.recordOf("single-field",
-    Schema.Field.of("dummy", Schema.of(Schema.Type.STRING)));
+          Schema.Field.of("dummy", Schema.of(Schema.Type.STRING)));
   private static final StructuredRecord SINGLE_FIELD_RECORD = StructuredRecord.builder(SINGLE_FIELD_RECORD_SCHEMA)
-    .set("dummy", "dummy")
-    .build();
+          .set("dummy", "dummy")
+          .build();
 
   private final ImageAnnotationToRecordTransformer transformer;
   private final Schema schema;
@@ -51,7 +52,7 @@ public class FileAnnotationToRecordTransformer {
     Schema.Field featureField = Schema.Field.of(DocumentExtractorTransformConstants.FEATURE_FIELD_NAME, featureSchema);
     Schema featureRecordSchema = Schema.recordOf("feature-record", featureField);
     this.transformer = TransformerFactory.createInstance(config.getImageFeature(), featureField.getName(),
-      featureRecordSchema);
+            featureRecordSchema);
   }
 
   /**
@@ -85,7 +86,7 @@ public class FileAnnotationToRecordTransformer {
     Schema.Field field = schema.getField(outputFieldName);
     Schema pagesSchema = field.getSchema().isNullable() ? field.getSchema().getNonNullable() : field.getSchema();
     return pagesSchema.getComponentSchema().isNullable() ? pagesSchema.getComponentSchema().getNonNullable()
-      : pagesSchema.getComponentSchema();
+            : pagesSchema.getComponentSchema();
   }
 
   /**
@@ -121,12 +122,12 @@ public class FileAnnotationToRecordTransformer {
    */
   public StructuredRecord transform(StructuredRecord input, AnnotateFileResponse annotateFileResponse) {
     List<StructuredRecord> pages = annotateFileResponse.getResponsesList().stream()
-      .map(this::annotateImageResponseToPageRecord)
-      .collect(Collectors.toList());
+            .map(this::annotateImageResponseToPageRecord)
+            .collect(Collectors.toList());
 
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, pages)
-      .build();
+            .set(outputFieldName, pages)
+            .build();
   }
 
   private StructuredRecord annotateImageResponseToPageRecord(AnnotateImageResponse annotateImageResponse) {
@@ -139,7 +140,7 @@ public class FileAnnotationToRecordTransformer {
 
     StructuredRecord transformed = transformer.transform(SINGLE_FIELD_RECORD, annotateImageResponse);
     builder.set(DocumentExtractorTransformConstants.FEATURE_FIELD_NAME,
-      transformed.get(DocumentExtractorTransformConstants.FEATURE_FIELD_NAME));
+            transformed.get(DocumentExtractorTransformConstants.FEATURE_FIELD_NAME));
 
     return builder.build();
   }

@@ -18,22 +18,13 @@ package io.cdap.plugin.cloud.vision.transform;
 
 import com.google.cloud.vision.v1.Feature;
 import io.cdap.cdap.api.data.schema.Schema;
-import io.cdap.plugin.cloud.vision.transform.schema.ColorInfoSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.CropHintAnnotationSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationWithPositionSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.FaceAnnotationSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.FullTextAnnotationSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.LocalizedObjectAnnotationSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.ProductSearchResultsSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.SafeSearchAnnotationSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.TextAnnotationSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.WebDetectionSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.*;
+
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 /**
  * The features to extract from images.
@@ -53,12 +44,12 @@ public enum ImageFeature {
   WEB_DETECTION("Web Detection", Feature.Type.WEB_DETECTION, WebDetectionSchema.SCHEMA),
   PRODUCT_SEARCH("Product Search", Feature.Type.PRODUCT_SEARCH, ProductSearchResultsSchema.SCHEMA),
   OBJECT_LOCALIZATION(
-    "Object Localization",
-    Feature.Type.OBJECT_LOCALIZATION,
-    Schema.arrayOf(LocalizedObjectAnnotationSchema.SCHEMA));
+          "Object Localization",
+          Feature.Type.OBJECT_LOCALIZATION,
+          Schema.arrayOf(LocalizedObjectAnnotationSchema.SCHEMA));
 
   private static final Map<String, ImageFeature> byDisplayName = Arrays.stream(values())
-    .collect(Collectors.toMap(ImageFeature::getDisplayName, Function.identity()));
+          .collect(Collectors.toMap(ImageFeature::getDisplayName, Function.identity()));
 
   private final String displayName;
   private final Feature.Type featureType;

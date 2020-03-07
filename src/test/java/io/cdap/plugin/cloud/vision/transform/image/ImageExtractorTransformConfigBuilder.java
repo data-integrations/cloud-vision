@@ -17,13 +17,14 @@ package io.cdap.plugin.cloud.vision.transform.image;
 
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfigBuilder;
+
 import javax.annotation.Nullable;
 
 /**
  * Builder class that provides handy methods to construct {@link ExtractorTransformConfig} for testing.
  */
 public class ImageExtractorTransformConfigBuilder
-  extends ExtractorTransformConfigBuilder<ImageExtractorTransformConfigBuilder> {
+        extends ExtractorTransformConfigBuilder<ImageExtractorTransformConfigBuilder> {
 
   @Nullable
   private String productSet;
@@ -43,19 +44,19 @@ public class ImageExtractorTransformConfigBuilder
 
   public static ImageExtractorTransformConfigBuilder builder(ImageExtractorTransformConfig original) {
     return new ImageExtractorTransformConfigBuilder()
-      .setProject(original.getProject())
-      .setServiceFilePath(original.getServiceAccountFilePath())
-      .setPathField(original.getPathField())
-      .setOutputField(original.getOutputField())
-      .setFeatures(original.getFeatures())
-      .setLanguageHints(original.getLanguageHints())
-      .setAspectRatios(original.getAspectRatios())
-      .setIncludeGeoResults(original.isIncludeGeoResults())
-      .setProductSet(original.getProductSet())
-      .setProductCategories(original.getProductCategories())
-      .setBoundingPolygon(original.getBoundingPolygon())
-      .setFilter(original.getFilter())
-      .setSchema(original.getSchema());
+            .setProject(original.getProject())
+            .setServiceFilePath(original.getServiceAccountFilePath())
+            .setPathField(original.getPathField())
+            .setOutputField(original.getOutputField())
+            .setFeatures(original.getFeatures())
+            .setLanguageHints(original.getLanguageHints())
+            .setAspectRatios(original.getAspectRatios())
+            .setIncludeGeoResults(original.isIncludeGeoResults())
+            .setProductSet(original.getProductSet())
+            .setProductCategories(original.getProductCategories())
+            .setBoundingPolygon(original.getBoundingPolygon())
+            .setFilter(original.getFilter())
+            .setSchema(original.getSchema());
   }
 
   public ImageExtractorTransformConfigBuilder setProductSet(@Nullable String productSet) {
@@ -81,6 +82,6 @@ public class ImageExtractorTransformConfigBuilder
   @Override
   public ImageExtractorTransformConfig build() {
     return new ImageExtractorTransformConfig(project, serviceFilePath, pathField, outputField, features, languageHints,
-      aspectRatios, includeGeoResults, schema, productSet, productCategories, boundingPolygon, filter);
+            aspectRatios, includeGeoResults, schema, productSet, productCategories, boundingPolygon, filter);
   }
 }

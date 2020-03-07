@@ -16,18 +16,11 @@
 
 package io.cdap.plugin.cloud.vision.transform.document;
 
-import com.google.cloud.vision.v1.AnnotateFileRequest;
-import com.google.cloud.vision.v1.AnnotateFileResponse;
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.BatchAnnotateFilesResponse;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.GcsSource;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.ImageContext;
-import com.google.cloud.vision.v1.InputConfig;
+import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 import io.cdap.plugin.cloud.vision.exception.CloudVisionExecutionException;
 import io.cdap.plugin.cloud.vision.transform.CloudVisionClient;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,17 +39,17 @@ public class DocumentAnnotatorClient extends CloudVisionClient {
 
   public AnnotateFileResponse extractDocumentFeature(byte[] content) throws Exception {
     InputConfig inputConfig = InputConfig.newBuilder()
-      .setContent(ByteString.copyFrom(content))
-      .setMimeType(config.getMimeType())
-      .build();
+            .setContent(ByteString.copyFrom(content))
+            .setMimeType(config.getMimeType())
+            .build();
     return extractDocumentFeature(inputConfig);
   }
 
   public AnnotateFileResponse extractDocumentFeature(String gcsPath) throws Exception {
     InputConfig inputConfig = InputConfig.newBuilder()
-      .setGcsSource(GcsSource.newBuilder().setUri(gcsPath))
-      .setMimeType(config.getMimeType())
-      .build();
+            .setGcsSource(GcsSource.newBuilder().setUri(gcsPath))
+            .setMimeType(config.getMimeType())
+            .build();
     return extractDocumentFeature(inputConfig);
   }
 
@@ -66,10 +59,10 @@ public class DocumentAnnotatorClient extends CloudVisionClient {
       Feature feature = Feature.newBuilder().setType(featureType).build();
 
       AnnotateFileRequest.Builder request =
-        AnnotateFileRequest.newBuilder()
-          .setInputConfig(inputConfig)
-          .addFeatures(feature)
-          .addAllPages(config.getPagesList());
+              AnnotateFileRequest.newBuilder()
+                      .setInputConfig(inputConfig)
+                      .addFeatures(feature)
+                      .addAllPages(config.getPagesList());
 
       ImageContext imageContext = getImageContext();
       if (imageContext != null) {
@@ -80,15 +73,15 @@ public class DocumentAnnotatorClient extends CloudVisionClient {
       AnnotateFileResponse annotateFileResponse = response.getResponses(SINGLE_RESPONSE_INDEX);
 
       List<String> errors = annotateFileResponse.getResponsesList().stream()
-        .filter(AnnotateImageResponse::hasError)
-        .map(r -> {
-          return String.format("Page '%d' has error: '%s'.", r.getContext().getPageNumber(), r.getError().getMessage());
-        })
-        .collect(Collectors.toList());
+              .filter(AnnotateImageResponse::hasError)
+              .map(r -> {
+                return String.format("Page '%d' has error: '%s'.", r.getContext().getPageNumber(), r.getError().getMessage());
+              })
+              .collect(Collectors.toList());
 
       if (!errors.isEmpty()) {
         String errorMessage = String.format("Unable to extract '%s' feature. %s", featureType,
-          String.join(" ", errors));
+                String.join(" ", errors));
         throw new CloudVisionExecutionException(errorMessage);
       }
 

@@ -18,18 +18,7 @@ package io.cdap.plugin.cloud.vision.action;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.Credentials;
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.AsyncBatchAnnotateImagesRequest;
-import com.google.cloud.vision.v1.CropHintsParams;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.GcsDestination;
-import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.ImageAnnotatorSettings;
-import com.google.cloud.vision.v1.ImageContext;
-import com.google.cloud.vision.v1.ImageSource;
-import com.google.cloud.vision.v1.OutputConfig;
-import com.google.cloud.vision.v1.WebDetectionParams;
+import com.google.cloud.vision.v1.*;
 import com.google.common.base.Strings;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Name;
@@ -40,9 +29,9 @@ import io.cdap.cdap.etl.api.action.Action;
 import io.cdap.cdap.etl.api.action.ActionContext;
 import io.cdap.plugin.cloud.vision.CredentialsHelper;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * Action that runs offline image extractor.
@@ -74,8 +63,8 @@ public class OfflineImageExtractorAction extends Action {
     Credentials credentials = CredentialsHelper.getCredentials(config.getServiceFilePath());
 
     ImageAnnotatorSettings imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder()
-      .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
-      .build();
+            .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
+            .build();
 
     try (ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
 
@@ -83,9 +72,9 @@ public class OfflineImageExtractorAction extends Action {
       Image image = Image.newBuilder().setSource(source).build();
 
       List<Feature> features =
-        Arrays.asList(Feature.newBuilder().setType(config.getImageFeature().getFeatureType()).build());
+              Arrays.asList(Feature.newBuilder().setType(config.getImageFeature().getFeatureType()).build());
       AnnotateImageRequest.Builder builder =
-        AnnotateImageRequest.newBuilder().setImage(image).addAllFeatures(features);
+              AnnotateImageRequest.newBuilder().setImage(image).addAllFeatures(features);
 
       ImageContext imageContext = getImageContext();
       if (imageContext != null) {
@@ -99,40 +88,40 @@ public class OfflineImageExtractorAction extends Action {
       // The max number of responses to output in each JSON file
       int batchSize = config.getBatchSizeValue();
       OutputConfig outputConfig =
-        OutputConfig.newBuilder()
-          .setGcsDestination(gcsDestination)
-          .setBatchSize(batchSize)
-          .build();
+              OutputConfig.newBuilder()
+                      .setGcsDestination(gcsDestination)
+                      .setBatchSize(batchSize)
+                      .build();
 
       AsyncBatchAnnotateImagesRequest asyncRequest =
-        AsyncBatchAnnotateImagesRequest.newBuilder()
-          .addAllRequests(requests)
-          .setOutputConfig(outputConfig)
-          .build();
+              AsyncBatchAnnotateImagesRequest.newBuilder()
+                      .addAllRequests(requests)
+                      .setOutputConfig(outputConfig)
+                      .build();
 
       imageAnnotatorClient.asyncBatchAnnotateImagesAsync(asyncRequest)
-        .getInitialFuture()
-        .get();
+              .getInitialFuture()
+              .get();
     } catch (Exception exception) {
       throw new IllegalStateException(exception);
     }
   }
 
   @Nullable
-  private ImageContext getImageContext() {
+  protected ImageContext getImageContext() {
     switch (config.getImageFeature()) {
       case TEXT:
         return Strings.isNullOrEmpty(config.getLanguageHints()) ? null
-          : ImageContext.newBuilder().addAllLanguageHints(config.getLanguages()).build();
+                : ImageContext.newBuilder().addAllLanguageHints(config.getLanguages()).build();
       case CROP_HINTS:
         CropHintsParams cropHintsParams = CropHintsParams.newBuilder().addAllAspectRatios(config.getAspectRatiosList())
-          .build();
+                .build();
         return Strings.isNullOrEmpty(config.getAspectRatios()) ? null
-          : ImageContext.newBuilder().setCropHintsParams(cropHintsParams).build();
+                : ImageContext.newBuilder().setCropHintsParams(cropHintsParams).build();
       case WEB_DETECTION:
         WebDetectionParams webDetectionParams = WebDetectionParams.newBuilder()
-          .setIncludeGeoResults(config.getIncludeGeoResults())
-          .build();
+                .setIncludeGeoResults(config.getIncludeGeoResults())
+                .build();
         return ImageContext.newBuilder().setWebDetectionParams(webDetectionParams).build();
       default:
         return null;

@@ -25,12 +25,12 @@ import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConstants;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 /**
  * Configuration for OfflineImageExtractorAction
@@ -38,48 +38,41 @@ import javax.annotation.Nullable;
 public class OfflineImageExtractorActionConfig extends PluginConfig {
 
   @Macro
+  @Name(ActionConstants.FEATURES)
+  @Description("Features to extract from images.")
+  protected final String features;
+  @Name(ActionConstants.LANGUAGE_HINTS)
+  @Nullable
+  @Description("Optional hints to provide to Cloud Vision API.")
+  protected final String languageHints;
+  @Name(ActionConstants.ASPECT_RATIOS)
+  @Nullable
+  @Description("Aspect ratios as a decimal number, representing the ratio of the width to the height of the image.")
+  protected final String aspectRatios;
+  @Name(ActionConstants.INCLUDE_GEO_RESULTS)
+  @Nullable
+  @Description("Whether to include results derived from the geo information in the image.")
+  protected final Boolean includeGeoResults;
+  @Macro
   @Name(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
   @Description("Path on the local file system of the service account key used "
-    + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
-    + "When running on other clusters, the file must be present on every node in the cluster.")
+          + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
+          + "When running on other clusters, the file must be present on every node in the cluster.")
   @Nullable
   protected String serviceFilePath;
-
   @Macro
   @Name(ActionConstants.SOURCE_PATH)
   @Description("Path to a source object or directory.")
   private String sourcePath;
-
   @Macro
   @Name(ActionConstants.DESTINATION_PATH)
   @Description("Path to the destination. The bucket must already exist.")
   private String destinationPath;
-
-  @Macro
-  @Name(ActionConstants.FEATURES)
-  @Description("Features to extract from images.")
-  protected final String features;
-
   @Macro
   @Name(ActionConstants.BATCH_SIZE)
   @Description("The max number of responses to output in each JSON file.")
   @Nullable
   private String batchSize;
-
-  @Name(ActionConstants.LANGUAGE_HINTS)
-  @Nullable
-  @Description("Optional hints to provide to Cloud Vision API.")
-  protected final String languageHints;
-
-  @Name(ActionConstants.ASPECT_RATIOS)
-  @Nullable
-  @Description("Aspect ratios as a decimal number, representing the ratio of the width to the height of the image.")
-  protected final String aspectRatios;
-
-  @Name(ActionConstants.INCLUDE_GEO_RESULTS)
-  @Nullable
-  @Description("Whether to include results derived from the geo information in the image.")
-  protected final Boolean includeGeoResults;
 
   public OfflineImageExtractorActionConfig(@Nullable String serviceFilePath, String features,
                                            @Nullable String languageHints, @Nullable String aspectRatios,
@@ -112,14 +105,14 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
 
   public static Builder builder(OfflineImageExtractorActionConfig copy) {
     return builder()
-      .setServiceFilePath(copy.getServiceFilePath())
-      .setSourcePath(copy.getSourcePath())
-      .setDestinationPath(copy.getDestinationPath())
-      .setFeatures(copy.getFeatures())
-      .setBatchSize(copy.getBatchSize())
-      .setLanguageHints(copy.getLanguageHints())
-      .setAspectRatios(copy.getAspectRatios())
-      .setIncludeGeoResults(copy.getIncludeGeoResults());
+            .setServiceFilePath(copy.getServiceFilePath())
+            .setSourcePath(copy.getSourcePath())
+            .setDestinationPath(copy.getDestinationPath())
+            .setFeatures(copy.getFeatures())
+            .setBatchSize(copy.getBatchSize())
+            .setLanguageHints(copy.getLanguageHints())
+            .setAspectRatios(copy.getAspectRatios())
+            .setIncludeGeoResults(copy.getIncludeGeoResults());
   }
 
   @Nullable
@@ -167,8 +160,8 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
 
   public List<Float> getAspectRatiosList() {
     return convertPropertyToList(aspectRatios).stream()
-      .map(Float::parseFloat)
-      .collect(Collectors.toList());
+            .map(Float::parseFloat)
+            .collect(Collectors.toList());
   }
 
   public boolean getIncludeGeoResults() {
@@ -187,7 +180,7 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     ImageFeature feature = getImageFeature();
     if (feature == null) {
       collector.addFailure(String.format("Incorrect value '%s' for Features.", features), null)
-        .withConfigProperty(ActionConstants.FEATURES);
+              .withConfigProperty(ActionConstants.FEATURES);
     }
 
     if (!containsMacro(ActionConstants.BATCH_SIZE) && batchSize != null) {
@@ -196,14 +189,14 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
         batch = Integer.parseInt(batchSize);
       } catch (NumberFormatException e) {
         collector.addFailure(String.format("Incorrect value '%s' for Batch Size.", batchSize),
-                             "Provide correct value.")
-          .withConfigProperty(ActionConstants.BATCH_SIZE);
+                "Provide correct value.")
+                .withConfigProperty(ActionConstants.BATCH_SIZE);
         return;
       }
 
       if (batch < 1 || batch > 100) {
         collector.addFailure("Invalid Batch Size.", "The valid range is [1, 100]")
-          .withConfigProperty(ActionConstants.BATCH_SIZE);
+                .withConfigProperty(ActionConstants.BATCH_SIZE);
       }
     }
 
@@ -213,7 +206,7 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
           Float.parseFloat(v);
         } catch (NumberFormatException e) {
           collector.addFailure(String.format("Incorrect value '%s' for Aspect Ratios.", v), null)
-            .withConfigProperty(ActionConstants.ASPECT_RATIOS);
+                  .withConfigProperty(ActionConstants.ASPECT_RATIOS);
         }
       });
     }
@@ -225,17 +218,17 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
   public static final class Builder {
     @Nullable
     protected String serviceFilePath;
-    private String sourcePath;
-    private String destinationPath;
     protected String features;
-    @Nullable
-    private String batchSize;
     @Nullable
     protected String languageHints;
     @Nullable
     protected String aspectRatios;
     @Nullable
     protected Boolean includeGeoResults;
+    private String sourcePath;
+    private String destinationPath;
+    @Nullable
+    private String batchSize;
 
     private Builder() {
     }

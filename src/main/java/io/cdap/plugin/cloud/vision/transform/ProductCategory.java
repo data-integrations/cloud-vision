@@ -16,11 +16,11 @@
 
 package io.cdap.plugin.cloud.vision.transform;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 /**
  * The list of product categories to search in.
@@ -31,7 +31,7 @@ public enum ProductCategory {
   TOYS("Toys", "toys");
 
   private static final Map<String, ProductCategory> byDisplayName = Arrays.stream(values())
-    .collect(Collectors.toMap(ProductCategory::getDisplayName, Function.identity()));
+          .collect(Collectors.toMap(ProductCategory::getDisplayName, Function.identity()));
 
   private final String displayName;
   private final String name;

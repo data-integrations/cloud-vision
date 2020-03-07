@@ -24,16 +24,10 @@ import io.cdap.cdap.api.annotation.Plugin;
 import io.cdap.cdap.api.common.Bytes;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
-import io.cdap.cdap.etl.api.Emitter;
-import io.cdap.cdap.etl.api.FailureCollector;
-import io.cdap.cdap.etl.api.InvalidEntry;
-import io.cdap.cdap.etl.api.PipelineConfigurer;
-import io.cdap.cdap.etl.api.StageConfigurer;
-import io.cdap.cdap.etl.api.StageSubmitterContext;
-import io.cdap.cdap.etl.api.Transform;
-import io.cdap.cdap.etl.api.TransformContext;
+import io.cdap.cdap.etl.api.*;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.document.transformer.FileAnnotationToRecordTransformer;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,8 +106,8 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
       }
     } catch (Exception e) {
       StructuredRecord errorRecord = StructuredRecord.builder(ExtractorTransformConfig.ERROR_SCHEMA)
-        .set("error", e.getMessage())
-        .build();
+              .set("error", e.getMessage())
+              .build();
       emitter.emitError(new InvalidEntry<>(400, e.getMessage(), errorRecord));
     }
   }
@@ -152,8 +146,8 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
    */
   private Schema pagesSchema(Schema imageFeatureSchema) {
     return Schema.arrayOf(
-      Schema.recordOf("page-record",
-        Schema.Field.of("page", Schema.of(Schema.Type.INT)),
-        Schema.Field.of("feature", imageFeatureSchema)));
+            Schema.recordOf("page-record",
+                    Schema.Field.of("page", Schema.of(Schema.Type.INT)),
+                    Schema.Field.of("feature", imageFeatureSchema)));
   }
 }

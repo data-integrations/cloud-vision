@@ -24,6 +24,7 @@ import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationWithPositionSchema;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.List;
 
 /**
@@ -32,28 +33,28 @@ import java.util.List;
 public class LogoAnnotationsToRecordTransformerTest extends LandmarkAnnotationsToRecordTransformerTest {
 
   private static final EntityAnnotation LOGO_ANNOTATION = EntityAnnotation.newBuilder()
-    .setMid("/m/0dx1j")
-    .setDescription("Some Logo")
-    .setLocale("en")
-    .setScore(0.87f)
-    .setTopicality(0.21f)
-    .addLocations(LOCATION)
-    .addProperties(PROPERTY_1)
-    .addProperties(PROPERTY_2)
-    .setBoundingPoly(POSITION)
-    .build();
+          .setMid("/m/0dx1j")
+          .setDescription("Some Logo")
+          .setLocale("en")
+          .setScore(0.87f)
+          .setTopicality(0.21f)
+          .addLocations(LOCATION)
+          .addProperties(PROPERTY_1)
+          .addProperties(PROPERTY_2)
+          .setBoundingPoly(POSITION)
+          .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .addLogoAnnotations(LOGO_ANNOTATION)
-    .build();
+          .addLogoAnnotations(LOGO_ANNOTATION)
+          .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.LOGOS.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.LOGOS.getSchema()));
 
     LogoAnnotationsToRecordTransformer transformer = new LogoAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -71,15 +72,15 @@ public class LogoAnnotationsToRecordTransformerTest extends LandmarkAnnotationsT
   public void testTransformEmptyAnnotation() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.LOGOS.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.LOGOS.getSchema()));
 
     LogoAnnotationsToRecordTransformer transformer = new LogoAnnotationsToRecordTransformer(schema, output);
 
     EntityAnnotation emptyAnnotation = EntityAnnotation.newBuilder().build();
     AnnotateImageResponse emptyLogoAnnotation = AnnotateImageResponse.newBuilder()
-      .addLogoAnnotations(emptyAnnotation)
-      .build();
+            .addLogoAnnotations(emptyAnnotation)
+            .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, emptyLogoAnnotation);
 
     Assert.assertNotNull(transformed);
@@ -95,10 +96,10 @@ public class LogoAnnotationsToRecordTransformerTest extends LandmarkAnnotationsT
   public void testTransformSingleField() {
     String output = "extracted";
     Schema labelAnnotationSingleFieldSchema = Schema.recordOf("single-label-field", Schema.Field.of(
-      EntityAnnotationWithPositionSchema.DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+            EntityAnnotationWithPositionSchema.DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, Schema.arrayOf(labelAnnotationSingleFieldSchema)));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, Schema.arrayOf(labelAnnotationSingleFieldSchema)));
 
     LogoAnnotationsToRecordTransformer transformer = new LogoAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -111,6 +112,6 @@ public class LogoAnnotationsToRecordTransformerTest extends LandmarkAnnotationsT
     // actual record has single-field schema
     Assert.assertEquals(labelAnnotationSingleFieldSchema, actual.getSchema());
     Assert.assertEquals(LOGO_ANNOTATION.getDescription(),
-      actual.get(EntityAnnotationWithPositionSchema.DESCRIPTION_FIELD_NAME));
+            actual.get(EntityAnnotationWithPositionSchema.DESCRIPTION_FIELD_NAME));
   }
 }

@@ -21,6 +21,7 @@ import com.google.cloud.vision.v1.EntityAnnotation;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationWithPositionSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,14 +39,14 @@ public class LandmarkAnnotationsToRecordTransformer extends LabelAnnotationsToRe
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractLandmarkAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractLandmarkAnnotations(annotateImageResponse))
+            .build();
   }
 
   private List<StructuredRecord> extractLandmarkAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getLandmarkAnnotationsList().stream()
-      .map(this::extractAnnotation)
-      .collect(Collectors.toList());
+            .map(this::extractAnnotation)
+            .collect(Collectors.toList());
   }
 
   @Override
@@ -63,8 +64,8 @@ public class LandmarkAnnotationsToRecordTransformer extends LabelAnnotationsToRe
     if (posField != null) {
       Schema positionSchema = getComponentSchema(posField);
       List<StructuredRecord> position = annotation.getBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
       builder.set(EntityAnnotationWithPositionSchema.POSITION_FIELD_NAME, position);
     }
 

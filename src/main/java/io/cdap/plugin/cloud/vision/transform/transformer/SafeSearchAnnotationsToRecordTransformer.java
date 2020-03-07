@@ -37,8 +37,8 @@ public class SafeSearchAnnotationsToRecordTransformer extends ImageAnnotationToR
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     SafeSearchAnnotation annotation = annotateImageResponse.getSafeSearchAnnotation();
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractSafeSearchAnnotation(annotation))
-      .build();
+            .set(outputFieldName, extractSafeSearchAnnotation(annotation))
+            .build();
   }
 
   private StructuredRecord extractSafeSearchAnnotation(SafeSearchAnnotation annotation) {
@@ -72,6 +72,6 @@ public class SafeSearchAnnotationsToRecordTransformer extends ImageAnnotationToR
   private Schema getSafeSearchAnnotationSchema() {
     Schema safeSearchAnnotationsFieldSchema = schema.getField(outputFieldName).getSchema();
     return safeSearchAnnotationsFieldSchema.isNullable() ? safeSearchAnnotationsFieldSchema.getNonNullable()
-      : safeSearchAnnotationsFieldSchema;
+            : safeSearchAnnotationsFieldSchema;
   }
 }

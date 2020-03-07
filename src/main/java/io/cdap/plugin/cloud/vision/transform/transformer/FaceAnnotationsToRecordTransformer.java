@@ -21,6 +21,7 @@ import com.google.cloud.vision.v1.FaceAnnotation;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.FaceAnnotationSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,14 +39,14 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractFaceAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractFaceAnnotations(annotateImageResponse))
+            .build();
   }
 
   private List<StructuredRecord> extractFaceAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getFaceAnnotationsList().stream()
-      .map(this::extractFaceAnnotationRecord)
-      .collect(Collectors.toList());
+            .map(this::extractFaceAnnotationRecord)
+            .collect(Collectors.toList());
   }
 
   private StructuredRecord extractFaceAnnotationRecord(FaceAnnotation annotation) {
@@ -62,11 +63,11 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     }
     if (faceSchema.getField(FaceAnnotationSchema.DETECTION_CONFIDENCE_FIELD_NAME) != null) {
       builder.set(FaceAnnotationSchema.DETECTION_CONFIDENCE_FIELD_NAME,
-        annotation.getDetectionConfidence());
+              annotation.getDetectionConfidence());
     }
     if (faceSchema.getField(FaceAnnotationSchema.LANDMARKING_CONFIDENCE_FIELD_NAME) != null) {
       builder.set(FaceAnnotationSchema.LANDMARKING_CONFIDENCE_FIELD_NAME,
-        annotation.getLandmarkingConfidence());
+              annotation.getLandmarkingConfidence());
     }
     if (faceSchema.getField(FaceAnnotationSchema.ANGER_FIELD_NAME) != null) {
       builder.set(FaceAnnotationSchema.ANGER_FIELD_NAME, annotation.getAngerLikelihood().name());
@@ -94,24 +95,24 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
       List<StructuredRecord> position = annotation.getBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
       builder.set(FaceAnnotationSchema.POSITION_FIELD_NAME, position);
     }
     Schema.Field fdPositionField = faceSchema.getField(FaceAnnotationSchema.FD_POSITION_FIELD_NAME);
     if (fdPositionField != null) {
       Schema positionSchema = getComponentSchema(fdPositionField);
       List<StructuredRecord> position = annotation.getFdBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
       builder.set(FaceAnnotationSchema.FD_POSITION_FIELD_NAME, position);
     }
     Schema.Field landmarksField = faceSchema.getField(FaceAnnotationSchema.LANDMARKS_FIELD_NAME);
     if (landmarksField != null) {
       Schema landmarkSchema = getComponentSchema(landmarksField);
       List<StructuredRecord> position = annotation.getLandmarksList().stream()
-        .map(v -> extractLandmark(v, landmarkSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractLandmark(v, landmarkSchema))
+              .collect(Collectors.toList());
       builder.set(FaceAnnotationSchema.LANDMARKS_FIELD_NAME, position);
     }
 

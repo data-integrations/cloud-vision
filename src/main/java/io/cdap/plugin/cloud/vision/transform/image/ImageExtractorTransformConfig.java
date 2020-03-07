@@ -28,8 +28,9 @@ import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.ProductCategory;
-import java.util.Objects;
+
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Defines a {@link PluginConfig} that Image and Document Extractor transforms can use.
@@ -66,7 +67,7 @@ public class ImageExtractorTransformConfig extends ExtractorTransformConfig {
                                        @Nullable String productSet, @Nullable String productCategories,
                                        @Nullable String boundingPolygon, @Nullable String filter) {
     super(project, serviceFilePath, pathField, outputField, features, languageHints, aspectRatios, includeGeoResults,
-      schema);
+            schema);
     this.productSet = productSet;
     this.productCategories = productCategories;
     this.boundingPolygon = boundingPolygon;
@@ -122,14 +123,14 @@ public class ImageExtractorTransformConfig extends ExtractorTransformConfig {
     super.validate(collector);
     if (!containsMacro(ExtractorTransformConstants.PATH_FIELD) && Strings.isNullOrEmpty(getPathField())) {
       collector.addFailure("Path field must be specified", null)
-        .withConfigProperty(ExtractorTransformConstants.PATH_FIELD);
+              .withConfigProperty(ExtractorTransformConstants.PATH_FIELD);
     }
     if (!containsMacro(ExtractorTransformConstants.BOUNDING_POLYGON) && !Strings.isNullOrEmpty(boundingPolygon)) {
       try {
         getBoundingPoly();
       } catch (IllegalStateException e) {
         collector.addFailure("Could not parse bounding polygon string.", null)
-          .withConfigProperty(ExtractorTransformConstants.BOUNDING_POLYGON);
+                .withConfigProperty(ExtractorTransformConstants.BOUNDING_POLYGON);
       }
     }
   }

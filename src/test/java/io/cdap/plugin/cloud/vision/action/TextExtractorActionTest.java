@@ -17,26 +17,21 @@
 package io.cdap.plugin.cloud.vision.action;
 
 import com.google.auth.Credentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.BucketInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageClass;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.*;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.cdap.cdap.etl.api.action.ActionContext;
 import io.cdap.cdap.etl.mock.action.MockActionContext;
 import io.cdap.plugin.cloud.vision.CredentialsHelper;
-import io.cdap.plugin.cloud.vision.source.GCSPath;
+import io.cdap.plugin.gcp.gcs.GCSPath;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.annotation.Nullable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import javax.annotation.Nullable;
 
 /**
  * Test class for {@link TextExtractorAction}.
@@ -59,6 +54,30 @@ public class TextExtractorActionTest {
   private static Storage storage;
   private static Bucket bucket;
 
+  private static void initTestsData() throws FileNotFoundException {
+    String path = String.format("src/test/resources/%s", PDF_FILE_NAME);
+
+    FileInputStream serviceAccountStream = new FileInputStream(path);
+    bucket.create(PDF_FILE_NAME, serviceAccountStream, PDF_CONTENT_TYPE, Bucket.BlobWriteOption.doesNotExist());
+  }
+
+  private static Storage getStorage(String project, @Nullable Credentials credentials) {
+    StorageOptions.Builder builder = StorageOptions.newBuilder().setProjectId(project);
+    if (credentials != null) {
+      builder.setCredentials(credentials);
+    }
+    return builder.build().getService();
+  }
+
+  private static void deleteBucket(Storage storage, Bucket bucket) {
+    if (bucket == null || bucket.list() == null)
+      return;
+    for (Blob blob : bucket.list().iterateAll()) {
+      storage.delete(blob.getBlobId());
+    }
+    bucket.delete(Bucket.BucketSourceOption.metagenerationMatch());
+  }
+
   @Before
   public void testSetup() throws Exception {
     Credentials credentials = CredentialsHelper.getCredentials(SERVICE_ACCOUNT_FILE_PATH);
@@ -73,9 +92,9 @@ public class TextExtractorActionTest {
     }
 
     BucketInfo bucketInfo = BucketInfo.newBuilder(bucketName)
-      .setStorageClass(StorageClass.STANDARD)
-      .setLocation("us-central1")
-      .build();
+            .setStorageClass(StorageClass.STANDARD)
+            .setLocation("us-central1")
+            .build();
     bucket = storage.create(bucketInfo);
     initTestsData();
   }
@@ -85,22 +104,15 @@ public class TextExtractorActionTest {
     deleteBucket(storage, bucket);
   }
 
-  private static void initTestsData() throws FileNotFoundException {
-    String path = String.format("src/test/resources/%s", PDF_FILE_NAME);
-
-    FileInputStream serviceAccountStream = new FileInputStream(path);
-    bucket.create(PDF_FILE_NAME, serviceAccountStream, PDF_CONTENT_TYPE, Bucket.BlobWriteOption.doesNotExist());
-  }
-
   @Test
   public void testRun() throws Exception {
     TextExtractorActionConfig config = new TextExtractorActionConfig(
-      SERVICE_ACCOUNT_FILE_PATH,
-      PDF_FILE_PATH,
-      RESULT_FOLDER_PATH,
-      PDF_CONTENT_TYPE,
-      1,
-      null
+            SERVICE_ACCOUNT_FILE_PATH,
+            PDF_FILE_PATH,
+            RESULT_FOLDER_PATH,
+            PDF_CONTENT_TYPE,
+            1,
+            null
     );
 
     TextExtractorAction action = new TextExtractorAction(config);
@@ -124,29 +136,14 @@ public class TextExtractorActionTest {
     JsonParser parser = new JsonParser();
     JsonElement jsonTree = parser.parse(content);
     String text = jsonTree.getAsJsonObject()
-      .get("responses")
-      .getAsJsonArray()
-      .get(0)
-      .getAsJsonObject()
-      .get("fullTextAnnotation")
-      .getAsJsonObject()
-      .get("text")
-      .getAsString();
+            .get("responses")
+            .getAsJsonArray()
+            .get(0)
+            .getAsJsonObject()
+            .get("fullTextAnnotation")
+            .getAsJsonObject()
+            .get("text")
+            .getAsString();
     Assert.assertEquals("Hello World!\n", text);
-  }
-
-  private static Storage getStorage(String project, @Nullable Credentials credentials) {
-    StorageOptions.Builder builder = StorageOptions.newBuilder().setProjectId(project);
-    if (credentials != null) {
-      builder.setCredentials(credentials);
-    }
-    return builder.build().getService();
-  }
-
-  private static void deleteBucket(Storage storage, Bucket bucket) {
-    for (Blob blob : bucket.list().iterateAll()) {
-      storage.delete(blob.getBlobId());
-    }
-    bucket.delete(Bucket.BucketSourceOption.metagenerationMatch());
   }
 }

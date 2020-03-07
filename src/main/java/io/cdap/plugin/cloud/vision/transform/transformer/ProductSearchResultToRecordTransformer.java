@@ -23,6 +23,7 @@ import com.google.cloud.vision.v1.ProductSearchResults;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.ProductSearchResultsSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,8 +42,8 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     ProductSearchResults productSearchResults = annotateImageResponse.getProductSearchResults();
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractProductSearchResults(productSearchResults))
-      .build();
+            .set(outputFieldName, extractProductSearchResults(productSearchResults))
+            .build();
   }
 
   private StructuredRecord extractProductSearchResults(ProductSearchResults searchResults) {
@@ -58,16 +59,16 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     if (resultsField != null) {
       Schema resultSchema = getComponentSchema(resultsField);
       List<StructuredRecord> results = searchResults.getResultsList().stream()
-        .map(r -> extractProductSearchResultRecord(r, resultSchema))
-        .collect(Collectors.toList());
+              .map(r -> extractProductSearchResultRecord(r, resultSchema))
+              .collect(Collectors.toList());
       builder.set(ProductSearchResultsSchema.RESULTS_FIELD_NAME, results);
     }
     Schema.Field groupedResField = schema.getField(ProductSearchResultsSchema.GROUPED_RESULTS_FIELD_NAME);
     if (groupedResField != null) {
       Schema resultSchema = getComponentSchema(groupedResField);
       List<StructuredRecord> results = searchResults.getProductGroupedResultsList().stream()
-        .map(r -> extractProductSearchResultRecord(r, resultSchema))
-        .collect(Collectors.toList());
+              .map(r -> extractProductSearchResultRecord(r, resultSchema))
+              .collect(Collectors.toList());
       builder.set(ProductSearchResultsSchema.GROUPED_RESULTS_FIELD_NAME, results);
     }
 
@@ -111,8 +112,8 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     if (labelsField != null) {
       Schema labelSchema = getComponentSchema(labelsField);
       List<StructuredRecord> labels = product.getProductLabelsList().stream()
-        .map(label -> extractProductLabelRecord(label, labelSchema))
-        .collect(Collectors.toList());
+              .map(label -> extractProductLabelRecord(label, labelSchema))
+              .collect(Collectors.toList());
       builder.set(ProductSearchResultsSchema.Product.PRODUCT_LABELS_FIELD_NAME, labels);
     }
 
@@ -136,16 +137,16 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
       List<StructuredRecord> position = result.getBoundingPoly().getVerticesList().stream()
-        .map(vertex -> extractVertex(vertex, positionSchema))
-        .collect(Collectors.toList());
+              .map(vertex -> extractVertex(vertex, positionSchema))
+              .collect(Collectors.toList());
       builder.set(ProductSearchResultsSchema.GroupedResult.POSITION_FIELD_NAME, position);
     }
     Schema.Field resultsField = schema.getField(ProductSearchResultsSchema.GroupedResult.RESULTS_FIELD_NAME);
     if (positionField != null) {
       Schema resultSchema = getComponentSchema(resultsField);
       List<StructuredRecord> results = result.getResultsList().stream()
-        .map(r -> extractProductSearchResultRecord(r, resultSchema))
-        .collect(Collectors.toList());
+              .map(r -> extractProductSearchResultRecord(r, resultSchema))
+              .collect(Collectors.toList());
       builder.set(ProductSearchResultsSchema.GroupedResult.RESULTS_FIELD_NAME, results);
     }
 
@@ -161,6 +162,6 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
   private Schema getProductSearchResultSchema() {
     Schema productSearchResultsFieldSchema = schema.getField(outputFieldName).getSchema();
     return productSearchResultsFieldSchema.isNullable() ? productSearchResultsFieldSchema.getNonNullable()
-      : productSearchResultsFieldSchema;
+            : productSearchResultsFieldSchema;
   }
 }

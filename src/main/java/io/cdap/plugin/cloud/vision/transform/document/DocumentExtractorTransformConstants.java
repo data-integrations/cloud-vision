@@ -23,36 +23,32 @@ import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
  */
 public class DocumentExtractorTransformConstants extends ExtractorTransformConstants {
 
-  private DocumentExtractorTransformConstants() {
-    throw new AssertionError("Should not instantiate static utility class.");
-  }
-
   /**
    * Configuration property name used to specify field in the input schema containing the file content, represented as
    * a stream of bytes.
    */
   public static final String CONTENT_FIELD = "contentField";
-
   /**
    * Configuration property name used to specify the type of the file. Currently only 'application/pdf', 'image/tiff'
    * and 'image/gif' are supported. Wildcards are not supported.
    */
   public static final String MIME_TYPE = "mimeType";
-
   /**
    * Configuration property name used to specify the pages in the file to perform image annotation.
    */
   public static final String PAGES = "pages";
-
   /**
    * File Annotation mapped to record with field {@value PAGE_FIELD_NAME} for page number and
    * {@value FEATURE_FIELD_NAME} field for extracted image feature.
    */
   public static final String PAGE_FIELD_NAME = "page";
-
   /**
    * File Annotation mapped to record with field {@value PAGE_FIELD_NAME} for page number and
    * {@value FEATURE_FIELD_NAME} field for extracted image feature.
    */
   public static final String FEATURE_FIELD_NAME = "feature";
+
+  private DocumentExtractorTransformConstants() {
+    throw new AssertionError("Should not instantiate static utility class.");
+  }
 }

@@ -32,24 +32,24 @@ import org.junit.Test;
 public class SafeSearchAnnotationsToRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   private static final SafeSearchAnnotation SAFE_SEARCH_ANNOTATION = SafeSearchAnnotation.newBuilder()
-    .setAdult(Likelihood.UNLIKELY)
-    .setSpoof(Likelihood.POSSIBLE)
-    .setMedical(Likelihood.UNLIKELY)
-    .setViolence(Likelihood.POSSIBLE)
-    .setRacy(Likelihood.UNLIKELY)
-    .build();
+          .setAdult(Likelihood.UNLIKELY)
+          .setSpoof(Likelihood.POSSIBLE)
+          .setMedical(Likelihood.UNLIKELY)
+          .setViolence(Likelihood.POSSIBLE)
+          .setRacy(Likelihood.UNLIKELY)
+          .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .setSafeSearchAnnotation(SAFE_SEARCH_ANNOTATION)
-    .build();
+          .setSafeSearchAnnotation(SAFE_SEARCH_ANNOTATION)
+          .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.EXPLICIT_CONTENT.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.EXPLICIT_CONTENT.getSchema()));
 
     SafeSearchAnnotationsToRecordTransformer transformer = new SafeSearchAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -63,15 +63,15 @@ public class SafeSearchAnnotationsToRecordTransformerTest extends BaseAnnotation
   public void testTransformEmptyAnnotation() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.EXPLICIT_CONTENT.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.EXPLICIT_CONTENT.getSchema()));
 
     SafeSearchAnnotationsToRecordTransformer transformer = new SafeSearchAnnotationsToRecordTransformer(schema, output);
 
     SafeSearchAnnotation emptyAnnotation = SafeSearchAnnotation.newBuilder().build();
     AnnotateImageResponse response = AnnotateImageResponse.newBuilder()
-      .setSafeSearchAnnotation(emptyAnnotation)
-      .build();
+            .setSafeSearchAnnotation(emptyAnnotation)
+            .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, response);
     Assert.assertNotNull(transformed);
     StructuredRecord actual = transformed.get(output);
@@ -83,10 +83,10 @@ public class SafeSearchAnnotationsToRecordTransformerTest extends BaseAnnotation
   public void testTransformSingleField() {
     String output = "extracted";
     Schema singleFieldSchema = Schema.recordOf("single-field", Schema.Field.of(
-      SafeSearchAnnotationSchema.VIOLENCE_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+            SafeSearchAnnotationSchema.VIOLENCE_FIELD_NAME, Schema.of(Schema.Type.STRING)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, singleFieldSchema));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, singleFieldSchema));
 
     SafeSearchAnnotationsToRecordTransformer transformer = new SafeSearchAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -96,7 +96,7 @@ public class SafeSearchAnnotationsToRecordTransformerTest extends BaseAnnotation
     // actual record has single-field schema
     Assert.assertEquals(singleFieldSchema, actual.getSchema());
     Assert.assertEquals(SAFE_SEARCH_ANNOTATION.getViolence().name(),
-      actual.get(SafeSearchAnnotationSchema.VIOLENCE_FIELD_NAME));
+            actual.get(SafeSearchAnnotationSchema.VIOLENCE_FIELD_NAME));
   }
 
   private void assertAnnotationEquals(SafeSearchAnnotation expected, StructuredRecord actual) {

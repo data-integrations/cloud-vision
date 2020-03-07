@@ -21,6 +21,7 @@ import com.google.cloud.vision.v1.EntityAnnotation;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.TextAnnotationSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,14 +39,14 @@ public class TextAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractTextAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractTextAnnotations(annotateImageResponse))
+            .build();
   }
 
   private List<StructuredRecord> extractTextAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getTextAnnotationsList().stream()
-      .map(this::extractTextAnnotationRecord)
-      .collect(Collectors.toList());
+            .map(this::extractTextAnnotationRecord)
+            .collect(Collectors.toList());
   }
 
   private StructuredRecord extractTextAnnotationRecord(EntityAnnotation annotation) {
@@ -61,8 +62,8 @@ public class TextAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
       List<StructuredRecord> position = annotation.getBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
       builder.set(TextAnnotationSchema.POSITION_FIELD_NAME, position);
     }
 

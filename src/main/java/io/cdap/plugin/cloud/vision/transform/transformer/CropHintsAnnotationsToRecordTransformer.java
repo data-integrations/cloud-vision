@@ -21,13 +21,14 @@ import com.google.cloud.vision.v1.CropHint;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.CropHintAnnotationSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 /**
- * Transforms crop hints annotations of specified {@link AnnotateImageResponse} to {@link StructuredRecord} according to
- * the specified schema.
+ * Transforms crop hints annotations of specified {@link AnnotateImageResponse}
+ * to {@link StructuredRecord} according to the specified schema.
  */
 public class CropHintsAnnotationsToRecordTransformer extends ImageAnnotationToRecordTransformer {
 
@@ -36,16 +37,18 @@ public class CropHintsAnnotationsToRecordTransformer extends ImageAnnotationToRe
   }
 
   @Override
-  public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
+  public StructuredRecord transform(StructuredRecord input,
+                                    AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractCropHintsAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractCropHintsAnnotations(annotateImageResponse))
+            .build();
   }
 
-  private List<StructuredRecord> extractCropHintsAnnotations(AnnotateImageResponse annotateImageResponse) {
+  private List<StructuredRecord>
+  extractCropHintsAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getCropHintsAnnotation().getCropHintsList().stream()
-      .map(this::extractCropHintRecord)
-      .collect(Collectors.toList());
+            .map(this::extractCropHintRecord)
+            .collect(Collectors.toList());
   }
 
   private StructuredRecord extractCropHintRecord(CropHint hint) {
@@ -55,8 +58,8 @@ public class CropHintsAnnotationsToRecordTransformer extends ImageAnnotationToRe
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
       List<StructuredRecord> position = hint.getBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
       builder.set(CropHintAnnotationSchema.POSITION_FIELD_NAME, position);
     }
     if (hintSchema.getField(CropHintAnnotationSchema.CONFIDENCE_FIELD_NAME) != null) {
@@ -64,7 +67,7 @@ public class CropHintsAnnotationsToRecordTransformer extends ImageAnnotationToRe
     }
     if (hintSchema.getField(CropHintAnnotationSchema.IMPORTANCE_FRACTION_FIELD_NAME) != null) {
       builder.set(CropHintAnnotationSchema.IMPORTANCE_FRACTION_FIELD_NAME,
-        hint.getImportanceFraction());
+              hint.getImportanceFraction());
     }
 
     return builder.build();
