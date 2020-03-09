@@ -16,7 +16,15 @@
 
 package io.cdap.plugin.cloud.vision.transform.document;
 
-import com.google.cloud.vision.v1.*;
+import com.google.cloud.vision.v1.AnnotateFileRequest;
+import com.google.cloud.vision.v1.AnnotateFileResponse;
+import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.BatchAnnotateFilesResponse;
+import com.google.cloud.vision.v1.Feature;
+import com.google.cloud.vision.v1.GcsSource;
+import com.google.cloud.vision.v1.ImageAnnotatorClient;
+import com.google.cloud.vision.v1.ImageContext;
+import com.google.cloud.vision.v1.InputConfig;
 import com.google.protobuf.ByteString;
 import io.cdap.plugin.cloud.vision.exception.CloudVisionExecutionException;
 import io.cdap.plugin.cloud.vision.transform.CloudVisionClient;

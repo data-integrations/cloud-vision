@@ -17,7 +17,14 @@
 package io.cdap.plugin.cloud.vision.transform.image;
 
 import com.google.api.client.util.Strings;
-import com.google.cloud.vision.v1.*;
+import com.google.cloud.vision.v1.AnnotateImageRequest;
+import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
+import com.google.cloud.vision.v1.Feature;
+import com.google.cloud.vision.v1.Image;
+import com.google.cloud.vision.v1.ImageContext;
+import com.google.cloud.vision.v1.ImageSource;
+import com.google.cloud.vision.v1.ProductSearchParams;
 import io.cdap.plugin.cloud.vision.exception.CloudVisionExecutionException;
 import io.cdap.plugin.cloud.vision.transform.CloudVisionClient;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
@@ -43,13 +50,15 @@ public class ImageAnnotatorClient extends CloudVisionClient {
       Image img = Image.newBuilder().setSource(imgSource).build();
       Feature.Type featureType = config.getImageFeature().getFeatureType();
       Feature feature = Feature.newBuilder().setType(featureType).build();
-      AnnotateImageRequest.Builder request = AnnotateImageRequest.newBuilder().addFeatures(feature).setImage(img);
+      AnnotateImageRequest.Builder request = AnnotateImageRequest
+              .newBuilder().addFeatures(feature).setImage(img);
       ImageContext imageContext = getImageContext();
       if (imageContext != null) {
         request.setImageContext(imageContext);
       }
 
-      BatchAnnotateImagesResponse response = client.batchAnnotateImages(Collections.singletonList(request.build()));
+      BatchAnnotateImagesResponse response = client
+              .batchAnnotateImages(Collections.singletonList(request.build()));
       AnnotateImageResponse annotateImageResponse = response.getResponses(SINGLE_RESPONSE_INDEX);
       if (annotateImageResponse.hasError()) {
         String errorMessage = String.format("Unable to extract '%s' feature of image '%s' due to: '%s'", featureType,
@@ -60,7 +69,6 @@ public class ImageAnnotatorClient extends CloudVisionClient {
       return annotateImageResponse;
     }
   }
-
 
   @Override
   @Nullable

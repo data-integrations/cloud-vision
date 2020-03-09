@@ -25,10 +25,9 @@ import io.cdap.plugin.cloud.vision.transform.schema.WebDetectionSchema;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
- * Transforms web detection of specified {@link AnnotateImageResponse} to {@link StructuredRecord} according
- * to the specified schema.
+ * Transforms web detection of specified {@link AnnotateImageResponse} to {@link StructuredRecord}
+ * according to the specified schema.
  */
 public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTransformer {
 

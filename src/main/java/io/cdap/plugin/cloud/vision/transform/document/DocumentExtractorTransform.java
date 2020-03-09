@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This transform plugin can detect and transcribe text from small(up to 5 pages) PDF and TIFF files stored in
- * Cloud Storage.
+ * This transform plugin can detect and transcribe text from small (up to 5 pages) PDF and TIFF
+ * files stored in Cloud Storage.
  */
 @Plugin(type = Transform.PLUGIN_TYPE)
 @Name(DocumentExtractorTransform.PLUGIN_NAME)
@@ -61,20 +61,26 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     inputSchema = configurer.getStageConfigurer().getInputSchema();
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
     FailureCollector collector = stageConfigurer.getFailureCollector();
+
     config.validate(collector);
     collector.getOrThrowException();
+
     config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
+
     Schema schema = getSchema();
     Schema configuredSchema = config.getParsedSchema();
     if (configuredSchema == null) {
       configurer.getStageConfigurer().setOutputSchema(schema);
       return;
     }
+
     config.validateOutputSchema(configuredSchema, collector);
     collector.getOrThrowException();
+
     ExtractorTransformConfig.validateFieldsMatch(schema, configuredSchema, collector);
     collector.getOrThrowException();
+
     configurer.getStageConfigurer().setOutputSchema(configuredSchema);
     configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }

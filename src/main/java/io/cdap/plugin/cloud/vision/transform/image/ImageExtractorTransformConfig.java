@@ -61,13 +61,14 @@ public class ImageExtractorTransformConfig extends ExtractorTransformConfig {
   @Nullable
   private String filter;
 
-  public ImageExtractorTransformConfig(String project, String serviceFilePath, String pathField, String outputField,
-                                       String features, @Nullable String languageHints, @Nullable String aspectRatios,
+  public ImageExtractorTransformConfig(String project, String serviceFilePath, String pathField,
+                                       String outputField, String features,
+                                       @Nullable String languageHints, @Nullable String aspectRatios,
                                        @Nullable Boolean includeGeoResults, @Nullable String schema,
                                        @Nullable String productSet, @Nullable String productCategories,
                                        @Nullable String boundingPolygon, @Nullable String filter) {
-    super(project, serviceFilePath, pathField, outputField, features, languageHints, aspectRatios, includeGeoResults,
-            schema);
+    super(project, serviceFilePath, pathField, outputField, features,
+            languageHints, aspectRatios, includeGeoResults, schema);
     this.productSet = productSet;
     this.productCategories = productCategories;
     this.boundingPolygon = boundingPolygon;

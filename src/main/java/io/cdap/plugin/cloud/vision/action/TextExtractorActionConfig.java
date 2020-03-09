@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Config class for {@link TextExtractorAction}.
+ * Config class for {@link OfflineTextExtractorAction}.
  */
 public class TextExtractorActionConfig extends PluginConfig {
 

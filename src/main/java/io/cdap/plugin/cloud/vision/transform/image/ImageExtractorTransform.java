@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Google Cloud Vision Image Extractor Transform which can be used in conjunction with the file path batch source to
- * extract enrichments from each image based on selected features.
+ * Google Cloud Vision Image Extractor Transform which can be used in conjunction with the file path
+ * batch source to extract enrichments from each image based on selected features.
  */
 @Plugin(type = Transform.PLUGIN_TYPE)
 @Name(ImageExtractorTransform.PLUGIN_NAME)
@@ -85,7 +85,8 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   public void initialize(TransformContext context) throws Exception {
     super.initialize(context);
     Schema schema = context.getOutputSchema();
-    transformer = TransformerFactory.createInstance(config.getImageFeature(), config.getOutputField(), schema);
+    transformer = TransformerFactory.createInstance(config.getImageFeature(),
+            config.getOutputField(), schema);
     imageAnnotatorClient = new ImageAnnotatorClient(config);
   }
 

@@ -34,9 +34,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 /**
- * Test class for {@link TextExtractorAction}.
+ * Test class for {@link OfflineTextExtractorAction}.
  */
-public class TextExtractorActionTest {
+public class OfflineTextExtractorActionTest {
   protected static final String PROJECT = System.getProperty("project", "auto-detect");
   protected static final String SERVICE_ACCOUNT_FILE_PATH = System.getProperty("serviceFilePath", "auto-detect");
   protected static final String PATH = System.getProperty("path", "gs://cloud-vision-cdap-text-offline");
@@ -115,7 +115,7 @@ public class TextExtractorActionTest {
             null
     );
 
-    TextExtractorAction action = new TextExtractorAction(config);
+    OfflineTextExtractorAction action = new OfflineTextExtractorAction(config);
     ActionContext context = new MockActionContext();
     action.run(context);
 

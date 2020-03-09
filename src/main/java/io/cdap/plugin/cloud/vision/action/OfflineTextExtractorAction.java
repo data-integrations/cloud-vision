@@ -37,15 +37,15 @@ import java.util.List;
  * Action that runs offline document text extractor.
  */
 @Plugin(type = Action.PLUGIN_TYPE)
-@Name(TextExtractorAction.PLUGIN_NAME)
+@Name(OfflineTextExtractorAction.PLUGIN_NAME)
 @Description("Action that runs offline document text extractor")
-public class TextExtractorAction extends Action {
-  public static final String PLUGIN_NAME = "TextExtractorOffline";
-  private static final Logger LOG = LoggerFactory.getLogger(TextExtractorAction.class);
+public class OfflineTextExtractorAction extends Action {
+  public static final String PLUGIN_NAME = "OfflineTextExtractor";
+  private static final Logger LOG = LoggerFactory.getLogger(OfflineTextExtractorAction.class);
 
   private final TextExtractorActionConfig config;
 
-  public TextExtractorAction(TextExtractorActionConfig config) {
+  public OfflineTextExtractorAction(TextExtractorActionConfig config) {
     this.config = config;
   }
 

@@ -23,9 +23,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test class for {@link TextExtractorActionConfigTest}.
+ * Test class for {@link OfflineTextExtractorActionConfigTest}.
  */
-public class TextExtractorActionConfigTest {
+public class OfflineTextExtractorActionConfigTest {
   private static final String MOCK_STAGE = "mockStage";
   private static final TextExtractorActionConfig VALID_CONFIG = new TextExtractorActionConfig(
           "/path",
