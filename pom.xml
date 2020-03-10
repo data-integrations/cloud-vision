@@ -97,6 +97,18 @@
         <project.surefire.redirectTestOutputToFile>true</project.surefire.redirectTestOutputToFile>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>4.2.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>io.cdap.cdap</groupId>
@@ -255,14 +267,12 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-vision</artifactId>
-            <version>${google.cloud.vision.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
-            <version>${google.cloud.storage.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.cdap.plugin/google-cloud -->
+
         <dependency>
             <groupId>io.cdap.plugin</groupId>
             <artifactId>google-cloud</artifactId>
@@ -492,6 +502,7 @@
                     <instructions>
                         <_exportcontents>
                             io.cdap.plugin.cloud.vision.*,
+                            io.grpc.stub,
                             com.google.auth.*,
                             com.google.api.client.*,
                             com.google.protobuf.*,
