@@ -24,8 +24,11 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConstants;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -74,12 +77,23 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
   @Nullable
   private String batchSize;
 
+  // Debug
+  private static Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
+
   public OfflineImageExtractorActionConfig(@Nullable String serviceFilePath, String features,
                                            @Nullable String languageHints, @Nullable String aspectRatios,
                                            @Nullable Boolean includeGeoResults, String sourcePath,
                                            String destinationPath, @Nullable String batchSize) {
     this.serviceFilePath = serviceFilePath;
+
+    if (sourcePath != null)
+      sourcePath = sourcePath.trim();
+
     this.sourcePath = sourcePath;
+
+    if (destinationPath != null)
+      destinationPath = destinationPath.trim();
+
     this.destinationPath = destinationPath;
     this.features = features;
     this.batchSize = batchSize;
@@ -88,10 +102,26 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     this.includeGeoResults = includeGeoResults;
   }
 
+  private void logStringAsBytes(String s, String methodName, String msg) {
+    if (s == null)
+      return;
+
+    try {
+      final byte[] arrayUtf8 = s.getBytes("UTF-8");
+      StringBuilder sb = new StringBuilder(s.length() * 5);
+      for (byte b : arrayUtf8)
+        sb.append(b + " ");
+
+      LOG.info("PATRICE: " + methodName + " " + msg + ": " + sb.toString());
+    } catch (UnsupportedEncodingException e) {
+      ;
+    }
+  }
+
   private OfflineImageExtractorActionConfig(Builder builder) {
     serviceFilePath = builder.serviceFilePath;
-    sourcePath = builder.sourcePath;
-    destinationPath = builder.destinationPath;
+    sourcePath = builder.sourcePath.trim();
+    destinationPath = builder.destinationPath.trim();
     features = builder.features;
     batchSize = builder.batchSize;
     languageHints = builder.languageHints;
@@ -212,6 +242,14 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     }
   }
 
+  public void setSourcePath(String sourcePath) {
+    this.sourcePath = sourcePath;
+  }
+
+  public void setDestinationPath(String destinationPath) {
+    this.destinationPath = destinationPath;
+  }
+
   /**
    * Builder for creating a {@link OfflineImageExtractorActionConfig}
    */
@@ -230,16 +268,26 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     @Nullable
     private String batchSize;
 
+    // Debug
+    private static Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorActionConfig.Builder.class);
+
     private Builder() {
     }
 
     public Builder setSourcePath(String sourcePath) {
-      this.sourcePath = sourcePath;
+      if (sourcePath != null)
+        this.sourcePath = sourcePath.trim();
+      else
+        this.sourcePath = sourcePath;
+
       return this;
     }
 
     public Builder setDestinationPath(String destinationPath) {
-      this.destinationPath = destinationPath;
+      if (destinationPath != null)
+        this.destinationPath = destinationPath.trim();
+      else
+        this.destinationPath = destinationPath;
       return this;
     }
 

@@ -18,7 +18,19 @@ package io.cdap.plugin.cloud.vision.action;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.Credentials;
-import com.google.cloud.vision.v1.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.vision.v1.AnnotateImageRequest;
+import com.google.cloud.vision.v1.AsyncBatchAnnotateImagesRequest;
+import com.google.cloud.vision.v1.CropHintsParams;
+import com.google.cloud.vision.v1.Feature;
+import com.google.cloud.vision.v1.GcsDestination;
+import com.google.cloud.vision.v1.Image;
+import com.google.cloud.vision.v1.ImageAnnotatorClient;
+import com.google.cloud.vision.v1.ImageAnnotatorSettings;
+import com.google.cloud.vision.v1.ImageContext;
+import com.google.cloud.vision.v1.ImageSource;
+import com.google.cloud.vision.v1.OutputConfig;
+import com.google.cloud.vision.v1.WebDetectionParams;
 import com.google.common.base.Strings;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Name;
@@ -28,8 +40,11 @@ import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.action.Action;
 import io.cdap.cdap.etl.api.action.ActionContext;
 import io.cdap.plugin.cloud.vision.CredentialsHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,7 +59,16 @@ public class OfflineImageExtractorAction extends Action {
 
   private final OfflineImageExtractorActionConfig config;
 
+  // Logging
+  private static Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
+
   public OfflineImageExtractorAction(OfflineImageExtractorActionConfig config) {
+    if (config.getSourcePath() != null)
+      config.setSourcePath(config.getSourcePath().trim()); // Remove whitespace
+
+    if (config.getDestinationPath() != null)
+      config.setDestinationPath(config.getDestinationPath().trim());
+
     this.config = config;
   }
 
@@ -60,48 +84,78 @@ public class OfflineImageExtractorAction extends Action {
     config.validate(collector);
     collector.getOrThrowException();
 
+    // The max number of responses to output in each JSON file
+    int batchSize = config.getBatchSizeValue();
+
     Credentials credentials = CredentialsHelper.getCredentials(config.getServiceFilePath());
+
+    // Destination in GCS where the results will be stored
+    String destinationPath = config.getDestinationPath();
+    // Add a / at the end if it's not already there
+    if (!destinationPath.endsWith("/"))
+      destinationPath += "/";
+    GcsDestination gcsDestination = GcsDestination.newBuilder().setUri(destinationPath).build();
+
+    LOG.warn("Setting destination path to: " + destinationPath);
+
+    OutputConfig outputConfig =
+            OutputConfig.newBuilder()
+                    .setGcsDestination(gcsDestination)
+                    .setBatchSize(batchSize)
+                    .build();
 
     ImageAnnotatorSettings imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder()
             .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
             .build();
 
+    // Get all the blobs in the source path
+    List<Blob> blobs = GcsBucketHelper.getAllFilesInPath(config.getSourcePath(), credentials);
+
+    // Prepare the list of requests
+    List<AnnotateImageRequest> imageRequests = new ArrayList<>(blobs.size());
+
+    // Features we are going to ask for (only one)
+    List<Feature> features = Arrays.asList(Feature.newBuilder()
+            .setType(config.getImageFeature().getFeatureType())
+            .build());
+
     try (ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
 
-      ImageSource source = ImageSource.newBuilder().setImageUri(config.getSourcePath()).build();
-      Image image = Image.newBuilder().setSource(source).build();
+      for (Blob blob : blobs) {
+        // Rebuild the full path of the blob
+        String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
 
-      List<Feature> features =
-              Arrays.asList(Feature.newBuilder().setType(config.getImageFeature().getFeatureType()).build());
-      AnnotateImageRequest.Builder builder =
-              AnnotateImageRequest.newBuilder().setImage(image).addAllFeatures(features);
+        LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
 
-      ImageContext imageContext = getImageContext();
-      if (imageContext != null) {
-        builder.setImageContext(imageContext);
+        ImageSource imageSource = ImageSource.newBuilder().setImageUri(fullBlobPath).build();
+        Image image = Image.newBuilder().setSource(imageSource).build();
+
+        AnnotateImageRequest.Builder builder =
+                AnnotateImageRequest.newBuilder()
+                        .setImage(image)
+                        .addAllFeatures(features);
+
+        ImageContext imageContext = getImageContext();
+        if (imageContext != null) {
+          builder.setImageContext(imageContext);
+        }
+
+        AnnotateImageRequest annotateImageRequest = builder.build();
+        imageRequests.add(annotateImageRequest);
       }
 
-      AnnotateImageRequest requestsElement = builder.build();
-      List<AnnotateImageRequest> requests = Arrays.asList(requestsElement);
-      GcsDestination gcsDestination = GcsDestination.newBuilder().setUri(config.getDestinationPath()).build();
-
-      // The max number of responses to output in each JSON file
-      int batchSize = config.getBatchSizeValue();
-      OutputConfig outputConfig =
-              OutputConfig.newBuilder()
-                      .setGcsDestination(gcsDestination)
-                      .setBatchSize(batchSize)
-                      .build();
-
+      // Send the requests
       AsyncBatchAnnotateImagesRequest asyncRequest =
               AsyncBatchAnnotateImagesRequest.newBuilder()
-                      .addAllRequests(requests)
+                      .addAllRequests(imageRequests)
                       .setOutputConfig(outputConfig)
                       .build();
 
+      // Wait for the future to complete
       imageAnnotatorClient.asyncBatchAnnotateImagesAsync(asyncRequest)
               .getInitialFuture()
               .get();
+
     } catch (Exception exception) {
       throw new IllegalStateException(exception);
     }

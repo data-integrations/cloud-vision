@@ -98,8 +98,9 @@ public class OfflineImageExtractorActionTest {
   }
 
   private static void deleteBucket(Storage storage, Bucket bucket) {
-    if (bucket == null || bucket.list() == null)
+    if (bucket == null || bucket.list() == null) {
       return;
+    }
 
     for (Blob blob : bucket.list().iterateAll()) {
       storage.delete(blob.getBlobId());
