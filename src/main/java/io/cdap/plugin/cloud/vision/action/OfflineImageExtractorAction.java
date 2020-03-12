@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_IMAGES_PER_BATCH;
+
 /**
  * Action that runs offline image extractor.
  */
@@ -121,41 +123,48 @@ public class OfflineImageExtractorAction extends Action {
 
     try (ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
 
-      for (Blob blob : blobs) {
-        // Rebuild the full path of the blob
-        String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
+      // Create batches of images to send for processing
+      for (int batch_id = 0;
+           batch_id < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH);
+           batch_id++) {
+        for (int index = batch_id * MAX_NUMBER_OF_IMAGES_PER_BATCH;
+             (index < (batch_id + 1) * MAX_NUMBER_OF_IMAGES_PER_BATCH) && (index < blobs.size());
+             index++) {
+          Blob blob = blobs.get(index);
+          // Rebuild the full path of the blob
+          String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
 
-        LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
+          LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
 
-        ImageSource imageSource = ImageSource.newBuilder().setImageUri(fullBlobPath).build();
-        Image image = Image.newBuilder().setSource(imageSource).build();
+          ImageSource imageSource = ImageSource.newBuilder().setImageUri(fullBlobPath).build();
+          Image image = Image.newBuilder().setSource(imageSource).build();
 
-        AnnotateImageRequest.Builder builder =
-                AnnotateImageRequest.newBuilder()
-                        .setImage(image)
-                        .addAllFeatures(features);
+          AnnotateImageRequest.Builder builder =
+                  AnnotateImageRequest.newBuilder()
+                          .setImage(image)
+                          .addAllFeatures(features);
 
-        ImageContext imageContext = getImageContext();
-        if (imageContext != null) {
-          builder.setImageContext(imageContext);
+          ImageContext imageContext = getImageContext();
+          if (imageContext != null) {
+            builder.setImageContext(imageContext);
+          }
+
+          AnnotateImageRequest annotateImageRequest = builder.build();
+          imageRequests.add(annotateImageRequest);
         }
 
-        AnnotateImageRequest annotateImageRequest = builder.build();
-        imageRequests.add(annotateImageRequest);
+        // Send the requests
+        AsyncBatchAnnotateImagesRequest asyncRequest =
+                AsyncBatchAnnotateImagesRequest.newBuilder()
+                        .addAllRequests(imageRequests)
+                        .setOutputConfig(outputConfig)
+                        .build();
+
+        // Wait for the future to complete
+        imageAnnotatorClient.asyncBatchAnnotateImagesAsync(asyncRequest)
+                .getInitialFuture()
+                .get();
       }
-
-      // Send the requests
-      AsyncBatchAnnotateImagesRequest asyncRequest =
-              AsyncBatchAnnotateImagesRequest.newBuilder()
-                      .addAllRequests(imageRequests)
-                      .setOutputConfig(outputConfig)
-                      .build();
-
-      // Wait for the future to complete
-      imageAnnotatorClient.asyncBatchAnnotateImagesAsync(asyncRequest)
-              .getInitialFuture()
-              .get();
-
     } catch (Exception exception) {
       throw new IllegalStateException(exception);
     }

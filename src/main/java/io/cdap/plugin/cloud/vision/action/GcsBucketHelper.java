@@ -89,16 +89,28 @@ public class GcsBucketHelper {
     String sourceFolderPath = BUCKET + "images";
     Credentials credentials = CredentialsHelper.getCredentials(SERVICE_ACCOUNT_FILE_PATH);
 
-    List<Blob> res = GcsBucketHelper.getAllFilesInPath(sourceFolderPath, credentials);
-    if (res == null) {
+    List<Blob> blobs = GcsBucketHelper.getAllFilesInPath(sourceFolderPath, credentials);
+    if (blobs == null) {
       System.out.println("No result");
       return;
     }
 
     System.out.println();
     System.out.println("Results:");
-    for (Blob blob : res) {
+    for (Blob blob : blobs) {
       System.out.println("blob.getName(): " + blob.getName());
+    }
+
+    for (int MAX_NUMBER_OF_IMAGES_PER_BATCH = 1; MAX_NUMBER_OF_IMAGES_PER_BATCH < 10; MAX_NUMBER_OF_IMAGES_PER_BATCH++) {
+      System.out.println("MAX_NUMBER_OF_IMAGES_PER_BATCH=" + MAX_NUMBER_OF_IMAGES_PER_BATCH);
+      System.out.println("-----------------------");
+      for (int batch_id = 0; batch_id < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH); batch_id++) {
+        System.out.println("Batch=" + batch_id);
+        System.out.println("-----");
+        for (int index = batch_id * MAX_NUMBER_OF_IMAGES_PER_BATCH; (index < (batch_id + 1) * MAX_NUMBER_OF_IMAGES_PER_BATCH) && (index < blobs.size()); index++) {
+          System.out.println("Batch=" + batch_id + " index: " + index);
+        }
+      }
     }
   }
 }
