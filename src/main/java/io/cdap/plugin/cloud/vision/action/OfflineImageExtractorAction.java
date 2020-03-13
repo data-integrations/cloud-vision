@@ -97,11 +97,10 @@ public class OfflineImageExtractorAction extends Action {
 
     LOG.info("Setting destination path to: " + destinationPath);
 
-    OutputConfig outputConfig =
-            OutputConfig.newBuilder()
-                    .setGcsDestination(gcsDestination)
-                    .setBatchSize(config.getBatchSizeValue())
-                    .build();
+    OutputConfig outputConfig = OutputConfig.newBuilder()
+            .setGcsDestination(gcsDestination)
+            .setBatchSize(config.getBatchSizeValue())
+            .build();
 
     ImageAnnotatorSettings imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder()
             .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
@@ -125,11 +124,11 @@ public class OfflineImageExtractorAction extends Action {
     try (ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
 
       // Create batches of images to send for processing
-      for (int batch_id = 0;
-           batch_id < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH);
-           batch_id++) {
-        for (int index = batch_id * MAX_NUMBER_OF_IMAGES_PER_BATCH;
-             (index < (batch_id + 1) * MAX_NUMBER_OF_IMAGES_PER_BATCH) && (index < blobs.size());
+      for (int batchId = 0;
+           batchId < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH);
+           batchId++) {
+        for (int index = batchId * MAX_NUMBER_OF_IMAGES_PER_BATCH;
+             (index < (batchId + 1) * MAX_NUMBER_OF_IMAGES_PER_BATCH) && (index < blobs.size());
              index++) {
           Blob blob = blobs.get(index);
           // Rebuild the full path of the blob
@@ -149,6 +148,7 @@ public class OfflineImageExtractorAction extends Action {
                           .setImage(image)
                           .addFeatures(feature);
 
+          // TODO: Is the list in getImageContext() complete?
           ImageContext imageContext = getImageContext();
           if (imageContext != null) {
             builder.setImageContext(imageContext);
@@ -181,7 +181,8 @@ public class OfflineImageExtractorAction extends Action {
         return Strings.isNullOrEmpty(config.getLanguageHints()) ? null
                 : ImageContext.newBuilder().addAllLanguageHints(config.getLanguages()).build();
       case CROP_HINTS:
-        CropHintsParams cropHintsParams = CropHintsParams.newBuilder().addAllAspectRatios(config.getAspectRatiosList())
+        CropHintsParams cropHintsParams = CropHintsParams.newBuilder()
+                .addAllAspectRatios(config.getAspectRatiosList())
                 .build();
         return Strings.isNullOrEmpty(config.getAspectRatios()) ? null
                 : ImageContext.newBuilder().setCropHintsParams(cropHintsParams).build();

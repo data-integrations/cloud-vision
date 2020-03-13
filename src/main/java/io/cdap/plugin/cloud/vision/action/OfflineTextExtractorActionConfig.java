@@ -59,7 +59,8 @@ public class OfflineTextExtractorActionConfig extends PluginConfig {
   @Macro
   private String serviceFilePath;
 
-  public OfflineTextExtractorActionConfig(String serviceFilePath, String sourcePath, String destinationPath, String mimeType,
+  public OfflineTextExtractorActionConfig(String serviceFilePath, String sourcePath,
+                                          String destinationPath, String mimeType,
                                           Integer batchSize, @Nullable String languageHints) {
     this.serviceFilePath = serviceFilePath;
     this.sourcePath = sourcePath;
@@ -101,7 +102,8 @@ public class OfflineTextExtractorActionConfig extends PluginConfig {
 
   @Nullable
   public String getServiceAccountFilePath() {
-    if (containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH) || Strings.isNullOrEmpty(serviceFilePath)) {
+    if (containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
+            || Strings.isNullOrEmpty(serviceFilePath)) {
       return null;
     }
 
@@ -146,7 +148,8 @@ public class OfflineTextExtractorActionConfig extends PluginConfig {
   }
 
   public void validate(FailureCollector collector) {
-    if (!containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH) && Strings.isNullOrEmpty(serviceFilePath)) {
+    if (!containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
+            && Strings.isNullOrEmpty(serviceFilePath)) {
       collector.addFailure("Service account file path must be specified.", null)
               .withConfigProperty(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
     }

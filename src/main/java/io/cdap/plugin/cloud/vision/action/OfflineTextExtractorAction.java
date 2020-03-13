@@ -110,7 +110,7 @@ public class OfflineTextExtractorAction extends Action {
     }
 
     // Prepare the list of requests
-    List<AsyncAnnotateFileRequest> requests = new ArrayList<>();
+    List<AsyncAnnotateFileRequest> requests = new ArrayList<>(blobs.size());
 
     // Feature we are going to ask for
     Feature feature = Feature.newBuilder()
@@ -120,11 +120,11 @@ public class OfflineTextExtractorAction extends Action {
     try (ImageAnnotatorClient client = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
 
       // Create batches of images to send for processing
-      for (int batch_id = 0;
-           batch_id < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH);
-           batch_id++) {
-        for (int index = batch_id * MAX_NUMBER_OF_IMAGES_PER_BATCH;
-             (index < (batch_id + 1) * MAX_NUMBER_OF_IMAGES_PER_BATCH) && (index < blobs.size());
+      for (int batchId = 0;
+           batchId < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH);
+           batchId++) {
+        for (int index = batchId * MAX_NUMBER_OF_IMAGES_PER_BATCH;
+             (index < (batchId + 1) * MAX_NUMBER_OF_IMAGES_PER_BATCH) && (index < blobs.size());
              index++) {
           Blob blob = blobs.get(index);
           // Rebuild the full path of the blob
