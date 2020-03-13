@@ -505,24 +505,22 @@
                 <configuration>
                     <instructions>
                         <_exportcontents>
-                            io.cdap.plugin.cloud.vision.*,
-                            io.grpc.stub,
-                            com.google.auth.*,
-                            com.google.api.client.*,
-                            com.google.protobuf.*,
-                            javax.annotation.*,
-                            com.google.cloud.vision.v1.*,
-                            io.opencensus.trace, io.opencensus.trace.propagation,
-                            com.google.api.core,com.google.api.gax.core,com.google.api.gax.grpc,
-                            com.google.api.gax.longrunning,com.google.api.gax.paging,com.google.api.gax.rpc,
-                            com.google.api.resourcenames,com.google.common.collect,com.google.longrunning,
-                            com.google.longrunning.stub,com.google.rpc,com.google.type,io.opencensus.common,
-                            io.opencensus.trace.config,io.opencensus.trace.export,com.google.api.gax.batching,
-                            com.google.api.gax.retrying,com.google.api.gax.tracing,com.google.common.base,
-                            com.google.common.util.concurrent,io.grpc,org.checkerframework.checker.nullness.qual,
-                            org.threeten.bp,com.google.common.io,com.google.common.util.concurrent.internal,
-                            com.google.errorprone.annotations,org.checkerframework.framework.qual,org.threeten.bp.*,
-                            com.google.common.graph, com.google.common.hash
+                            com.google.api,com.google.api.client.*,com.google.api.core,com.google.api.gax.batching,
+                            com.google.api.gax.core,com.google.api.gax.grpc,com.google.api.gax.longrunning,
+                            com.google.api.gax.paging,com.google.api.gax.retrying,com.google.api.gax.rpc,
+                            com.google.api.gax.tracing,com.google.api.resourcenames,
+                            com.google.api.services.storage.model,com.google.auth.*,com.google.cloud,
+                            com.google.cloud.http,com.google.cloud.spi,com.google.cloud.storage,
+                            com.google.cloud.storage.spi,com.google.cloud.storage.spi.v1,com.google.cloud.vision.v1.*,
+                            com.google.common.base,com.google.common.collect,com.google.common.graph,
+                            com.google.common.hash,com.google.common.io,com.google.common.util.concurrent,
+                            com.google.common.util.concurrent.internal,com.google.errorprone.annotations,
+                            com.google.iam.v1,com.google.longrunning,com.google.longrunning.stub,com.google.protobuf.*,
+                            com.google.rpc,com.google.type,io.cdap.plugin.cloud.vision.*,io.grpc,io.grpc.stub,
+                            io.opencensus.common,io.opencensus.trace,io.opencensus.trace.config,
+                            io.opencensus.trace.export,io.opencensus.trace.propagation,javax.annotation.*,
+                            org.checkerframework.checker.nullness.qual,org.checkerframework.framework.qual,
+                            org.threeten.bp,org.threeten.bp.*
                         </_exportcontents>
                         <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>

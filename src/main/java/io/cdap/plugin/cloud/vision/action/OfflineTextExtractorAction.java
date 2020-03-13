@@ -43,9 +43,9 @@ public class OfflineTextExtractorAction extends Action {
   public static final String PLUGIN_NAME = "OfflineTextExtractor";
   private static final Logger LOG = LoggerFactory.getLogger(OfflineTextExtractorAction.class);
 
-  private final TextExtractorActionConfig config;
+  private final OfflineTextExtractorActionConfig config;
 
-  public OfflineTextExtractorAction(TextExtractorActionConfig config) {
+  public OfflineTextExtractorAction(OfflineTextExtractorActionConfig config) {
     this.config = config;
   }
 

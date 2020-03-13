@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Config class for {@link OfflineTextExtractorAction}.
  */
-public class TextExtractorActionConfig extends PluginConfig {
+public class OfflineTextExtractorActionConfig extends PluginConfig {
 
   @Name(ActionConstants.SOURCE_PATH)
   @Macro
@@ -59,8 +59,8 @@ public class TextExtractorActionConfig extends PluginConfig {
   @Macro
   private String serviceFilePath;
 
-  public TextExtractorActionConfig(String serviceFilePath, String sourcePath, String destinationPath, String mimeType,
-                                   Integer batchSize, @Nullable String languageHints) {
+  public OfflineTextExtractorActionConfig(String serviceFilePath, String sourcePath, String destinationPath, String mimeType,
+                                          Integer batchSize, @Nullable String languageHints) {
     this.serviceFilePath = serviceFilePath;
     this.sourcePath = sourcePath;
     this.destinationPath = destinationPath;
@@ -69,7 +69,7 @@ public class TextExtractorActionConfig extends PluginConfig {
     this.languageHints = languageHints;
   }
 
-  private TextExtractorActionConfig(Builder builder) {
+  private OfflineTextExtractorActionConfig(Builder builder) {
     serviceFilePath = builder.serviceFilePath;
     sourcePath = builder.sourcePath;
     destinationPath = builder.destinationPath;
@@ -82,7 +82,7 @@ public class TextExtractorActionConfig extends PluginConfig {
     return new Builder();
   }
 
-  public static Builder builder(TextExtractorActionConfig copy) {
+  public static Builder builder(OfflineTextExtractorActionConfig copy) {
     Builder builder = new Builder();
 
     builder.setServiceFilePath(copy.getServiceFilePath());
@@ -155,7 +155,7 @@ public class TextExtractorActionConfig extends PluginConfig {
   }
 
   /**
-   * Builder for creating a {@link TextExtractorActionConfig}.
+   * Builder for creating a {@link OfflineTextExtractorActionConfig}.
    */
   public static final class Builder {
     private String serviceFilePath;
@@ -200,8 +200,8 @@ public class TextExtractorActionConfig extends PluginConfig {
       return this;
     }
 
-    public TextExtractorActionConfig build() {
-      return new TextExtractorActionConfig(this);
+    public OfflineTextExtractorActionConfig build() {
+      return new OfflineTextExtractorActionConfig(this);
     }
   }
 }

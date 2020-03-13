@@ -23,11 +23,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test class for {@link OfflineTextExtractorActionConfigTest}.
+ * Test class for {@link OfflineOfflineTextExtractorActionConfigTest}.
  */
-public class OfflineTextExtractorActionConfigTest {
+public class OfflineOfflineTextExtractorActionConfigTest {
   private static final String MOCK_STAGE = "mockStage";
-  private static final TextExtractorActionConfig VALID_CONFIG = new TextExtractorActionConfig(
+  private static final OfflineTextExtractorActionConfig VALID_CONFIG = new OfflineTextExtractorActionConfig(
           "/path",
           "/path",
           "/path",
@@ -45,7 +45,7 @@ public class OfflineTextExtractorActionConfigTest {
 
   @Test
   public void testEmptyServiceFilePath() {
-    TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
+    OfflineTextExtractorActionConfig config = OfflineTextExtractorActionConfig.builder(VALID_CONFIG)
             .setServiceFilePath("")
             .build();
 
@@ -57,7 +57,7 @@ public class OfflineTextExtractorActionConfigTest {
 
   @Test
   public void testEmptySourcePath() {
-    TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
+    OfflineTextExtractorActionConfig config = OfflineTextExtractorActionConfig.builder(VALID_CONFIG)
             .setSourcePath("")
             .build();
 
@@ -68,7 +68,7 @@ public class OfflineTextExtractorActionConfigTest {
 
   @Test
   public void testEmptyDestinationPath() {
-    TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
+    OfflineTextExtractorActionConfig config = OfflineTextExtractorActionConfig.builder(VALID_CONFIG)
             .setDestinationPath("")
             .build();
 

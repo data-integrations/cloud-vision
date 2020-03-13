@@ -106,7 +106,7 @@ public class OfflineTextExtractorActionTest {
 
   @Test
   public void testRun() throws Exception {
-    TextExtractorActionConfig config = new TextExtractorActionConfig(
+    OfflineTextExtractorActionConfig config = new OfflineTextExtractorActionConfig(
             SERVICE_ACCOUNT_FILE_PATH,
             PDF_FILE_PATH,
             RESULT_FOLDER_PATH,
