@@ -33,7 +33,8 @@
             "default": "application/pdf",
             "values": [
               "application/pdf",
-              "image/tiff"
+              "image/tiff",
+              "image/gif"
             ]
           }
         },

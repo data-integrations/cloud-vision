@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_IMAGES_PER_BATCH;
@@ -54,23 +53,20 @@ import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_I
  * Action that runs offline image extractor.
  */
 @Plugin(type = Action.PLUGIN_TYPE)
-@Name(OfflineImageExtractorAction.NAME)
+@Name(OfflineImageExtractorAction.PLUGIN_NAME)
 @Description("Action that runs offline image extractor.")
 public class OfflineImageExtractorAction extends Action {
-  public static final String NAME = "OfflineImageExtractor";
-
+  public static final String PLUGIN_NAME = "OfflineImageExtractor";
   private final OfflineImageExtractorActionConfig config;
-
-  // Logging
   private static Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
 
   public OfflineImageExtractorAction(OfflineImageExtractorActionConfig config) {
-    if (config.getSourcePath() != null)
+    if (config.getSourcePath() != null) {
       config.setSourcePath(config.getSourcePath().trim()); // Remove whitespace
-
-    if (config.getDestinationPath() != null)
+    }
+    if (config.getDestinationPath() != null) {
       config.setDestinationPath(config.getDestinationPath().trim());
-
+    }
     this.config = config;
   }
 
@@ -78,6 +74,7 @@ public class OfflineImageExtractorAction extends Action {
   public void configurePipeline(PipelineConfigurer pipelineConfigurer) {
     FailureCollector collector = pipelineConfigurer.getStageConfigurer().getFailureCollector();
     config.validate(collector);
+    collector.getOrThrowException();
   }
 
   @Override
@@ -86,24 +83,24 @@ public class OfflineImageExtractorAction extends Action {
     config.validate(collector);
     collector.getOrThrowException();
 
-    // The max number of responses to output in each JSON file
-    int batchSize = config.getBatchSizeValue();
-
     Credentials credentials = CredentialsHelper.getCredentials(config.getServiceFilePath());
 
     // Destination in GCS where the results will be stored
     String destinationPath = config.getDestinationPath();
     // Add a / at the end if it's not already there
-    if (!destinationPath.endsWith("/"))
+    if (!destinationPath.endsWith("/")) {
       destinationPath += "/";
-    GcsDestination gcsDestination = GcsDestination.newBuilder().setUri(destinationPath).build();
+    }
+    GcsDestination gcsDestination = GcsDestination.newBuilder()
+            .setUri(destinationPath)
+            .build();
 
-    LOG.warn("Setting destination path to: " + destinationPath);
+    LOG.info("Setting destination path to: " + destinationPath);
 
     OutputConfig outputConfig =
             OutputConfig.newBuilder()
                     .setGcsDestination(gcsDestination)
-                    .setBatchSize(batchSize)
+                    .setBatchSize(config.getBatchSizeValue())
                     .build();
 
     ImageAnnotatorSettings imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder()
@@ -112,14 +109,18 @@ public class OfflineImageExtractorAction extends Action {
 
     // Get all the blobs in the source path
     List<Blob> blobs = GcsBucketHelper.getAllFilesInPath(config.getSourcePath(), credentials);
+    if (blobs.isEmpty()) {
+      LOG.warn("Nothing found to process in path: " + config.getSourcePath());
+      return;
+    }
 
     // Prepare the list of requests
     List<AnnotateImageRequest> imageRequests = new ArrayList<>(blobs.size());
 
-    // Features we are going to ask for (only one)
-    List<Feature> features = Arrays.asList(Feature.newBuilder()
+    // Feature we are going to ask for
+    Feature feature = Feature.newBuilder()
             .setType(config.getImageFeature().getFeatureType())
-            .build());
+            .build();
 
     try (ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
 
@@ -133,16 +134,20 @@ public class OfflineImageExtractorAction extends Action {
           Blob blob = blobs.get(index);
           // Rebuild the full path of the blob
           String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
-
           LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
 
-          ImageSource imageSource = ImageSource.newBuilder().setImageUri(fullBlobPath).build();
-          Image image = Image.newBuilder().setSource(imageSource).build();
+          ImageSource imageSource = ImageSource.newBuilder()
+                  .setImageUri(fullBlobPath)
+                  .build();
+
+          Image image = Image.newBuilder()
+                  .setSource(imageSource)
+                  .build();
 
           AnnotateImageRequest.Builder builder =
                   AnnotateImageRequest.newBuilder()
                           .setImage(image)
-                          .addAllFeatures(features);
+                          .addFeatures(feature);
 
           ImageContext imageContext = getImageContext();
           if (imageContext != null) {
@@ -154,11 +159,10 @@ public class OfflineImageExtractorAction extends Action {
         }
 
         // Send the requests
-        AsyncBatchAnnotateImagesRequest asyncRequest =
-                AsyncBatchAnnotateImagesRequest.newBuilder()
-                        .addAllRequests(imageRequests)
-                        .setOutputConfig(outputConfig)
-                        .build();
+        AsyncBatchAnnotateImagesRequest asyncRequest = AsyncBatchAnnotateImagesRequest.newBuilder()
+                .addAllRequests(imageRequests)
+                .setOutputConfig(outputConfig)
+                .build();
 
         // Wait for the future to complete
         imageAnnotatorClient.asyncBatchAnnotateImagesAsync(asyncRequest)

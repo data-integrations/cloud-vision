@@ -37,11 +37,11 @@ public class OfflineTextExtractorActionConfig extends PluginConfig {
   @Name(ActionConstants.SOURCE_PATH)
   @Macro
   @Description("Path to the location of the directory on GCS where the input files are stored.")
-  private final String sourcePath;
+  private String sourcePath;
   @Name(ActionConstants.DESTINATION_PATH)
   @Macro
   @Description("Path to the location of the directory on GCS where output files should be stored.")
-  private final String destinationPath;
+  private String destinationPath;
   @Name(CloudVisionConstants.MIME_TYPE)
   @Description("Document type.")
   private final String mimeType;
@@ -135,6 +135,14 @@ public class OfflineTextExtractorActionConfig extends PluginConfig {
     }
 
     return Collections.emptyList();
+  }
+
+  public void setSourcePath(String sourcePath) {
+    this.sourcePath = sourcePath;
+  }
+
+  public void setDestinationPath(String destinationPath) {
+    this.destinationPath = destinationPath;
   }
 
   public void validate(FailureCollector collector) {
