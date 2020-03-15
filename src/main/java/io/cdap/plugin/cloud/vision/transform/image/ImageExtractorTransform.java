@@ -97,7 +97,6 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     LOG.info("Processing: " + imagePath);
     try {
       AnnotateImageResponse response = imageAnnotatorClient.extractImageFeature(imagePath);
-      String jsonString = com.google.protobuf.util.JsonFormat.printer().print(response);
       StructuredRecord transformed = transformer.transform(input, response);
       emitter.emit(transformed);
     } catch (Exception e) {

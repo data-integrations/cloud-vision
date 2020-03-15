@@ -142,7 +142,7 @@ public class WebDetectionSchema {
     public static final String LABEL_FIELD_NAME = "label";
 
     /**
-     * The BCP-47 language code, such as "en-US" or "sr-Latn". For more information, see
+     * The BCP-47 language code, such as "en-US" or "sr-Latin". For more information, see
      * http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
      */
     public static final String LANGUAGE_CODE_FIELD_NAME = "languageCode";

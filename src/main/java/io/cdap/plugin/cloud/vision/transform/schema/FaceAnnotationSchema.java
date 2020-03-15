@@ -148,6 +148,7 @@ public class FaceAnnotationSchema {
     public static final String Z_FIELD_NAME = "z";
 
     public static final Schema SCHEMA = Schema.recordOf("face-landmark-record",
+            // The following field is not a simple type as it is defined as an Enum
             Schema.Field.of(TYPE_FIELD_NAME, Schema.enumWith(
                     FaceAnnotationSchema.getIterableFromEnum(
                             FaceAnnotation.Landmark.Type.values()))),

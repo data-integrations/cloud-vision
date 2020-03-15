@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 
 
 /**
- * Transforms product search results of specified {@link AnnotateImageResponse} to {@link StructuredRecord}
- * according to the specified schema.
+ * Transforms product search results of specified {@link AnnotateImageResponse} to
+ * {@link StructuredRecord} according to the specified schema.
  */
 public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRecordTransformer {
 
@@ -154,8 +154,8 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
   }
 
   /**
-   * Retrieves Product Search Result non-nullable component schema. Schema retrieved instead of using constant
-   * schema since users are free to choose to not include some of the fields.
+   * Retrieves Product Search Result non-nullable component schema. Schema retrieved instead of
+   * using constant schema since users are free to choose to not include some of the fields.
    *
    * @return Product Search Result non-nullable component schema.
    */
