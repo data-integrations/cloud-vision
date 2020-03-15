@@ -22,10 +22,19 @@ import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
-import io.cdap.cdap.etl.api.*;
+import io.cdap.cdap.etl.api.Emitter;
+import io.cdap.cdap.etl.api.FailureCollector;
+import io.cdap.cdap.etl.api.InvalidEntry;
+import io.cdap.cdap.etl.api.PipelineConfigurer;
+import io.cdap.cdap.etl.api.StageConfigurer;
+import io.cdap.cdap.etl.api.StageSubmitterContext;
+import io.cdap.cdap.etl.api.Transform;
+import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.transformer.ImageAnnotationToRecordTransformer;
 import io.cdap.plugin.cloud.vision.transform.transformer.TransformerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +57,8 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   private ImageAnnotationToRecordTransformer transformer;
   private ImageExtractorTransformConfig config;
   private Schema inputSchema;
+  private Schema outputSchema;
+  private static Logger LOG = LoggerFactory.getLogger(ImageExtractorTransform.class);
 
   public ImageExtractorTransform(ImageExtractorTransformConfig config) {
     this.config = config;
@@ -56,21 +67,11 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   @Override
   public void configurePipeline(PipelineConfigurer configurer) throws IllegalArgumentException {
     super.configurePipeline(configurer);
-    inputSchema = configurer.getStageConfigurer().getInputSchema();
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
-    FailureCollector collector = stageConfigurer.getFailureCollector();
-    config.validate(collector);
-    collector.getOrThrowException();
-    Schema schema = getSchema();
-    Schema configuredSchema = config.getParsedSchema();
-    if (configuredSchema == null) {
-      configurer.getStageConfigurer().setOutputSchema(schema);
-      return;
-    }
-    ExtractorTransformConfig.validateFieldsMatch(schema, configuredSchema, collector);
-    collector.getOrThrowException();
-    configurer.getStageConfigurer().setOutputSchema(configuredSchema);
-    configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
+    inputSchema = stageConfigurer.getInputSchema();
+    outputSchema = getOutputSchema(inputSchema);
+    stageConfigurer.setOutputSchema(outputSchema);
+    stageConfigurer.setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
 
   @Override
@@ -84,17 +85,19 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   @Override
   public void initialize(TransformContext context) throws Exception {
     super.initialize(context);
-    Schema schema = context.getOutputSchema();
+    outputSchema = getOutputSchema(context.getInputSchema());
     transformer = TransformerFactory.createInstance(config.getImageFeature(),
-            config.getOutputField(), schema);
+            config.getOutputField(), outputSchema);
     imageAnnotatorClient = new ImageAnnotatorClient(config);
   }
 
   @Override
   public void transform(StructuredRecord input, Emitter<StructuredRecord> emitter) {
     String imagePath = input.get(config.getPathField());
+    LOG.info("Processing: " + imagePath);
     try {
       AnnotateImageResponse response = imageAnnotatorClient.extractImageFeature(imagePath);
+      String jsonString = com.google.protobuf.util.JsonFormat.printer().print(response);
       StructuredRecord transformed = transformer.transform(input, response);
       emitter.emit(transformed);
     } catch (Exception e) {
@@ -105,7 +108,7 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     }
   }
 
-  public Schema getSchema() {
+  public Schema getOutputSchema(Schema inputSchema) {
     List<Schema.Field> fields = new ArrayList<>();
     if (inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());

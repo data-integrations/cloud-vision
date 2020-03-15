@@ -70,15 +70,18 @@ public abstract class ImageAnnotationToRecordTransformer {
    * @param input input record.
    * @return output record builder with copied input record field values.
    */
-  protected StructuredRecord.Builder getOutputRecordBuilder(StructuredRecord input) {
+  public StructuredRecord.Builder getOutputRecordBuilder(StructuredRecord input) {
     Schema inputRecordSchema = input.getSchema();
+    // schema is the output schema
     StructuredRecord.Builder outputRecordBuilder = StructuredRecord.builder(schema);
-    for (Schema.Field field : schema.getFields()) {
-      if (inputRecordSchema.getField(field.getName()) == null) {
-        continue;
+    // Loop through the input fields and copy them to the output
+    for (Schema.Field inputField : inputRecordSchema.getFields()) {
+      if (schema.getField(inputField.getName()) == null) {
+        continue; // Not found at the output
       }
+
       // copy input record field values
-      outputRecordBuilder.set(field.getName(), input.get(field.getName()));
+      outputRecordBuilder.set(inputField.getName(), input.get(inputField.getName()));
     }
 
     return outputRecordBuilder;

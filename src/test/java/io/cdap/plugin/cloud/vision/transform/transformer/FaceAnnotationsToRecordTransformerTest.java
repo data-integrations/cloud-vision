@@ -153,9 +153,9 @@ public class FaceAnnotationsToRecordTransformerTest extends BaseAnnotationsToRec
     Assert.assertEquals(expected.getUnderExposedLikelihood().name(),
             actual.get(FaceAnnotationSchema.UNDER_EXPOSED_FIELD_NAME));
 
-    List<StructuredRecord> position = actual.get(FaceAnnotationSchema.POSITION_FIELD_NAME);
+    List<StructuredRecord> position = actual.get(FaceAnnotationSchema.BOUNDING_POLY_NAME);
     assertPositionEqual(expected.getBoundingPoly(), position);
-    List<StructuredRecord> fdPosition = actual.get(FaceAnnotationSchema.FD_POSITION_FIELD_NAME);
+    List<StructuredRecord> fdPosition = actual.get(FaceAnnotationSchema.FD_BOUNDING_POLY_NAME);
     assertPositionEqual(expected.getFdBoundingPoly(), fdPosition);
     List<StructuredRecord> landmarks = actual.get(FaceAnnotationSchema.LANDMARKS_FIELD_NAME);
     assertLandmarksEqual(expected.getLandmarksList(), landmarks);

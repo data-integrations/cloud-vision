@@ -19,8 +19,8 @@ package io.cdap.plugin.cloud.vision.transform.schema;
 import io.cdap.cdap.api.data.schema.Schema;
 
 /**
- * A vertex represents a 2D point in the image. {@link com.google.cloud.vision.v1.Vertex} mapped to a record with
- * following fields.
+ * A vertex represents a 2D point in the image. {@link com.google.cloud.vision.v1.Vertex} mapped to
+ * a record with the following fields.
  */
 public class VertexSchema {
 

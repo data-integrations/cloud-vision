@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 
 
 /**
- * Transforms face annotations of specified {@link AnnotateImageResponse} to {@link StructuredRecord} according to
- * the specified schema.
+ * Transforms face annotations of specified {@link AnnotateImageResponse} to
+ * {@link StructuredRecord} according to the specified schema.
  */
 public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordTransformer {
 
@@ -38,9 +38,14 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
 
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
-    return getOutputRecordBuilder(input)
-            .set(outputFieldName, extractFaceAnnotations(annotateImageResponse))
-            .build();
+    StructuredRecord.Builder builder = getOutputRecordBuilder(input);
+    List<StructuredRecord> extracted = extractFaceAnnotations(annotateImageResponse);
+    return builder.set(outputFieldName, extracted).build();
+  }
+
+  public StructuredRecord.Builder getBuilder(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
+    StructuredRecord.Builder builder = getOutputRecordBuilder(input);
+    return builder;
   }
 
   private List<StructuredRecord> extractFaceAnnotations(AnnotateImageResponse annotateImageResponse) {
@@ -91,21 +96,21 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
       String surprise = annotation.getSurpriseLikelihood().name();
       builder.set(FaceAnnotationSchema.SURPRISE_FIELD_NAME, surprise);
     }
-    Schema.Field positionField = faceSchema.getField(FaceAnnotationSchema.POSITION_FIELD_NAME);
+    Schema.Field positionField = faceSchema.getField(FaceAnnotationSchema.BOUNDING_POLY_NAME);
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
       List<StructuredRecord> position = annotation.getBoundingPoly().getVerticesList().stream()
               .map(v -> extractVertex(v, positionSchema))
               .collect(Collectors.toList());
-      builder.set(FaceAnnotationSchema.POSITION_FIELD_NAME, position);
+      builder.set(FaceAnnotationSchema.BOUNDING_POLY_NAME, position);
     }
-    Schema.Field fdPositionField = faceSchema.getField(FaceAnnotationSchema.FD_POSITION_FIELD_NAME);
+    Schema.Field fdPositionField = faceSchema.getField(FaceAnnotationSchema.FD_BOUNDING_POLY_NAME);
     if (fdPositionField != null) {
       Schema positionSchema = getComponentSchema(fdPositionField);
       List<StructuredRecord> position = annotation.getFdBoundingPoly().getVerticesList().stream()
               .map(v -> extractVertex(v, positionSchema))
               .collect(Collectors.toList());
-      builder.set(FaceAnnotationSchema.FD_POSITION_FIELD_NAME, position);
+      builder.set(FaceAnnotationSchema.FD_BOUNDING_POLY_NAME, position);
     }
     Schema.Field landmarksField = faceSchema.getField(FaceAnnotationSchema.LANDMARKS_FIELD_NAME);
     if (landmarksField != null) {

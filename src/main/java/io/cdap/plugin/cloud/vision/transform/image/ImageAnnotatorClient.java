@@ -65,7 +65,6 @@ public class ImageAnnotatorClient extends CloudVisionClient {
                 gcsPath, annotateImageResponse.getError().getMessage());
         throw new CloudVisionExecutionException(errorMessage);
       }
-
       return annotateImageResponse;
     }
   }
