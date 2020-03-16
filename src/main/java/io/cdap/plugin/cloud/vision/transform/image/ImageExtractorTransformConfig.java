@@ -28,9 +28,8 @@ import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.ProductCategory;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Defines a {@link PluginConfig} that Image and Document Extractor transforms can use.

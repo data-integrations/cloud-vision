@@ -16,14 +16,19 @@
 
 package io.cdap.plugin.cloud.vision.transform.transformer;
 
-import com.google.cloud.vision.v1.*;
+import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.Block;
+import com.google.cloud.vision.v1.Page;
+import com.google.cloud.vision.v1.Paragraph;
+import com.google.cloud.vision.v1.Symbol;
+import com.google.cloud.vision.v1.TextAnnotation;
+import com.google.cloud.vision.v1.Word;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import io.cdap.plugin.cloud.vision.transform.schema.FullTextAnnotationSchema;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.List;
 
 /**
@@ -37,7 +42,11 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
           .setBoundingBox(POSITION)
           .setProperty(
                   TextAnnotation.TextProperty.newBuilder()
-                          .addDetectedLanguages(TextAnnotation.DetectedLanguage.newBuilder().setConfidence(0.5f).setLanguageCode("en"))
+                          .addDetectedLanguages(TextAnnotation
+                                  .DetectedLanguage
+                                  .newBuilder()
+                                  .setConfidence(0.5f)
+                                  .setLanguageCode("en"))
           )
           .build();
 
@@ -47,7 +56,11 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
           .setBoundingBox(POSITION)
           .setProperty(
                   TextAnnotation.TextProperty.newBuilder()
-                          .addDetectedLanguages(TextAnnotation.DetectedLanguage.newBuilder().setConfidence(0.7f).setLanguageCode("ru"))
+                          .addDetectedLanguages(TextAnnotation
+                                  .DetectedLanguage
+                                  .newBuilder()
+                                  .setConfidence(0.7f)
+                                  .setLanguageCode("ru"))
           )
           .build();
 
@@ -57,7 +70,11 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
           .setBoundingBox(POSITION)
           .setProperty(
                   TextAnnotation.TextProperty.newBuilder()
-                          .addDetectedLanguages(TextAnnotation.DetectedLanguage.newBuilder().setConfidence(0.6f).setLanguageCode("ru"))
+                          .addDetectedLanguages(TextAnnotation
+                                  .DetectedLanguage
+                                  .newBuilder()
+                                  .setConfidence(0.6f)
+                                  .setLanguageCode("ru"))
           )
           .build();
 

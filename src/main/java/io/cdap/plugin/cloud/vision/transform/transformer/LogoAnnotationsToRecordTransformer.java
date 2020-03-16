@@ -19,7 +19,6 @@ package io.cdap.plugin.cloud.vision.transform.transformer;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

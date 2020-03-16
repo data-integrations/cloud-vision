@@ -19,7 +19,6 @@ package io.cdap.plugin.cloud.vision.transform.schema;
 import com.google.cloud.vision.v1.FaceAnnotation;
 import com.google.cloud.vision.v1.Likelihood;
 import io.cdap.cdap.api.data.schema.Schema;
-
 import java.util.ArrayList;
 import java.util.List;
 

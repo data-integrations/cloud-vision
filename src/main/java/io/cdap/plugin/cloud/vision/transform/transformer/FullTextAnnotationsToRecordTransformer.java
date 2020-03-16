@@ -16,11 +16,16 @@
 
 package io.cdap.plugin.cloud.vision.transform.transformer;
 
-import com.google.cloud.vision.v1.*;
+import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.Block;
+import com.google.cloud.vision.v1.Page;
+import com.google.cloud.vision.v1.Paragraph;
+import com.google.cloud.vision.v1.Symbol;
+import com.google.cloud.vision.v1.TextAnnotation;
+import com.google.cloud.vision.v1.Word;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.FullTextAnnotationSchema;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

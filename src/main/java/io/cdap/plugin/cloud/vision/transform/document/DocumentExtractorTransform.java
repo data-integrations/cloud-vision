@@ -34,7 +34,6 @@ import io.cdap.cdap.etl.api.Transform;
 import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.document.transformer.FileAnnotationToRecordTransformer;
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;

@@ -21,21 +21,22 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import io.cdap.plugin.cloud.vision.CredentialsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Helper class used to retrieve a list of Blobs from a GCSPath.
+ */
+
 public class GcsBucketHelper {
   // Logging
-  private static Logger LOG = LoggerFactory.getLogger(GcsBucketHelper.class);
+  private static Logger logger = LoggerFactory.getLogger(GcsBucketHelper.class);
 
   /**
-   * This is a helper function that returns a List of Blobs that are found in a given path on GCS.
+   * Helper function that returns a List of Blobs that are found in a given path on GCS.
    *
    * @param sourceFolderPath
    * @param credentials
@@ -63,54 +64,5 @@ public class GcsBucketHelper {
       }
     }
     return results;
-  }
-
-  private void logStringAsBytes(String s, String methodName, String msg) {
-    if (s == null)
-      return;
-    try {
-      final byte[] arrayUtf8 = s.getBytes("UTF-8");
-      StringBuilder sb = new StringBuilder(s.length() * 5);
-      for (byte b : arrayUtf8)
-        sb.append(b + " ");
-
-      LOG.info("PATRICE: " + methodName + " " + msg + ": " + sb.toString());
-    } catch (UnsupportedEncodingException e) {
-      ;
-    }
-  }
-
-  public static void main(String[] args) throws IOException {
-    final String SERVICE_ACCOUNT_FILE_PATH = "/Volumes/RAID1/Jobs/Cirus/CDAP/gcp-keys/cdap-vision-test01-19b37b9ff15c.json";
-    final String BUCKET = "gs://vision-api-pbo2/";
-
-    System.out.println("SERVICE_ACCOUNT_FILE_PATH: " + SERVICE_ACCOUNT_FILE_PATH);
-
-    String sourceFolderPath = BUCKET + "images";
-    Credentials credentials = CredentialsHelper.getCredentials(SERVICE_ACCOUNT_FILE_PATH);
-
-    List<Blob> blobs = GcsBucketHelper.getAllFilesInPath(sourceFolderPath, credentials);
-    if (blobs == null) {
-      System.out.println("No result");
-      return;
-    }
-
-    System.out.println();
-    System.out.println("Results:");
-    for (Blob blob : blobs) {
-      System.out.println("blob.getName(): " + blob.getName());
-    }
-
-    for (int MAX_NUMBER_OF_IMAGES_PER_BATCH = 1; MAX_NUMBER_OF_IMAGES_PER_BATCH < 10; MAX_NUMBER_OF_IMAGES_PER_BATCH++) {
-      System.out.println("MAX_NUMBER_OF_IMAGES_PER_BATCH=" + MAX_NUMBER_OF_IMAGES_PER_BATCH);
-      System.out.println("-----------------------");
-      for (int batch_id = 0; batch_id < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH); batch_id++) {
-        System.out.println("Batch=" + batch_id);
-        System.out.println("-----");
-        for (int index = batch_id * MAX_NUMBER_OF_IMAGES_PER_BATCH; (index < (batch_id + 1) * MAX_NUMBER_OF_IMAGES_PER_BATCH) && (index < blobs.size()); index++) {
-          System.out.println("Batch=" + batch_id + " index: " + index);
-        }
-      }
-    }
   }
 }

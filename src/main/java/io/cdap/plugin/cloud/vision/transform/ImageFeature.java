@@ -18,13 +18,22 @@ package io.cdap.plugin.cloud.vision.transform;
 
 import com.google.cloud.vision.v1.Feature;
 import io.cdap.cdap.api.data.schema.Schema;
-import io.cdap.plugin.cloud.vision.transform.schema.*;
-
-import javax.annotation.Nullable;
+import io.cdap.plugin.cloud.vision.transform.schema.ColorInfoSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.CropHintAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationWithPositionSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.FaceAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.FullTextAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.LocalizedObjectAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.ProductSearchResultsSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.SafeSearchAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.TextAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.WebDetectionSchema;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 /**
  * The features to extract from images.

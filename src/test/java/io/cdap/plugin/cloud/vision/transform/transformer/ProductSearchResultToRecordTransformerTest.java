@@ -27,7 +27,6 @@ import io.cdap.plugin.cloud.vision.transform.ProductCategory;
 import io.cdap.plugin.cloud.vision.transform.schema.ProductSearchResultsSchema;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.List;
 
 /**
@@ -39,7 +38,8 @@ public class ProductSearchResultToRecordTransformerTest extends BaseAnnotationsT
           .setImage("gs://product-search-tutorial/dress-shoe-dataset/469a896b70ba11e8be97d20059124800.jpg")
           .setScore(0.5f)
           .setProduct(Product.newBuilder()
-                  .setName("projects/prj-prod-search-tutorials/locations/us-east1/products/P_CLOTH-SHOE_46903668_070318")
+                  .setName("projects/prj-prod-search-tutorials/locations/us-east1/products/"
+                          + "P_CLOTH-SHOE_46903668_070318")
                   .setDisplayName("Blue Dress")
                   .setProductCategory(ProductCategory.APPAREL.getName())
                   .setDescription("Short sleeved and 1950s style satin dress")

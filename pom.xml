@@ -195,28 +195,6 @@
             <version>1.105.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>${common.codec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.core.version}</version>
-        </dependency>
-
         <!-- tests -->
 
         <dependency>
@@ -256,12 +234,6 @@
             <artifactId>httpclient</artifactId>
             <version>${httpcomponents.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -459,9 +431,9 @@
                             com.google.iam.v1,com.google.longrunning,com.google.longrunning.stub,com.google.protobuf.*,
                             com.google.rpc,com.google.type,io.cdap.plugin.cloud.vision.*,io.grpc,io.grpc.stub,
                             io.opencensus.common,io.opencensus.trace,io.opencensus.trace.config,
-                            io.opencensus.trace.export,io.opencensus.trace.propagation,javax.annotation.*,
-                            org.checkerframework.checker.nullness.qual,org.checkerframework.framework.qual,
-                            org.threeten.bp,org.threeten.bp.*
+                            io.opencensus.trace.export,io.opencensus.trace.propagation,
+                            org.checkerframework.checker.nullness.compatqual,org.checkerframework.checker.nullness.qual,
+                            org.checkerframework.framework.qual,org.threeten.bp,org.threeten.bp.*
                         </_exportcontents>
                         <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>

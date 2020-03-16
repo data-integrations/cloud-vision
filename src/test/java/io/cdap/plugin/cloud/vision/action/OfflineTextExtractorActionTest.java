@@ -17,7 +17,12 @@
 package io.cdap.plugin.cloud.vision.action;
 
 import com.google.auth.Credentials;
-import com.google.cloud.storage.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.BucketInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageClass;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.cdap.cdap.etl.api.action.ActionContext;
@@ -28,10 +33,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.annotation.Nullable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import javax.annotation.Nullable;
 
 /**
  * Test class for {@link OfflineTextExtractorAction}.
@@ -70,8 +74,9 @@ public class OfflineTextExtractorActionTest {
   }
 
   private static void deleteBucket(Storage storage, Bucket bucket) {
-    if (bucket == null || bucket.list() == null)
+    if (bucket == null || bucket.list() == null) {
       return;
+    }
     for (Blob blob : bucket.list().iterateAll()) {
       storage.delete(blob.getBlobId());
     }

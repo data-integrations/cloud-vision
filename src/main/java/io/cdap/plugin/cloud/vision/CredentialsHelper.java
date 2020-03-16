@@ -20,7 +20,6 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.ServiceOptions;
 import com.google.common.base.Strings;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

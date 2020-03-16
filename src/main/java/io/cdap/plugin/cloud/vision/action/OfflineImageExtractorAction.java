@@ -42,11 +42,9 @@ import io.cdap.cdap.etl.api.action.ActionContext;
 import io.cdap.plugin.cloud.vision.CredentialsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.annotation.Nullable;
 import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_IMAGES_PER_BATCH;
 
 /**
@@ -58,7 +56,7 @@ import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_I
 public class OfflineImageExtractorAction extends Action {
   public static final String PLUGIN_NAME = "OfflineImageExtractor";
   private final OfflineImageExtractorActionConfig config;
-  private static Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
+  private static Logger logger = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
 
   public OfflineImageExtractorAction(OfflineImageExtractorActionConfig config) {
     if (config.getSourcePath() != null) {
@@ -95,7 +93,7 @@ public class OfflineImageExtractorAction extends Action {
             .setUri(destinationPath)
             .build();
 
-    LOG.info("Setting destination path to: " + destinationPath);
+    logger.info("Setting destination path to: " + destinationPath);
 
     OutputConfig outputConfig = OutputConfig.newBuilder()
             .setGcsDestination(gcsDestination)
@@ -109,7 +107,7 @@ public class OfflineImageExtractorAction extends Action {
     // Get all the blobs in the source path
     List<Blob> blobs = GcsBucketHelper.getAllFilesInPath(config.getSourcePath(), credentials);
     if (blobs.isEmpty()) {
-      LOG.warn("Nothing found to process in path: " + config.getSourcePath());
+      logger.warn("Nothing found to process in path: " + config.getSourcePath());
       return;
     }
 
@@ -133,7 +131,7 @@ public class OfflineImageExtractorAction extends Action {
           Blob blob = blobs.get(index);
           // Rebuild the full path of the blob
           String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
-          LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
+          logger.info("Adding blob: " + fullBlobPath + " to the list of requests");
 
           ImageSource imageSource = ImageSource.newBuilder()
                   .setImageUri(fullBlobPath)

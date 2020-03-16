@@ -17,7 +17,12 @@
 package io.cdap.plugin.cloud.vision.action;
 
 import com.google.auth.Credentials;
-import com.google.cloud.storage.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.BucketInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageClass;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.cdap.cdap.etl.api.action.ActionContext;
@@ -30,10 +35,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.annotation.Nullable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import javax.annotation.Nullable;
 
 /**
  * Test class for {@link OfflineImageExtractorAction}.
@@ -41,8 +45,10 @@ import java.io.FileNotFoundException;
 public class OfflineImageExtractorActionTest {
 
   private static final String PROJECT = System.getProperty("project", CloudVisionConstants.AUTO_DETECT);
-  private static final String SERVICE_ACCOUNT_FILE_PATH = System.getProperty("serviceFilePath", CloudVisionConstants.AUTO_DETECT);
-  private static final String PATH = System.getProperty("path", "gs://cloud-vision-cdap-text-image-extractor-offline");
+  private static final String SERVICE_ACCOUNT_FILE_PATH = System.getProperty("serviceFilePath",
+          CloudVisionConstants.AUTO_DETECT);
+  private static final String PATH = System.getProperty("path",
+          "gs://cloud-vision-cdap-text-image-extractor-offline");
   private static final String PATH_PATTERN = "%s/%s/";
   private static final String RESULT_PATH_PATTERN = "%s/%s";
 
@@ -81,12 +87,18 @@ public class OfflineImageExtractorActionTest {
     String path = String.format("src/test/resources/%s", OBJECT_IMAGE_NAME);
 
     FileInputStream serviceAccountStream = new FileInputStream(path);
-    bucket.create(OBJECT_IMAGE_NAME, serviceAccountStream, JPG_CONTENT_TYPE, Bucket.BlobWriteOption.doesNotExist());
+    bucket.create(OBJECT_IMAGE_NAME,
+            serviceAccountStream,
+            JPG_CONTENT_TYPE,
+            Bucket.BlobWriteOption.doesNotExist());
 
     path = String.format("src/test/resources/%s", SAFE_IMAGE_NAME);
 
     serviceAccountStream = new FileInputStream(path);
-    bucket.create(SAFE_IMAGE_NAME, serviceAccountStream, JPG_CONTENT_TYPE, Bucket.BlobWriteOption.doesNotExist());
+    bucket.create(SAFE_IMAGE_NAME,
+            serviceAccountStream,
+            JPG_CONTENT_TYPE,
+            Bucket.BlobWriteOption.doesNotExist());
   }
 
   private static Storage getStorage(String project, @Nullable Credentials credentials) {

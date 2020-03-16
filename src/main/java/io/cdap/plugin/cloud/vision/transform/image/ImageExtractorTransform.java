@@ -35,7 +35,6 @@ import io.cdap.plugin.cloud.vision.transform.transformer.ImageAnnotationToRecord
 import io.cdap.plugin.cloud.vision.transform.transformer.TransformerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   private ImageExtractorTransformConfig config;
   private Schema inputSchema;
   private Schema outputSchema;
-  private static Logger LOG = LoggerFactory.getLogger(ImageExtractorTransform.class);
+  private static Logger logger = LoggerFactory.getLogger(ImageExtractorTransform.class);
 
   public ImageExtractorTransform(ImageExtractorTransformConfig config) {
     this.config = config;
@@ -94,7 +93,7 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   @Override
   public void transform(StructuredRecord input, Emitter<StructuredRecord> emitter) {
     String imagePath = input.get(config.getPathField());
-    LOG.info("Processing: " + imagePath);
+    logger.info("Processing: " + imagePath);
     try {
       AnnotateImageResponse response = imageAnnotatorClient.extractImageFeature(imagePath);
       StructuredRecord transformed = transformer.transform(input, response);

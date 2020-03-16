@@ -28,9 +28,8 @@ import com.google.cloud.vision.v1.ProductSearchParams;
 import io.cdap.plugin.cloud.vision.exception.CloudVisionExecutionException;
 import io.cdap.plugin.cloud.vision.transform.CloudVisionClient;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
-
-import javax.annotation.Nullable;
 import java.util.Collections;
+import javax.annotation.Nullable;
 
 /**
  * Provides handy methods to access Google Cloud Vision.

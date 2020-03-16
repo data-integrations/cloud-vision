@@ -23,7 +23,6 @@ import io.cdap.plugin.cloud.vision.CloudVisionConstants;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;

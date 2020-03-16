@@ -28,7 +28,6 @@ import com.google.cloud.vision.v1.InputConfig;
 import com.google.protobuf.ByteString;
 import io.cdap.plugin.cloud.vision.exception.CloudVisionExecutionException;
 import io.cdap.plugin.cloud.vision.transform.CloudVisionClient;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,7 +82,9 @@ public class DocumentAnnotatorClient extends CloudVisionClient {
       List<String> errors = annotateFileResponse.getResponsesList().stream()
               .filter(AnnotateImageResponse::hasError)
               .map(r -> {
-                return String.format("Page '%d' has error: '%s'.", r.getContext().getPageNumber(), r.getError().getMessage());
+                return String.format("Page '%d' has error: '%s'.",
+                        r.getContext().getPageNumber(),
+                        r.getError().getMessage());
               })
               .collect(Collectors.toList());
 
