@@ -189,10 +189,108 @@
             </exclusions>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>io.cdap.plugin</groupId>-->
+<!--            <artifactId>google-cloud</artifactId>-->
+<!--            <version>${google.cloud.version}</version>-->
+
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.avro</groupId>-->
+<!--                    <artifactId>avro</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.avro</groupId>-->
+<!--                    <artifactId>avro-mapred</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>io.thekraken</groupId>-->
+<!--                    <artifactId>grok</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.bahir</groupId>-->
+<!--                    <artifactId>spark-streaming-pubsub_2.11</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>commons-codec</groupId>-->
+<!--                    <artifactId>commons-codec</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.cloud.bigdataoss</groupId>-->
+<!--                    <artifactId>bigquery-connector</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.flogger</groupId>-->
+<!--                    <artifactId>flogger-system-backend</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.cloud.bigtable</groupId>-->
+<!--                    <artifactId>bigtable-hbase-1.x-mapreduce</artifactId>-->
+<!--                </exclusion>-->
+
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.hbase</groupId>-->
+<!--                    <artifactId>hbase-shaded-client</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.hbase</groupId>-->
+<!--                    <artifactId>hbase-shaded-server</artifactId>-->
+<!--                </exclusion>-->
+
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.cloud</groupId>-->
+<!--                    <artifactId>google-cloud-bigquery</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.cloud</groupId>-->
+<!--                    <artifactId>google-cloud-spanner</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.cloud</groupId>-->
+<!--                    <artifactId>google-cloud-speech</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.cloud</groupId>-->
+<!--                    <artifactId>google-cloud-pubsub</artifactId>-->
+<!--                </exclusion>-->
+
+<!--            </exclusions>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+            <version>1.105.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${common.codec.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+
+        <!-- tests -->
+
         <dependency>
             <groupId>io.cdap.plugin</groupId>
             <artifactId>google-cloud</artifactId>
             <version>${google.cloud.version}</version>
+            <scope>test</scope>
 
             <exclusions>
                 <exclusion>
@@ -256,35 +354,7 @@
 
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-storage</artifactId>
-            <version>1.105.1</version>
-        </dependency>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>${common.codec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.core.version}</version>
-        </dependency>
-
-        <!-- tests -->
         <dependency>
             <groupId>io.cdap.cdap</groupId>
             <artifactId>hydrator-test</artifactId>
@@ -538,4 +608,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
