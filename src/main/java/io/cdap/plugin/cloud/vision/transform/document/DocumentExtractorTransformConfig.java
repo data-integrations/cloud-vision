@@ -118,14 +118,16 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
    */
   public void validateInputSchema(Schema inputSchema, FailureCollector collector) {
     Schema.Field contentField = inputSchema.getField(getContentField());
-    if (contentField != null) {
-      collector.addFailure(String.format("Content field '%s' is expected to be 'bytes'", getContentField()), null)
-              .withInputSchemaField(getContentField());
+    if (contentField != null && !(contentField.getSchema().getType() == Schema.Type.BYTES)) {
+      collector.addFailure(
+              String.format("Content field '%s' is expected to be 'bytes'", getContentField()),
+              null).withInputSchemaField(getContentField());
     }
     Schema.Field pathField = inputSchema.getField(getPathField());
-    if (pathField != null) {
-      collector.addFailure(String.format("Path field '%s' is expected to be a string", getPathField()), null)
-              .withInputSchemaField(getPathField());
+    if (pathField != null && !(pathField.getSchema().getType() == Schema.Type.STRING)) {
+      collector.addFailure(
+              String.format("Path field '%s' is expected to be a string", getPathField()),
+              null).withInputSchemaField(getPathField());
     }
   }
 

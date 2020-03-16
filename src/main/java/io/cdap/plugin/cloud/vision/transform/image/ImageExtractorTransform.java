@@ -107,7 +107,7 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     }
   }
 
-  public Schema getOutputSchema(Schema inputSchema) {
+  private Schema getOutputSchema(Schema inputSchema) {
     List<Schema.Field> fields = new ArrayList<>();
     if (inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());

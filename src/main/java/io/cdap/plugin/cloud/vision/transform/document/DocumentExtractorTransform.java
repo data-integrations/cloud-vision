@@ -24,7 +24,14 @@ import io.cdap.cdap.api.annotation.Plugin;
 import io.cdap.cdap.api.common.Bytes;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
-import io.cdap.cdap.etl.api.*;
+import io.cdap.cdap.etl.api.Emitter;
+import io.cdap.cdap.etl.api.FailureCollector;
+import io.cdap.cdap.etl.api.InvalidEntry;
+import io.cdap.cdap.etl.api.PipelineConfigurer;
+import io.cdap.cdap.etl.api.StageConfigurer;
+import io.cdap.cdap.etl.api.StageSubmitterContext;
+import io.cdap.cdap.etl.api.Transform;
+import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.document.transformer.FileAnnotationToRecordTransformer;
 
@@ -50,6 +57,7 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   private FileAnnotationToRecordTransformer transformer;
   private DocumentExtractorTransformConfig config;
   private Schema inputSchema;
+  private Schema outputSchema;
 
   public DocumentExtractorTransform(DocumentExtractorTransformConfig config) {
     this.config = config;
@@ -58,31 +66,21 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   @Override
   public void configurePipeline(PipelineConfigurer configurer) throws IllegalArgumentException {
     super.configurePipeline(configurer);
-    inputSchema = configurer.getStageConfigurer().getInputSchema();
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
-    FailureCollector collector = stageConfigurer.getFailureCollector();
+    inputSchema = configurer.getStageConfigurer().getInputSchema();
+    outputSchema = getOutputSchema();
+    stageConfigurer.setOutputSchema(outputSchema);
+    stageConfigurer.setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
 
+    FailureCollector collector = stageConfigurer.getFailureCollector();
     config.validate(collector);
     collector.getOrThrowException();
 
     config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
 
-    Schema schema = getSchema();
-    Schema configuredSchema = config.getParsedSchema();
-    if (configuredSchema == null) {
-      configurer.getStageConfigurer().setOutputSchema(schema);
-      return;
-    }
-
-    config.validateOutputSchema(configuredSchema, collector);
+    config.validateOutputSchema(outputSchema, collector);
     collector.getOrThrowException();
-
-    ExtractorTransformConfig.validateFieldsMatch(schema, configuredSchema, collector);
-    collector.getOrThrowException();
-
-    configurer.getStageConfigurer().setOutputSchema(configuredSchema);
-    configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
 
   @Override
@@ -133,9 +131,9 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     emitter.emit(transformed);
   }
 
-  public Schema getSchema() {
+  private Schema getOutputSchema() {
     List<Schema.Field> fields = new ArrayList<>();
-    if (inputSchema.getFields() != null) {
+    if (inputSchema != null && inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());
     }
 
