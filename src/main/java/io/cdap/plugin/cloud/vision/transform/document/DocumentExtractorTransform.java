@@ -33,15 +33,16 @@ import io.cdap.cdap.etl.api.StageSubmitterContext;
 import io.cdap.cdap.etl.api.Transform;
 import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
-import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.document.transformer.FileAnnotationToRecordTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This transform plugin can detect and transcribe text from small (up to 5 pages) PDF and TIFF
- * files stored in Cloud Storage.
+ * This transform plugin can detect and transcribe text from small(up to 5 pages) PDF and TIFF files stored in
+ * Cloud Storage.
  */
 @Plugin(type = Transform.PLUGIN_TYPE)
 @Name(DocumentExtractorTransform.PLUGIN_NAME)
@@ -57,18 +58,14 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   private FileAnnotationToRecordTransformer transformer;
   private DocumentExtractorTransformConfig config;
   private Schema inputSchema;
-  private Schema outputSchema;
 
-  public DocumentExtractorTransform(DocumentExtractorTransformConfig config) {
-    this.config = config;
-  }
-
+  // Does not have values, check the macro
   @Override
   public void configurePipeline(PipelineConfigurer configurer) throws IllegalArgumentException {
     super.configurePipeline(configurer);
-    StageConfigurer stageConfigurer = configurer.getStageConfigurer();
-    inputSchema = configurer.getStageConfigurer().getInputSchema();
 
+    StageConfigurer stageConfigurer = configurer.getStageConfigurer();
+    inputSchema = stageConfigurer.getInputSchema();
     FailureCollector collector = stageConfigurer.getFailureCollector();
     config.validate(collector);
     collector.getOrThrowException();
@@ -76,17 +73,12 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
 
-    if (!config.containsMacro(ExtractorTransformConstants.OUTPUT_FIELD)) {
-      outputSchema = getOutputSchema();
-      stageConfigurer.setOutputSchema(outputSchema);
-
-      config.validateOutputSchema(outputSchema, collector);
-      collector.getOrThrowException();
-    }
-
-    stageConfigurer.setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
+    Schema outputSchema = getSchema();
+    configurer.getStageConfigurer().setOutputSchema(outputSchema);
+    configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
 
+  // That's where CDAP gives the actual value for a macro
   @Override
   public void prepareRun(StageSubmitterContext context) throws Exception {
     super.prepareRun(context);
@@ -98,15 +90,9 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   @Override
   public void initialize(TransformContext context) throws Exception {
     super.initialize(context);
-
-    if (this.outputSchema == null) {
-      this.outputSchema = getOutputSchema();
-      FailureCollector collector = context.getFailureCollector();
-      config.validateOutputSchema(outputSchema, collector);
-      collector.getOrThrowException();
-    }
+    Schema schema = context.getOutputSchema();
     // create new document transformer
-    transformer = new FileAnnotationToRecordTransformer(config, this.outputSchema);
+    transformer = new FileAnnotationToRecordTransformer(config, schema);
     documentAnnotatorClient = new DocumentAnnotatorClient(config);
   }
 
@@ -141,20 +127,16 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     emitter.emit(transformed);
   }
 
-  private Schema getOutputSchema() {
+  public Schema getSchema() {
     List<Schema.Field> fields = new ArrayList<>();
+    // Add the input fields
     if (inputSchema != null && inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());
     }
-
+    // Add the fields of the image feature schema
     Schema pagesSchema = pagesSchema(config.getImageFeature().getSchema());
-
-    if (!config.containsMacro(DocumentExtractorTransformConstants.OUTPUT_FIELD)) {
-      fields.add(Schema.Field.of(config.getOutputField(), pagesSchema));
-    } else {
-      // There is a Macro, use a default name
-      fields.add(Schema.Field.of("default_name", pagesSchema));
-    }
+    fields.add(Schema.Field.of(config.getOutputField(), pagesSchema));
+    // Build a schema combining all
     return Schema.recordOf("record", fields);
   }
 

@@ -286,8 +286,8 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
 
   private StructuredRecord extractDetectedLanguage(TextAnnotation.DetectedLanguage language, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
-    if (schema.getField(FullTextAnnotationSchema.DetectedLanguage.CODE_FIELD_NAME) != null) {
-      builder.set(FullTextAnnotationSchema.DetectedLanguage.CODE_FIELD_NAME, language.getLanguageCode());
+    if (schema.getField(FullTextAnnotationSchema.DetectedLanguage.LANGUAGE_CODE_FIELD_NAME) != null) {
+      builder.set(FullTextAnnotationSchema.DetectedLanguage.LANGUAGE_CODE_FIELD_NAME, language.getLanguageCode());
     }
     if (schema.getField(FullTextAnnotationSchema.DetectedLanguage.CONFIDENCE_FIELD_NAME) != null) {
       builder.set(FullTextAnnotationSchema.DetectedLanguage.CONFIDENCE_FIELD_NAME, language.getConfidence());

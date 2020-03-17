@@ -5,7 +5,7 @@
         "scope": "SYSTEM"
     },
     "description": "Data Pipeline Application",
-    "name": "Offline_Image_Extractor_Crop_Hint_01",
+    "name": "Offline_Image_Extractor_Crop_Hint",
     "config": {
         "resources": {
             "memoryMB": 2048,

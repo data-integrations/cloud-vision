@@ -76,7 +76,7 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
   private String batchSize;
 
   // Debug
-  private static Logger logger = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
 
   public OfflineImageExtractorActionConfig(@Nullable String serviceFilePath, String features,
                                            @Nullable String languageHints, @Nullable String aspectRatios,
@@ -250,9 +250,6 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     private String destinationPath;
     @Nullable
     private String batchSize;
-
-    // Debug
-    private static Logger logger = LoggerFactory.getLogger(OfflineImageExtractorActionConfig.Builder.class);
 
     private Builder() {
     }

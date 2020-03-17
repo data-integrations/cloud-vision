@@ -56,7 +56,7 @@ import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_I
 public class OfflineImageExtractorAction extends Action {
   public static final String PLUGIN_NAME = "OfflineImageExtractor";
   private final OfflineImageExtractorActionConfig config;
-  private static Logger logger = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
 
   public OfflineImageExtractorAction(OfflineImageExtractorActionConfig config) {
     if (config.getSourcePath() != null) {
@@ -93,7 +93,7 @@ public class OfflineImageExtractorAction extends Action {
             .setUri(destinationPath)
             .build();
 
-    logger.info("Setting destination path to: " + destinationPath);
+    LOG.info("Setting destination path to: " + destinationPath);
 
     OutputConfig outputConfig = OutputConfig.newBuilder()
             .setGcsDestination(gcsDestination)
@@ -107,7 +107,7 @@ public class OfflineImageExtractorAction extends Action {
     // Get all the blobs in the source path
     List<Blob> blobs = GcsBucketHelper.getAllFilesInPath(config.getSourcePath(), credentials);
     if (blobs.isEmpty()) {
-      logger.warn("Nothing found to process in path: " + config.getSourcePath());
+      LOG.warn("Nothing found to process in path: " + config.getSourcePath());
       return;
     }
 
@@ -131,7 +131,7 @@ public class OfflineImageExtractorAction extends Action {
           Blob blob = blobs.get(index);
           // Rebuild the full path of the blob
           String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
-          logger.info("Adding blob: " + fullBlobPath + " to the list of requests");
+          LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
 
           ImageSource imageSource = ImageSource.newBuilder()
                   .setImageUri(fullBlobPath)

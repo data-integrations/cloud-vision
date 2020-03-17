@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 
 /**
  * Builder class that provides handy methods to construct {@link ExtractorTransformConfig} for testing.
+ *
  */
 public abstract class ExtractorTransformConfigBuilder<T extends ExtractorTransformConfigBuilder>
         extends CloudVisionConfigBuilder<T> {

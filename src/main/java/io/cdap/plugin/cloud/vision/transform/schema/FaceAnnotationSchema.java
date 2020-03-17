@@ -112,7 +112,7 @@ public class FaceAnnotationSchema {
           Schema.Field.of(SORROW_FIELD_NAME, Schema.of(Schema.Type.STRING)),
           Schema.Field.of(HEADWEAR_FIELD_NAME, Schema.of(Schema.Type.STRING)),
           Schema.Field.of(BOUNDING_POLY_NAME, Schema.arrayOf(VertexSchema.SCHEMA)),
-          Schema.Field.of(FD_BOUNDING_POLY_NAME, Schema.arrayOf(VertexSchema.SCHEMA)),
+          Schema.Field.of(FD_BOUNDING_POLY_NAME, Schema.arrayOf(VertexSchema.SCHEMA2)),
           Schema.Field.of(LANDMARKS_FIELD_NAME, Schema.arrayOf(FaceLandmark.SCHEMA))
   );
 
@@ -156,6 +156,46 @@ public class FaceAnnotationSchema {
             Schema.Field.of(Z_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
 
     private FaceLandmark() {
+      throw new AssertionError("Should not instantiate static utility class.");
+    }
+  }
+
+  /**
+   * {@link com.google.cloud.vision.v1.FaceAnnotation.Landmark} mapped to a record with the
+   * following fields.
+   */
+  public static class FaceLandmark2 {
+
+    /**
+     * Face landmark type.
+     */
+    public static final String TYPE_FIELD_NAME = "type";
+
+    /**
+     * X coordinate.
+     */
+    public static final String X_FIELD_NAME = "x";
+
+    /**
+     * Y coordinate.
+     */
+    public static final String Y_FIELD_NAME = "y";
+
+    /**
+     * Z coordinate.
+     */
+    public static final String Z_FIELD_NAME = "z";
+
+    public static final Schema SCHEMA = Schema.recordOf("face-landmark-record2",
+            // The following field is not a simple type as it is defined as an Enum
+            Schema.Field.of(TYPE_FIELD_NAME, Schema.enumWith(
+                    FaceAnnotationSchema.getIterableFromEnum(
+                            FaceAnnotation.Landmark.Type.values()))),
+            Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+            Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+            Schema.Field.of(Z_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
+
+    private FaceLandmark2() {
       throw new AssertionError("Should not instantiate static utility class.");
     }
   }

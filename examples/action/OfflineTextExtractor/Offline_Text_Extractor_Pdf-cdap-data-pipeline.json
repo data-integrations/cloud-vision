@@ -1,5 +1,5 @@
 {
-    "name": "Offline_Text_Extractor_Pdf_v2",
+    "name": "Offline_Text_Extractor_Pdf",
     "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",

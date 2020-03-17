@@ -37,7 +37,7 @@ public class FullTextAnnotationSchema {
    */
   public static final String PAGES_FIELD_NAME = "pages";
   public static final Schema SCHEMA = Schema.recordOf(
-          "document-text-annotation-component-record",
+          "fullTextAnnotation",
           Schema.Field.of(TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
           Schema.Field.of(PAGES_FIELD_NAME, Schema.arrayOf(TextPage.SCHEMA)));
 
@@ -304,6 +304,11 @@ public class FullTextAnnotationSchema {
     public static final String BLOCKS_FIELD_NAME = "blocks";
 
     /**
+     * Property section that contains detected languages
+     */
+    public static final String PROPERTY_FIELD_NAME = "property";
+
+    /**
      * A list of detected languages together with confidence.
      */
     public static final String DETECTED_LANGUAGES_FIELD_NAME = "detectedLanguages";
@@ -316,11 +321,11 @@ public class FullTextAnnotationSchema {
     public static final Schema SCHEMA = Schema.recordOf(
             "document-text-page-record",
             Schema.Field.of(TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(WIDTH_FIELD_NAME, Schema.of(Schema.Type.INT)),
-            Schema.Field.of(HEIGHT_FIELD_NAME, Schema.of(Schema.Type.INT)),
+            Schema.Field.of(WIDTH_FIELD_NAME, Schema.of(Schema.Type.INT)),         //
+            Schema.Field.of(HEIGHT_FIELD_NAME, Schema.of(Schema.Type.INT)),        //
             Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-            Schema.Field.of(BLOCKS_FIELD_NAME, Schema.arrayOf(TextBlock.SCHEMA)),
-            Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(DetectedLanguage.SCHEMA))),
+            Schema.Field.of(BLOCKS_FIELD_NAME, Schema.arrayOf(TextBlock.SCHEMA)),  //
+            Schema.Field.of(PROPERTY_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(DetectedLanguage.SCHEMA))),
             Schema.Field.of(DETECTED_BREAK_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))));
   }
 
@@ -334,7 +339,7 @@ public class FullTextAnnotationSchema {
      * The BCP-47 language code, such as "en-US" or "sr-Latn". For more information, see
      * http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
      */
-    public static final String CODE_FIELD_NAME = "code";
+    public static final String LANGUAGE_CODE_FIELD_NAME = "languageCode";
 
     /**
      * Confidence of detected language. Range [0, 1].
@@ -342,8 +347,8 @@ public class FullTextAnnotationSchema {
     public static final String CONFIDENCE_FIELD_NAME = "confidence";
 
     public static final Schema SCHEMA = Schema.recordOf(
-            "detected-language-record",
-            Schema.Field.of(CODE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+            "detectedLanguages",
+            Schema.Field.of(LANGUAGE_CODE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
             Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
   }
 }

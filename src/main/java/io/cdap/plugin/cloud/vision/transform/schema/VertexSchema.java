@@ -36,6 +36,10 @@ public class VertexSchema {
           Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
           Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
 
+  public static final Schema SCHEMA2 = Schema.recordOf("vertex-record2",
+          Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
+          Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
+
   private VertexSchema() {
     throw new AssertionError("Should not instantiate static utility class.");
   }

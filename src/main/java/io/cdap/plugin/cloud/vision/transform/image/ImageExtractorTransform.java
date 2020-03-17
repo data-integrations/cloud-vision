@@ -57,19 +57,13 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   private ImageAnnotationToRecordTransformer transformer;
   private ImageExtractorTransformConfig config;
   private Schema inputSchema;
-  private Schema outputSchema;
-  private static Logger logger = LoggerFactory.getLogger(ImageExtractorTransform.class);
-
-  public ImageExtractorTransform(ImageExtractorTransformConfig config) {
-    this.config = config;
-  }
 
   @Override
   public void configurePipeline(PipelineConfigurer configurer) throws IllegalArgumentException {
     super.configurePipeline(configurer);
+
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
     inputSchema = stageConfigurer.getInputSchema();
-
     FailureCollector collector = stageConfigurer.getFailureCollector();
     config.validate(collector);
     collector.getOrThrowException();
@@ -77,9 +71,9 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
 
-    outputSchema = getOutputSchema(inputSchema);
-    stageConfigurer.setOutputSchema(outputSchema);
-    stageConfigurer.setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
+    Schema outputSchema = getOutputSchema(inputSchema);
+    configurer.getStageConfigurer().setOutputSchema(outputSchema);
+    configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
 
   @Override
@@ -93,16 +87,14 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   @Override
   public void initialize(TransformContext context) throws Exception {
     super.initialize(context);
-    outputSchema = getOutputSchema(context.getInputSchema());
     transformer = TransformerFactory.createInstance(config.getImageFeature(),
-            config.getOutputField(), outputSchema);
+            config.getOutputField(), context.getOutputSchema());
     imageAnnotatorClient = new ImageAnnotatorClient(config);
   }
 
   @Override
   public void transform(StructuredRecord input, Emitter<StructuredRecord> emitter) {
     String imagePath = input.get(config.getPathField());
-    logger.info("Processing: " + imagePath);
     try {
       AnnotateImageResponse response = imageAnnotatorClient.extractImageFeature(imagePath);
       StructuredRecord transformed = transformer.transform(input, response);
@@ -115,16 +107,15 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     }
   }
 
-  public Schema getOutputSchema(Schema inputSchema) {
+  protected Schema getOutputSchema(Schema inputSchema) {
     List<Schema.Field> fields = new ArrayList<>();
+    // Add the input fields
     if (inputSchema != null && inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());
     }
-
-    if (!config.containsMacro(ExtractorTransformConstants.OUTPUT_FIELD)) {
-      fields.add(Schema.Field.of(config.getOutputField(), config.getImageFeature().getSchema()));
-    }
-
+    // Add the fields of the image feature schema
+    fields.add(Schema.Field.of(config.getOutputField(), config.getImageFeature().getSchema()));
+    // Build a schema combining all
     return Schema.recordOf("record", fields);
   }
 }

@@ -29,17 +29,15 @@ import java.util.stream.Collectors;
 
 
 /**
- * Transforms {@link AnnotateFileResponse} to {@link StructuredRecord} according to the specified
- * schema.
+ * Transforms {@link AnnotateFileResponse} to {@link StructuredRecord} according to the specified schema.
  */
 public class FileAnnotationToRecordTransformer {
 
   private static final Schema SINGLE_FIELD_RECORD_SCHEMA = Schema.recordOf("single-field",
           Schema.Field.of("dummy", Schema.of(Schema.Type.STRING)));
-  private static final StructuredRecord SINGLE_FIELD_RECORD =
-          StructuredRecord.builder(SINGLE_FIELD_RECORD_SCHEMA)
-                  .set("dummy", "dummy")
-                  .build();
+  private static final StructuredRecord SINGLE_FIELD_RECORD = StructuredRecord.builder(SINGLE_FIELD_RECORD_SCHEMA)
+          .set("dummy", "dummy")
+          .build();
 
   private final ImageAnnotationToRecordTransformer transformer;
   private final Schema schema;

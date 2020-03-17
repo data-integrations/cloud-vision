@@ -78,7 +78,7 @@
                         "pages": "1,2,3,4,5",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
                         "pathField": "body",
-                        "outputField": "${OUTPUT_FIELD_NAME}"
+                        "outputField": "vision_output"
                     }
                 },
                 "outputSchema": [

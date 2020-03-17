@@ -33,7 +33,7 @@ import java.util.List;
 
 public class GcsBucketHelper {
   // Logging
-  private static Logger logger = LoggerFactory.getLogger(GcsBucketHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GcsBucketHelper.class);
 
   /**
    * Helper function that returns a List of Blobs that are found in a given path on GCS.
