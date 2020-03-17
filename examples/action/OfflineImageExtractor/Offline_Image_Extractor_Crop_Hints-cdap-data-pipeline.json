@@ -1,11 +1,11 @@
 {
-    "name": "GCS_Offline_Image_Extractor_Localizations",
-    "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
         "version": "6.1.1",
         "scope": "SYSTEM"
     },
+    "description": "Data Pipeline Application",
+    "name": "Offline_Image_Extractor_Crop_Hint_01",
     "config": {
         "resources": {
             "memoryMB": 2048,
@@ -50,7 +50,7 @@
                         "recursive": "true",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
                         "referenceName": "gcs-get-json-image-face",
-                        "path": "${GCS_LOCALIZATION_DESTINATION_PATH}"
+                        "path": "${GCS_CROP_HINT_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [
@@ -58,10 +58,7 @@
                         "name": "etlSchemaBody",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
-                ],
-                "type": "batchsource",
-                "label": "GCS",
-                "icon": "fa-plug"
+                ]
             },
             {
                 "name": "File",
@@ -88,10 +85,7 @@
                         "name": "GCS",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
-                ],
-                "type": "batchsink",
-                "label": "File",
-                "icon": "icon-file"
+                ]
             },
             {
                 "name": "Offline Image Extractor",
@@ -106,10 +100,10 @@
                     },
                     "properties": {
                         "serviceFilePath": "${GCP_JSON_KEY_PATH}",
-                        "features": "Object Localization",
+                        "features": "Crop Hints",
                         "batchSize": "${GCS_IMAGE_BATCH_SIZE}",
                         "sourcePath": "${GCS_IMAGE_SOURCE_PATH}",
-                        "destinationPath": "${GCS_LOCALIZATION_DESTINATION_PATH}"
+                        "destinationPath": "${GCS_CROP_HINT_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [
@@ -117,10 +111,7 @@
                         "name": "etlSchemaBody",
                         "schema": ""
                     }
-                ],
-                "type": "action",
-                "label": "Offline Image Extractor",
-                "icon": "fa-plug"
+                ]
             }
         ],
         "schedule": "0 * * * *",

@@ -1,5 +1,5 @@
 {
-    "name": "GCS_Offline_Text_Extractor_Pdf_v2",
+    "name": "Offline_Image_Extractor_Web_Detections",
     "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
@@ -21,7 +21,7 @@
                 "to": "File"
             },
             {
-                "from": "Offline Text Extractor",
+                "from": "Offline Image Extractor",
                 "to": "GCS"
             }
         ],
@@ -49,8 +49,8 @@
                         "filenameOnly": "false",
                         "recursive": "true",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
-                        "referenceName": "gcs-extracted-text",
-                        "path": "${GCS_TEXT_EXTRACTED_DESTINATION_PATH}"
+                        "referenceName": "gcs-get-json-image-face",
+                        "path": "${GCS_WEB_DETECTION_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [
@@ -78,8 +78,8 @@
                         "suffix": "yyyy-MM-dd-HH-mm",
                         "format": "json",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
-                        "path": "${FS_DESTINATION_PATH}",
-                        "referenceName": "file-extracted"
+                        "referenceName": "gcs-json-image-face",
+                        "path": "${FS_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
@@ -94,11 +94,11 @@
                 "icon": "icon-file"
             },
             {
-                "name": "Offline Text Extractor",
+                "name": "Offline Image Extractor",
                 "plugin": {
-                    "name": "OfflineTextExtractor",
+                    "name": "OfflineImageExtractor",
                     "type": "action",
-                    "label": "Offline Text Extractor",
+                    "label": "Offline Image Extractor",
                     "artifact": {
                         "name": "cloud-vision",
                         "version": "1.0.0-SNAPSHOT",
@@ -106,10 +106,11 @@
                     },
                     "properties": {
                         "serviceFilePath": "${GCP_JSON_KEY_PATH}",
-                        "mimeType": "application/pdf",
+                        "features": "Web Detection",
+                        "batchSize": "${GCS_IMAGE_BATCH_SIZE}",
+                        "includeGeoResults": "on",
                         "sourcePath": "${GCS_IMAGE_SOURCE_PATH}",
-                        "destinationPath": "${GCS_TEXT_EXTRACTED_DESTINATION_PATH}",
-                        "batchSize": "20"
+                        "destinationPath": "${GCS_WEB_DETECTION_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [
@@ -119,7 +120,7 @@
                     }
                 ],
                 "type": "action",
-                "label": "Offline Text Extractor",
+                "label": "Offline Image Extractor",
                 "icon": "fa-plug"
             }
         ],

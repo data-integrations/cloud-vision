@@ -1,0 +1,130 @@
+{
+    "name": "Image_Extractor_Logos",
+    "description": "Data Pipeline Application",
+    "artifact": {
+        "name": "cdap-data-pipeline",
+        "version": "6.1.1",
+        "scope": "SYSTEM"
+    },
+    "config": {
+        "resources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "driverResources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "connections": [
+            {
+                "from": "File",
+                "to": "Image Extractor"
+            },
+            {
+                "from": "Image Extractor",
+                "to": "File2"
+            }
+        ],
+        "comments": [],
+        "postActions": [],
+        "properties": {},
+        "processTimingEnabled": true,
+        "stageLoggingEnabled": false,
+        "stages": [
+            {
+                "name": "File",
+                "plugin": {
+                    "name": "File",
+                    "type": "batchsource",
+                    "label": "File",
+                    "artifact": {
+                        "name": "core-plugins",
+                        "version": "2.3.4",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "format": "text",
+                        "filenameOnly": "false",
+                        "recursive": "false",
+                        "ignoreNonExistingFolders": "false",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
+                        "referenceName": "ImagePaths",
+                        "path": "${FS_LIST_OF_IMAGES_PATH}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "Image Extractor",
+                "plugin": {
+                    "name": "ImageExtractor",
+                    "type": "transform",
+                    "label": "Image Extractor",
+                    "artifact": {
+                        "name": "cloud-vision",
+                        "version": "1.0.0-SNAPSHOT",
+                        "scope": "USER"
+                    },
+                    "properties": {
+                        "serviceFilePath": "${GCP_JSON_KEY_PATH}",
+                        "project": "${GCS_PROJECT_ID}",
+                        "features": "Logos",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"FaceInformation\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-annotation-component-record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\"},{\"name\":\"panAngle\",\"type\":\"float\"},{\"name\":\"tiltAngle\",\"type\":\"float\"},{\"name\":\"detectionConfidence\",\"type\":\"float\"},{\"name\":\"landmarkingConfidence\",\"type\":\"float\"},{\"name\":\"angerLikelihood\",\"type\":\"string\"},{\"name\":\"joyLikelihood\",\"type\":\"string\"},{\"name\":\"surpriseLikelihood\",\"type\":\"string\"},{\"name\":\"blurredLikelihood\",\"type\":\"string\"},{\"name\":\"underExposedLikelihood\",\"type\":\"string\"},{\"name\":\"sorrowLikelihood\",\"type\":\"string\"},{\"name\":\"headwearLikelihood\",\"type\":\"string\"},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vertex-record\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vertex-record\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"face-landmark-record\",\"type\":\"record\",\"fields\":[{\"name\":\"type\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"x\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"z\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}}}]}",
+                        "pathField": "body",
+                        "outputField": "${OUTPUT_FIELD_NAME}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"FaceInformation\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-annotation-component-record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\"},{\"name\":\"panAngle\",\"type\":\"float\"},{\"name\":\"tiltAngle\",\"type\":\"float\"},{\"name\":\"detectionConfidence\",\"type\":\"float\"},{\"name\":\"landmarkingConfidence\",\"type\":\"float\"},{\"name\":\"angerLikelihood\",\"type\":\"string\"},{\"name\":\"joyLikelihood\",\"type\":\"string\"},{\"name\":\"surpriseLikelihood\",\"type\":\"string\"},{\"name\":\"blurredLikelihood\",\"type\":\"string\"},{\"name\":\"underExposedLikelihood\",\"type\":\"string\"},{\"name\":\"sorrowLikelihood\",\"type\":\"string\"},{\"name\":\"headwearLikelihood\",\"type\":\"string\"},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vertex-record\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vertex-record\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"face-landmark-record\",\"type\":\"record\",\"fields\":[{\"name\":\"type\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"x\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"z\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}}}]}"
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "File",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "File2",
+                "plugin": {
+                    "name": "File",
+                    "type": "batchsink",
+                    "label": "File2",
+                    "artifact": {
+                        "name": "core-plugins",
+                        "version": "2.3.4",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "suffix": "yyyy-MM-dd-HH-mm",
+                        "format": "json",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
+                        "referenceName": "visiondata",
+                        "path": "${FS_DESTINATION_PATH}"
+
+                    }
+                },
+                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
+                "inputSchema": [
+                    {
+                        "name": "Image Extractor",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"FaceInformation\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-annotation-component-record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\"},{\"name\":\"panAngle\",\"type\":\"float\"},{\"name\":\"tiltAngle\",\"type\":\"float\"},{\"name\":\"detectionConfidence\",\"type\":\"float\"},{\"name\":\"landmarkingConfidence\",\"type\":\"float\"},{\"name\":\"angerLikelihood\",\"type\":\"string\"},{\"name\":\"joyLikelihood\",\"type\":\"string\"},{\"name\":\"surpriseLikelihood\",\"type\":\"string\"},{\"name\":\"blurredLikelihood\",\"type\":\"string\"},{\"name\":\"underExposedLikelihood\",\"type\":\"string\"},{\"name\":\"sorrowLikelihood\",\"type\":\"string\"},{\"name\":\"headwearLikelihood\",\"type\":\"string\"},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vertex-record\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vertex-record\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"face-landmark-record\",\"type\":\"record\",\"fields\":[{\"name\":\"type\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"x\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"z\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}}}]}"
+                    }
+                ]
+            }
+        ],
+        "schedule": "0 * * * *",
+        "engine": "spark",
+        "numOfRecordsPreview": 100,
+        "description": "Data Pipeline Application",
+        "maxConcurrentRuns": 1
+    }
+}

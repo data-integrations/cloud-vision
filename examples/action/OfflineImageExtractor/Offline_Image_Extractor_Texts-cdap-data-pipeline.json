@@ -1,5 +1,5 @@
 {
-    "name": "GCS_Offline_Image_Extractor_Web_Detections",
+    "name": "Offline_Image_Extractor_Texts",
     "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
@@ -50,7 +50,7 @@
                         "recursive": "true",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
                         "referenceName": "gcs-get-json-image-face",
-                        "path": "${GCS_WEB_DETECTION_DESTINATION_PATH}"
+                        "path": "${GCS_TEXT_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [
@@ -106,11 +106,10 @@
                     },
                     "properties": {
                         "serviceFilePath": "${GCP_JSON_KEY_PATH}",
-                        "features": "Web Detection",
+                        "features": "Text",
                         "batchSize": "${GCS_IMAGE_BATCH_SIZE}",
-                        "includeGeoResults": "on",
                         "sourcePath": "${GCS_IMAGE_SOURCE_PATH}",
-                        "destinationPath": "${GCS_WEB_DETECTION_DESTINATION_PATH}"
+                        "destinationPath": "${GCS_TEXT_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [

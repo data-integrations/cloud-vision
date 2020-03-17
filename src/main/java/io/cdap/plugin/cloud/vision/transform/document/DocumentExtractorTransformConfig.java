@@ -139,8 +139,8 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
   public void validateOutputSchema(Schema providedSchema, FailureCollector collector) {
     Schema.Field outputField = providedSchema.getField(getOutputField());
     if (outputField == null) {
-      collector.addFailure(String.format("Schema must contain '%s' output field", getOutputField()), null)
-              .withConfigProperty(ExtractorTransformConstants.SCHEMA);
+      collector.addFailure(String.format("%s cannot be null", ExtractorTransformConstants.OUTPUT_FIELD), null)
+              .withConfigProperty(ExtractorTransformConstants.OUTPUT_FIELD);
     } else {
       Schema pagesSchema = outputField.getSchema();
       if (pagesSchema.getType() != Schema.Type.ARRAY) {
@@ -148,7 +148,8 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
                 .withOutputSchemaField(getOutputField());
       } else {
         Schema pageSchema = pagesSchema.getComponentSchema();
-        if (pageSchema.getField(DocumentExtractorTransformConstants.FEATURE_FIELD_NAME) == null) {
+        if (pageSchema != null
+                && pageSchema.getField(DocumentExtractorTransformConstants.FEATURE_FIELD_NAME) == null) {
           String errorMessage = String.format("Schema of the output field '%s' must contain '%s' feature field",
                   getOutputField(), DocumentExtractorTransformConstants.FEATURE_FIELD_NAME);
           collector.addFailure(errorMessage, null).withOutputSchemaField(getOutputField());

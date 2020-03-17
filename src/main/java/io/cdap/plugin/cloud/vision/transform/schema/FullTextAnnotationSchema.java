@@ -83,7 +83,7 @@ public class FullTextAnnotationSchema {
      * 2----3
      * |    |
      * 1----0
-     * and the vertice order will still be (0, 1, 2, 3).
+     * and the vertex order will still be (0, 1, 2, 3).
      */
     public static final String BOUNDING_BOX_FIELD_NAME = "boundingBox";
 

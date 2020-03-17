@@ -33,6 +33,7 @@ import io.cdap.cdap.etl.api.StageSubmitterContext;
 import io.cdap.cdap.etl.api.Transform;
 import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
+import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.document.transformer.FileAnnotationToRecordTransformer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -67,9 +68,6 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     super.configurePipeline(configurer);
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
     inputSchema = configurer.getStageConfigurer().getInputSchema();
-    outputSchema = getOutputSchema();
-    stageConfigurer.setOutputSchema(outputSchema);
-    stageConfigurer.setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
 
     FailureCollector collector = stageConfigurer.getFailureCollector();
     config.validate(collector);
@@ -78,8 +76,15 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
 
-    config.validateOutputSchema(outputSchema, collector);
-    collector.getOrThrowException();
+    if (!config.containsMacro(ExtractorTransformConstants.OUTPUT_FIELD)) {
+      outputSchema = getOutputSchema();
+      stageConfigurer.setOutputSchema(outputSchema);
+
+      config.validateOutputSchema(outputSchema, collector);
+      collector.getOrThrowException();
+    }
+
+    stageConfigurer.setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
 
   @Override
@@ -93,9 +98,15 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   @Override
   public void initialize(TransformContext context) throws Exception {
     super.initialize(context);
-    Schema schema = context.getOutputSchema();
+
+    if (this.outputSchema == null) {
+      this.outputSchema = getOutputSchema();
+      FailureCollector collector = context.getFailureCollector();
+      config.validateOutputSchema(outputSchema, collector);
+      collector.getOrThrowException();
+    }
     // create new document transformer
-    transformer = new FileAnnotationToRecordTransformer(config, schema);
+    transformer = new FileAnnotationToRecordTransformer(config, this.outputSchema);
     documentAnnotatorClient = new DocumentAnnotatorClient(config);
   }
 
@@ -137,7 +148,13 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     }
 
     Schema pagesSchema = pagesSchema(config.getImageFeature().getSchema());
-    fields.add(Schema.Field.of(config.getOutputField(), pagesSchema));
+
+    if (!config.containsMacro(DocumentExtractorTransformConstants.OUTPUT_FIELD)) {
+      fields.add(Schema.Field.of(config.getOutputField(), pagesSchema));
+    } else {
+      // There is a Macro, use a default name
+      fields.add(Schema.Field.of("default_name", pagesSchema));
+    }
     return Schema.recordOf("record", fields);
   }
 

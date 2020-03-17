@@ -1,5 +1,5 @@
 {
-    "name": "GCS_Offline_Image_Extractor_Landmarks",
+    "name": "Offline_Image_Extractor_Explicit_Contents",
     "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
@@ -50,7 +50,7 @@
                         "recursive": "true",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
                         "referenceName": "gcs-get-json-image-face",
-                        "path": "${GCS_LANDMARK_DESTINATION_PATH}"
+                        "path": "${GCS_EXPLICIT_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [
@@ -106,10 +106,10 @@
                     },
                     "properties": {
                         "serviceFilePath": "${GCP_JSON_KEY_PATH}",
-                        "features": "Landmarks",
+                        "features": "Explicit Content",
                         "batchSize": "${GCS_IMAGE_BATCH_SIZE}",
                         "sourcePath": "${GCS_IMAGE_SOURCE_PATH}",
-                        "destinationPath": "${GCS_LANDMARK_DESTINATION_PATH}"
+                        "destinationPath": "${GCS_EXPLICIT_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [

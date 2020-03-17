@@ -31,6 +31,7 @@ import io.cdap.cdap.etl.api.StageSubmitterContext;
 import io.cdap.cdap.etl.api.Transform;
 import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
+import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.transformer.ImageAnnotationToRecordTransformer;
 import io.cdap.plugin.cloud.vision.transform.transformer.TransformerFactory;
 import org.slf4j.Logger;
@@ -68,6 +69,14 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     super.configurePipeline(configurer);
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
     inputSchema = stageConfigurer.getInputSchema();
+
+    FailureCollector collector = stageConfigurer.getFailureCollector();
+    config.validate(collector);
+    collector.getOrThrowException();
+
+    config.validateInputSchema(inputSchema, collector);
+    collector.getOrThrowException();
+
     outputSchema = getOutputSchema(inputSchema);
     stageConfigurer.setOutputSchema(outputSchema);
     stageConfigurer.setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
@@ -106,13 +115,16 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     }
   }
 
-  private Schema getOutputSchema(Schema inputSchema) {
+  public Schema getOutputSchema(Schema inputSchema) {
     List<Schema.Field> fields = new ArrayList<>();
-    if (inputSchema.getFields() != null) {
+    if (inputSchema != null && inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());
     }
 
-    fields.add(Schema.Field.of(config.getOutputField(), config.getImageFeature().getSchema()));
+    if (!config.containsMacro(ExtractorTransformConstants.OUTPUT_FIELD)) {
+      fields.add(Schema.Field.of(config.getOutputField(), config.getImageFeature().getSchema()));
+    }
+
     return Schema.recordOf("record", fields);
   }
 }

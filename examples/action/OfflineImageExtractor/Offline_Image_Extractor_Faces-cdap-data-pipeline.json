@@ -5,7 +5,7 @@
         "scope": "SYSTEM"
     },
     "description": "Data Pipeline Application",
-    "name": "GCS_Offline_Image_Extractor_Labels",
+    "name": "Offline_Image_Extractor_Face_02",
     "config": {
         "resources": {
             "memoryMB": 2048,
@@ -50,15 +50,10 @@
                         "recursive": "true",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
                         "referenceName": "gcs-get-json-image-face",
-                        "path": "${GCS_LABEL_DESTINATION_PATH}"
+                        "path": "${GCS_IMAGE_DESTINATION_PATH}"
                     }
                 },
-                "outputSchema": [
-                    {
-                        "name": "etlSchemaBody",
-                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
-                    }
-                ]
+                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
             },
             {
                 "name": "File",
@@ -100,10 +95,10 @@
                     },
                     "properties": {
                         "serviceFilePath": "${GCP_JSON_KEY_PATH}",
-                        "features": "Labels",
+                        "features": "Face",
                         "batchSize": "${GCS_IMAGE_BATCH_SIZE}",
                         "sourcePath": "${GCS_IMAGE_SOURCE_PATH}",
-                        "destinationPath": "${GCS_LABEL_DESTINATION_PATH}"
+                        "destinationPath": "${GCS_FACE_DESTINATION_PATH}"
                     }
                 },
                 "outputSchema": [
