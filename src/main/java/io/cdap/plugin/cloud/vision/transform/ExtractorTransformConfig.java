@@ -227,6 +227,5 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
                 .withConfigProperty(ExtractorTransformConstants.FEATURES);
       }
     }
-    LOG.info("Feature json: " + ImageFeature.fromDisplayName(features).toString());
   }
 }

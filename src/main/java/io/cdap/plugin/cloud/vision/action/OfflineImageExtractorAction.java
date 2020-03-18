@@ -93,8 +93,6 @@ public class OfflineImageExtractorAction extends Action {
             .setUri(destinationPath)
             .build();
 
-    LOG.info("Setting destination path to: " + destinationPath);
-
     OutputConfig outputConfig = OutputConfig.newBuilder()
             .setGcsDestination(gcsDestination)
             .setBatchSize(config.getBatchSizeValue())

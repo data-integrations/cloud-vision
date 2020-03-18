@@ -89,8 +89,6 @@ public class OfflineTextExtractorAction extends Action {
             .setUri(destinationPath)
             .build();
 
-    LOG.info("Setting destination path to: " + destinationPath);
-
     OutputConfig outputConfig = OutputConfig.newBuilder()
             .setBatchSize(config.getBatchSize())
             .setGcsDestination(gcsDestination)
@@ -127,7 +125,6 @@ public class OfflineTextExtractorAction extends Action {
           Blob blob = blobs.get(index);
           // Rebuild the full path of the blob
           String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
-          LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
 
           GcsSource gcsSource = GcsSource.newBuilder()
                   .setUri(fullBlobPath)
