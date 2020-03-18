@@ -52,7 +52,6 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
   @Name(ExtractorTransformConstants.OUTPUT_FIELD)
   @Description("Field to store the extracted image features. If the specified output field name already exists "
           + "in the input record, it will be overwritten.")
-  @Macro
   private String outputField;
 
   @Name(ExtractorTransformConstants.FEATURES)

@@ -39,7 +39,8 @@ public class CropHintAnnotationSchema {
   public static final String IMPORTANCE_FRACTION_FIELD_NAME = "importanceFraction";
   public static final Schema SCHEMA = Schema.recordOf(
           "crop-hint-annotation-component-record",
-          Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA)),
+          Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(
+                  VertexSchema.getSchema("cropHintAnnotation-position"))),
           Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
           Schema.Field.of(IMPORTANCE_FRACTION_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
 

@@ -125,11 +125,20 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
               .withInputSchemaField(getPathField());
       return;
     }
-// TODO: Finish this test
+
+    if (contentField != null && pathField != null) {
+      collector.addFailure("Only one of Content field or Path field can be provided, not both.", null)
+              .withInputSchemaField(getContentField())
+              .withInputSchemaField(getPathField());
+      return;
+    }
+
     if (pathField != null && pathField.getSchema().getType() != Schema.Type.STRING) {
       collector.addFailure(String.format("Path field '%s' is expected to be a string", getPathField()), null)
               .withInputSchemaField(getPathField());
+      return;
     }
+
     if (contentField != null && contentField.getSchema().getType() != Schema.Type.STRING) {
       collector.addFailure(String.format("Content field '%s' is expected to be a string", getContentField()), null)
               .withInputSchemaField(getContentField());

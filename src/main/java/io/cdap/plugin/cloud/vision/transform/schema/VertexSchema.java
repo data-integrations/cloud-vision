@@ -27,19 +27,25 @@ public class VertexSchema {
   /**
    * X coordinate.
    */
+
   public static final String X_FIELD_NAME = "x";
   /**
    * Y coordinate.
    */
   public static final String Y_FIELD_NAME = "y";
-  public static final Schema SCHEMA = Schema.recordOf("vertex-record",
-          Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
-          Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
 
-  public static final Schema SCHEMA2 = Schema.recordOf("vertex-record2",
-          Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
-          Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
+  /*
+   * Utility method to get a Vertex schema.
+   */
+  public static Schema getSchema(String name) {
+    return Schema.recordOf(name,
+            Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
+            Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
+  }
 
+  /*
+   * Prevent instantiating this class.
+   */
   private VertexSchema() {
     throw new AssertionError("Should not instantiate static utility class.");
   }

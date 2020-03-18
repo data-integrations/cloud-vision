@@ -111,8 +111,8 @@ public class FaceAnnotationSchema {
           Schema.Field.of(UNDER_EXPOSED_FIELD_NAME, Schema.of(Schema.Type.STRING)),
           Schema.Field.of(SORROW_FIELD_NAME, Schema.of(Schema.Type.STRING)),
           Schema.Field.of(HEADWEAR_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-          Schema.Field.of(BOUNDING_POLY_NAME, Schema.arrayOf(VertexSchema.SCHEMA)),
-          Schema.Field.of(FD_BOUNDING_POLY_NAME, Schema.arrayOf(VertexSchema.SCHEMA2)),
+          Schema.Field.of(BOUNDING_POLY_NAME, Schema.arrayOf(VertexSchema.getSchema("bounding-vertex"))),
+          Schema.Field.of(FD_BOUNDING_POLY_NAME, Schema.arrayOf(VertexSchema.getSchema("fd-bounding-vertex"))),
           Schema.Field.of(LANDMARKS_FIELD_NAME, Schema.arrayOf(FaceLandmark.SCHEMA))
   );
 

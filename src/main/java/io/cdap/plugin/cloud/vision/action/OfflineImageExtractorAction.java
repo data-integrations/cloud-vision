@@ -131,7 +131,6 @@ public class OfflineImageExtractorAction extends Action {
           Blob blob = blobs.get(index);
           // Rebuild the full path of the blob
           String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
-          LOG.info("Adding blob: " + fullBlobPath + " to the list of requests");
 
           ImageSource imageSource = ImageSource.newBuilder()
                   .setImageUri(fullBlobPath)
@@ -146,7 +145,6 @@ public class OfflineImageExtractorAction extends Action {
                           .setImage(image)
                           .addFeatures(feature);
 
-          // TODO: Is the list in getImageContext() complete?
           ImageContext imageContext = getImageContext();
           if (imageContext != null) {
             builder.setImageContext(imageContext);

@@ -51,10 +51,10 @@ public class WebDetectionSchema {
   public static final Schema SCHEMA = Schema.recordOf(
           "web-detection-record",
           Schema.Field.of(ENTITIES_FIELD_NAME, Schema.arrayOf(WebEntity.SCHEMA)),
-          Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA)),
-          Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA)),
+          Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.getSchema("fmiWebImage"))),
+          Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.getSchema("pmiWebImage"))),
           Schema.Field.of(PAGES_WITH_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebPage.SCHEMA)),
-          Schema.Field.of(VISUALLY_SIMILAR_IMAGES, Schema.arrayOf(WebImage.SCHEMA)),
+          Schema.Field.of(VISUALLY_SIMILAR_IMAGES, Schema.arrayOf(WebImage.getSchema("vsiWebImage"))),
           Schema.Field.of(BEST_GUESS_LABELS_FIELD_NAME, Schema.arrayOf(BestGuessLabel.SCHEMA))
   );
 
@@ -126,8 +126,10 @@ public class WebDetectionSchema {
             Schema.Field.of(URL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
             Schema.Field.of(PAGE_TITLE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
             Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-            Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA)),
-            Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA))
+            Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(
+                    WebImage.getSchema("webPage-fmiWebImage"))),
+            Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(
+                    WebImage.getSchema("webPage-pmiWebImage")))
     );
   }
 
@@ -169,10 +171,18 @@ public class WebDetectionSchema {
      */
     public static final String SCORE_FIELD_NAME = "score";
 
-    public static final Schema SCHEMA = Schema.recordOf(
-            "web-image-record",
-            Schema.Field.of(URL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT))
-    );
+    /**
+     * Utility method to get a Schema to describe a Web Image.
+     *
+     * @param name Unique name for the schema
+     * @return a schema object
+     */
+    public static Schema getSchema(String name) {
+      return Schema.recordOf(
+              name,
+              Schema.Field.of(URL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+              Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT))
+      );
+    }
   }
 }

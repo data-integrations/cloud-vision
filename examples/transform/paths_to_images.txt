@@ -1,1 +1,0 @@
-gs://vision-api-pbo2/images/demo-img.jpg

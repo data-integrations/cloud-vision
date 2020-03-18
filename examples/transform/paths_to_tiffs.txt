@@ -1,1 +1,0 @@
-gs://vision-api-pbo2/tiffs/20200317_191230.tiff

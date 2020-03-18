@@ -51,7 +51,8 @@ public class LocalizedObjectAnnotationSchema {
           Schema.Field.of(LANGUAGE_CODE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
           Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
           Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-          Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA))
+          Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(
+                  VertexSchema.getSchema("localizedObjectAnnotation-position")))
   );
 
   protected LocalizedObjectAnnotationSchema() {

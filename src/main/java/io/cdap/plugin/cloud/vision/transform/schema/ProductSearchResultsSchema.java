@@ -39,9 +39,9 @@ public class ProductSearchResultsSchema {
    * in the union of all the per-product results.
    */
   public static final String GROUPED_RESULTS_FIELD_NAME = "productGroupedResults";
-  public static final Schema SCHEMA = Schema.recordOf("product-search-result-record",
+  public static final Schema SCHEMA = Schema.recordOf("productSearch-resultRecord",
           Schema.Field.of(INDEX_TIME_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))),
-          Schema.Field.of(RESULTS_FIELD_NAME, Schema.arrayOf(Result.SCHEMA)),
+          Schema.Field.of(RESULTS_FIELD_NAME, Schema.arrayOf(Result.getSchema("productSearch-result"))),
           Schema.Field.of(GROUPED_RESULTS_FIELD_NAME, Schema.arrayOf(GroupedResult.SCHEMA))
   );
 
@@ -69,11 +69,19 @@ public class ProductSearchResultsSchema {
      */
     public static final String PRODUCT_FIELD_NAME = "product";
 
-    public static final Schema SCHEMA = Schema.recordOf("result-record",
-            Schema.Field.of(IMAGE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-            Schema.Field.of(PRODUCT_FIELD_NAME, Product.SCHEMA)
-    );
+    /**
+     * Utility method to get a Schema.
+     *
+     * @param name name of the Schema
+     * @return a Result schema
+     */
+    public static Schema getSchema(String name) {
+      return Schema.recordOf(name,
+              Schema.Field.of(IMAGE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+              Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+              Schema.Field.of(PRODUCT_FIELD_NAME, Product.getSchema(name + "result-product"))
+      );
+    }
   }
 
   /**
@@ -108,13 +116,25 @@ public class ProductSearchResultsSchema {
      */
     public static final String PRODUCT_LABELS_FIELD_NAME = "productLabels";
 
-    public static final Schema SCHEMA = Schema.recordOf("product-record",
-            Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(DISPLAY_NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(PRODUCT_CATEGORY_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(PRODUCT_LABELS_FIELD_NAME, Schema.arrayOf(KeyValue.SCHEMA))
-    );
+//    public static final Schema SCHEMA = Schema.recordOf("product-record",
+//            Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+//            Schema.Field.of(DISPLAY_NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+//            Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+//            Schema.Field.of(PRODUCT_CATEGORY_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+//            Schema.Field.of(PRODUCT_LABELS_FIELD_NAME, Schema.arrayOf(KeyValue.getSchema()))
+//    );
+
+    public static Schema getSchema(String name) {
+      return Schema.recordOf(name,
+              Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+              Schema.Field.of(DISPLAY_NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+              Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+              Schema.Field.of(PRODUCT_CATEGORY_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+              Schema.Field.of(PRODUCT_LABELS_FIELD_NAME, Schema.arrayOf(
+                      KeyValue.getSchema(name + "-keyValue")))
+      );
+    }
+
   }
 
   /**
@@ -132,10 +152,18 @@ public class ProductSearchResultsSchema {
      */
     public static final String VALUE_FIELD_NAME = "value";
 
-    public static final Schema SCHEMA = Schema.recordOf("key-value-record",
-            Schema.Field.of(KEY_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-            Schema.Field.of(VALUE_FIELD_NAME, Schema.of(Schema.Type.STRING))
-    );
+    /**
+     * Utility method to get a Schema back.
+     *
+     * @param name name of the schema
+     * @return a KeyValue Schema
+     */
+    public static Schema getSchema(String name) {
+      return Schema.recordOf(name,
+              Schema.Field.of(KEY_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+              Schema.Field.of(VALUE_FIELD_NAME, Schema.of(Schema.Type.STRING))
+      );
+    }
   }
 
   /**
@@ -153,9 +181,10 @@ public class ProductSearchResultsSchema {
      */
     public static final String RESULTS_FIELD_NAME = "results";
 
-    public static final Schema SCHEMA = Schema.recordOf("grouped-result-record",
-            Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA)),
-            Schema.Field.of(RESULTS_FIELD_NAME, Schema.arrayOf(Result.SCHEMA))
+    public static final Schema SCHEMA = Schema.recordOf("groupedResult-record",
+            Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(
+                    VertexSchema.getSchema("groupedResult-position"))),
+            Schema.Field.of(RESULTS_FIELD_NAME, Schema.arrayOf(Result.getSchema("groupedResult-results")))
     );
   }
 }
