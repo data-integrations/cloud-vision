@@ -36,7 +36,7 @@ public class EntityAnnotationWithPositionSchema extends EntityAnnotationSchema {
           Schema.Field.of(TOPICALITY_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
           Schema.Field.of(LOCATIONS_FIELD_NAME, Schema.arrayOf(LocationInfo.SCHEMA)),
           Schema.Field.of(POSITION_FIELD_NAME, Schema.nullableOf(
-                  VertexSchema.getSchema("entityAnnotation-position"))),
+                  Schema.arrayOf(VertexSchema.getSchema("entityAnnotation-position")))),
           Schema.Field.of(PROPERTIES_FIELD_NAME, Schema.arrayOf(Property.SCHEMA))
   );
 

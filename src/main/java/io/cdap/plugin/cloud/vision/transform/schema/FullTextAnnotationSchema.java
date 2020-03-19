@@ -335,6 +335,8 @@ public class FullTextAnnotationSchema {
             Schema.Field.of(BLOCKS_FIELD_NAME, Schema.arrayOf(TextBlock.SCHEMA)),  //
             Schema.Field.of(PROPERTY_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
                     DetectedLanguage.getSchema("textPage-property")))),
+            Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
+                    DetectedLanguage.getSchema("textPage-detectedLanguages")))),
             Schema.Field.of(DETECTED_BREAK_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))));
   }
 
