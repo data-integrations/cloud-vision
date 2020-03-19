@@ -34,8 +34,12 @@ public class VertexSchema {
    */
   public static final String Y_FIELD_NAME = "y";
 
-  /*
-   * Utility method to get a Vertex schema.
+  /**
+   * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+   * that will be combined into a larger {@link Schema}.
+   *
+   * @param name {@link String} containing the name to give to the returned {@link Schema}.
+   * @return a {@link Schema} with the given name.
    */
   public static Schema getSchema(String name) {
     return Schema.recordOf(name,

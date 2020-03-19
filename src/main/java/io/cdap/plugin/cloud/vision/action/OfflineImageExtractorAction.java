@@ -63,7 +63,7 @@ public class OfflineImageExtractorAction extends Action {
       config.setSourcePath(config.getSourcePath().trim()); // Remove whitespace
     }
     if (config.getDestinationPath() != null) {
-      config.setDestinationPath(config.getDestinationPath().trim());
+      config.setDestinationPath(config.getDestinationPath().trim()); // Remove whitespace
     }
     this.config = config;
   }
@@ -85,7 +85,7 @@ public class OfflineImageExtractorAction extends Action {
 
     // Destination in GCS where the results will be stored
     String destinationPath = config.getDestinationPath();
-    // Add a / at the end if it's not already there
+    // Add a '/' at the end if it's not already there
     if (!destinationPath.endsWith("/")) {
       destinationPath += "/";
     }
@@ -118,8 +118,9 @@ public class OfflineImageExtractorAction extends Action {
             .build();
 
     try (ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
-
       // Create batches of images to send for processing
+      // We need to do this because there is a limit on the vision API that will raise an error if there are more
+      // than MAX_NUMBER_OF_IMAGES_PER_BATCH in a single batch
       for (int batchId = 0;
            batchId < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH);
            batchId++) {
@@ -189,5 +190,4 @@ public class OfflineImageExtractorAction extends Action {
         return null;
     }
   }
-
 }

@@ -31,11 +31,8 @@ import io.cdap.cdap.etl.api.StageSubmitterContext;
 import io.cdap.cdap.etl.api.Transform;
 import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
-import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.transformer.ImageAnnotationToRecordTransformer;
 import io.cdap.plugin.cloud.vision.transform.transformer.TransformerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +104,12 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     }
   }
 
+  /**
+   * Get the output Schema to use by combining the input Schema from CDAP and add the fields needed to store the
+   * information coming back from the cloud vision API.
+   *
+   * @return {@link Schema}
+   */
   protected Schema getOutputSchema(Schema inputSchema) {
     List<Schema.Field> fields = new ArrayList<>();
     // Add the input fields

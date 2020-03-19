@@ -15,6 +15,6 @@
  */
 
 /**
- * Classes that map answers from the Cloud Vision API to Records that can then be turned into json docs.
+ * Transformers to build CDAP pipelines that use the Cloud Vision API.
  */
-package io.cdap.plugin.cloud.vision.transform.transformer;
+package io.cdap.plugin.cloud.vision.transform;

@@ -114,8 +114,9 @@ public class OfflineTextExtractorAction extends Action {
             .build();
 
     try (ImageAnnotatorClient client = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
-
       // Create batches of images to send for processing
+      // We need to do this because there is a limit on the vision API that will raise an error if there are more
+      // than MAX_NUMBER_OF_IMAGES_PER_BATCH in a single batch
       for (int batchId = 0;
            batchId < (1 + blobs.size() / MAX_NUMBER_OF_IMAGES_PER_BATCH);
            batchId++) {
@@ -146,6 +147,7 @@ public class OfflineTextExtractorAction extends Action {
                   .setOutputConfig(outputConfig)
                   .build();
 
+          // Add this request to the list
           requests.add(request);
         }
 

@@ -52,7 +52,7 @@ public class GcsBucketHelper {
     for (Bucket currentBucket : storage.list().iterateAll()) {
       // Loop though the blobs and check if the path is what we want, based on sourceFolderPath
       for (Blob blob : currentBucket.list().iterateAll()) {
-        if (blob.getName().endsWith("/")) { // It's a folder
+        if (blob.getName().endsWith("/")) { // It's a "folder"
           continue; // Ignore
         }
         // Rebuild the full path of the blob

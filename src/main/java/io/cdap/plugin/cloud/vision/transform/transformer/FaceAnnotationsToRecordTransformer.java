@@ -20,6 +20,7 @@ import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.FaceAnnotation;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
+import io.cdap.plugin.cloud.vision.transform.schema.ColorInfoSchema;
 import io.cdap.plugin.cloud.vision.transform.schema.FaceAnnotationSchema;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,13 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link FaceAnnotationSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     StructuredRecord.Builder builder = getOutputRecordBuilder(input);
@@ -42,17 +50,25 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     return builder.set(outputFieldName, extracted).build();
   }
 
-  public StructuredRecord.Builder getBuilder(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
-    StructuredRecord.Builder builder = getOutputRecordBuilder(input);
-    return builder;
-  }
-
+  /**
+   * Extract a complete {@link List} of {@link StructuredRecord} objects mapped from the {@link AnnotateImageResponse}
+   * passed in, using the {@link FaceAnnotationSchema}.
+   *
+   * @param annotateImageResponse Input {@link AnnotateImageResponse} object to get the data from.
+   * @return {@link List} containing the {@link StructuredRecord} mapped from the input.
+   */
   private List<StructuredRecord> extractFaceAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getFaceAnnotationsList().stream()
             .map(this::extractFaceAnnotationRecord)
             .collect(Collectors.toList());
   }
 
+  /**
+   * Extract a {@link StructuredRecord} from a {@link FaceAnnotation} input.
+   *
+   * @param annotation The {@link FaceAnnotation} object to get the data from.
+   * @return {@link StructuredRecord} containing the data mapped to the {@link Schema}.
+   */
   private StructuredRecord extractFaceAnnotationRecord(FaceAnnotation annotation) {
     Schema faceSchema = getFaceAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(faceSchema);
@@ -123,6 +139,13 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} from a {@link FaceAnnotation} input.
+   *
+   * @param landmark The {@link FaceAnnotation.Landmark} object to get the data from.
+   * @param schema   The {@link Schema} to use for the mapping.
+   * @return {@link StructuredRecord} containing the data mapped to the {@link Schema}.
+   */
   private StructuredRecord extractLandmark(FaceAnnotation.Landmark landmark, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FaceAnnotationSchema.FaceLandmark.TYPE_FIELD_NAME) != null) {

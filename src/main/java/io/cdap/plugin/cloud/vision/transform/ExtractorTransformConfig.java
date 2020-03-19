@@ -82,8 +82,6 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
   @Nullable
   private String schema;
 
-  private static final Logger LOG = LoggerFactory.getLogger(ExtractorTransformConfig.class);
-
   public ExtractorTransformConfig(String project, String serviceFilePath, String pathField, String outputField,
                                   String features, @Nullable String languageHints, @Nullable String aspectRatios,
                                   @Nullable Boolean includeGeoResults, @Nullable String schema) {

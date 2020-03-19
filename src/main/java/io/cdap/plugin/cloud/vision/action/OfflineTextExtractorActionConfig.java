@@ -82,6 +82,12 @@ public class OfflineTextExtractorActionConfig extends PluginConfig {
     return new Builder();
   }
 
+  /**
+   * Helper function to get a Builder object based on an existing configuration.
+   *
+   * @param copy Configuration object to use as the source to copy from.
+   * @return Builer object.
+   */
   public static Builder builder(OfflineTextExtractorActionConfig copy) {
     Builder builder = new Builder();
 
@@ -146,6 +152,11 @@ public class OfflineTextExtractorActionConfig extends PluginConfig {
     this.destinationPath = destinationPath;
   }
 
+  /**
+   * Validate that the configuration is correct. If not, use the FailureCollector object passed to report errors.
+   *
+   * @param collector FailureCollector object to use to report errors.
+   */
   public void validate(FailureCollector collector) {
     if (!containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
             && Strings.isNullOrEmpty(serviceFilePath)) {

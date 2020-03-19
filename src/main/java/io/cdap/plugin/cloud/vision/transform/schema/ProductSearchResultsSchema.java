@@ -70,10 +70,11 @@ public class ProductSearchResultsSchema {
     public static final String PRODUCT_FIELD_NAME = "product";
 
     /**
-     * Utility method to get a Schema.
+     * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+     * that will be combined into a larger {@link Schema}.
      *
-     * @param name name of the Schema
-     * @return a Result schema
+     * @param name {@link String} containing the name to give to the returned {@link Schema}.
+     * @return a {@link Schema} with the given name.
      */
     public static Schema getSchema(String name) {
       return Schema.recordOf(name,
@@ -116,14 +117,13 @@ public class ProductSearchResultsSchema {
      */
     public static final String PRODUCT_LABELS_FIELD_NAME = "productLabels";
 
-//    public static final Schema SCHEMA = Schema.recordOf("product-record",
-//            Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-//            Schema.Field.of(DISPLAY_NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-//            Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-//            Schema.Field.of(PRODUCT_CATEGORY_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-//            Schema.Field.of(PRODUCT_LABELS_FIELD_NAME, Schema.arrayOf(KeyValue.getSchema()))
-//    );
-
+    /**
+     * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+     * that will be combined into a larger {@link Schema}.
+     *
+     * @param name {@link String} containing the name to give to the returned {@link Schema}.
+     * @return a {@link Schema} with the given name.
+     */
     public static Schema getSchema(String name) {
       return Schema.recordOf(name,
               Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
@@ -153,10 +153,11 @@ public class ProductSearchResultsSchema {
     public static final String VALUE_FIELD_NAME = "value";
 
     /**
-     * Utility method to get a Schema back.
+     * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+     * that will be combined into a larger {@link Schema}.
      *
-     * @param name name of the schema
-     * @return a KeyValue Schema
+     * @param name {@link String} containing the name to give to the returned {@link Schema}.
+     * @return a {@link Schema} with the given name.
      */
     public static Schema getSchema(String name) {
       return Schema.recordOf(name,

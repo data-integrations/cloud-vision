@@ -172,10 +172,11 @@ public class WebDetectionSchema {
     public static final String SCORE_FIELD_NAME = "score";
 
     /**
-     * Utility method to get a Schema to describe a Web Image.
+     * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+     * that will be combined into a larger {@link Schema}.
      *
-     * @param name Unique name for the schema
-     * @return a schema object
+     * @param name {@link String} containing the name to give to the returned {@link Schema}.
+     * @return a {@link Schema} with the given name.
      */
     public static Schema getSchema(String name) {
       return Schema.recordOf(

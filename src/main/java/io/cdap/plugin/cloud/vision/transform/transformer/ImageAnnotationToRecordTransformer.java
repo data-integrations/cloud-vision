@@ -86,6 +86,14 @@ public abstract class ImageAnnotationToRecordTransformer {
     return outputRecordBuilder;
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the vertex information from a
+   * {@link Vertex} input using a {@link Schema} for the mapping.
+   *
+   * @param vertex The {@link Vertex} object containing the data.
+   * @param schema The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   protected StructuredRecord extractVertex(Vertex vertex, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(VertexSchema.X_FIELD_NAME) != null) {

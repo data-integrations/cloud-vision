@@ -44,6 +44,14 @@ public class DocumentAnnotatorClient extends CloudVisionClient {
     this.config = config;
   }
 
+  /**
+   * Convenience method that wraps a call to extractDocumentFeature(InputConfig inputConfig) by building an
+   * {@link InputConfig} object from a Byte array containing the image bytes.
+   *
+   * @param content Byte array containing the image bytes to ask the cloud vision API to work on.
+   * @return {@link AnnotateFileResponse} with the information requested from the cloud vision API.
+   * @throws Exception if there was an error sent back by the cloud vision API.
+   */
   public AnnotateFileResponse extractDocumentFeature(byte[] content) throws Exception {
     InputConfig inputConfig = InputConfig.newBuilder()
             .setContent(ByteString.copyFrom(content))
@@ -52,6 +60,14 @@ public class DocumentAnnotatorClient extends CloudVisionClient {
     return extractDocumentFeature(inputConfig);
   }
 
+  /**
+   * Convenience method that wraps a call to extractDocumentFeature(InputConfig inputConfig) by building an
+   * {@link InputConfig} object from a gcsPath pointing to a blob in GCS.
+   *
+   * @param gcsPath Path to the blob to ask the cloud vision API to work on.
+   * @return {@link AnnotateFileResponse} with the information requested from the cloud vision API.
+   * @throws Exception if there was an error sent back by the cloud vision API.
+   */
   public AnnotateFileResponse extractDocumentFeature(String gcsPath) throws Exception {
     InputConfig inputConfig = InputConfig.newBuilder()
             .setGcsSource(GcsSource.newBuilder().setUri(gcsPath))
@@ -60,6 +76,11 @@ public class DocumentAnnotatorClient extends CloudVisionClient {
     return extractDocumentFeature(inputConfig);
   }
 
+  /**
+   * @param inputConfig Object that contains the information to send to the Cloud vision API.
+   * @return {@link AnnotateFileResponse} with the information requested from the cloud vision API.
+   * @throws Exception if there was an error sent back by the cloud vision API.
+   */
   public AnnotateFileResponse extractDocumentFeature(InputConfig inputConfig) throws Exception {
     try (ImageAnnotatorClient client = createImageAnnotatorClient()) {
       Feature.Type featureType = config.getImageFeature().getFeatureType();

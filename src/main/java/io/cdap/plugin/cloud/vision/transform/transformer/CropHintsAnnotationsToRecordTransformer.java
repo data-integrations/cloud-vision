@@ -35,6 +35,13 @@ public class CropHintsAnnotationsToRecordTransformer extends ImageAnnotationToRe
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link CropHintAnnotationSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input,
                                     AnnotateImageResponse annotateImageResponse) {
@@ -43,16 +50,22 @@ public class CropHintsAnnotationsToRecordTransformer extends ImageAnnotationToRe
             .build();
   }
 
-  private List<StructuredRecord>
-  extractCropHintsAnnotations(AnnotateImageResponse annotateImageResponse) {
+  private List<StructuredRecord> extractCropHintsAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getCropHintsAnnotation().getCropHintsList().stream()
             .map(this::extractCropHintRecord)
             .collect(Collectors.toList());
   }
 
+  /**
+   * Extract a {@link StructuredRecord} from a {@link CropHint} passed in.
+   *
+   * @param hint Contains the {@link CropHint} information to use.
+   * @return {@link StructuredRecord} that contains the data mapped to the {@link Schema}.
+   */
   private StructuredRecord extractCropHintRecord(CropHint hint) {
     Schema hintSchema = getCropHintsAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(hintSchema);
+
     Schema.Field positionField = hintSchema.getField(CropHintAnnotationSchema.POSITION_FIELD_NAME);
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
@@ -76,7 +89,7 @@ public class CropHintsAnnotationsToRecordTransformer extends ImageAnnotationToRe
    * Retrieves Crop Hints Annotation's non-nullable component schema. Crop Hints Annotation's schema is retrieved
    * instead of using constant schema since users are free to choose to not include some of the fields.
    *
-   * @return Crop Hints Annotation's non-nullable component schema.
+   * @return Crop Hints Annotation's non-nullable component {@link Schema}.
    */
   private Schema getCropHintsAnnotationSchema() {
     Schema.Field cropHintsAnnotationsField = schema.getField(outputFieldName);

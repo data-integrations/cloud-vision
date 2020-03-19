@@ -78,6 +78,11 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
     return pages;
   }
 
+  /**
+   * Convenience method that splits a comma separated string of values and turn those into a List<Integer>.
+   *
+   * @return {@link List<Integer>}
+   */
   public List<Integer> getPagesList() {
     if (Strings.isNullOrEmpty(pages)) {
       return Collections.emptyList();

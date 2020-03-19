@@ -71,7 +71,7 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
 
-    Schema outputSchema = getSchema();
+    Schema outputSchema = getOutputSchema();
     configurer.getStageConfigurer().setOutputSchema(outputSchema);
     configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
@@ -97,6 +97,9 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   @Override
   public void transform(StructuredRecord input, Emitter<StructuredRecord> emitter) {
     try {
+      // There are two ways the cloud vision API can be called.
+      // 1. By providing the path to a blob in GCS.
+      // 2. By providing the actual bytes of the image file.
       if (!Strings.isNullOrEmpty(config.getPathField())) {
         transformPath(input, emitter);
       } else {
@@ -110,6 +113,13 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     }
   }
 
+  /**
+   * Method that gets a response back from the cloud vision API by providing the path to an image blob in GCS.
+   *
+   * @param input   {@link StructuredRecord} passed in by CDAP to work with. It contains the actual path to use.
+   * @param emitter {@link Emitter<StructuredRecord>} object to use to send the response back to CDAP
+   * @throws Exception Raised if there was an error coming back from the cloud vision API.
+   */
   private void transformPath(StructuredRecord input, Emitter<StructuredRecord> emitter) throws Exception {
     String documentPath = input.get(config.getPathField());
     AnnotateFileResponse response = documentAnnotatorClient.extractDocumentFeature(documentPath);
@@ -117,6 +127,13 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     emitter.emit(transformed);
   }
 
+  /**
+   * Method that gets a response back from the cloud vision API by providing the actual bytes of the image file.
+   *
+   * @param input   {@link StructuredRecord} passed in by CDAP to work with. It contains the actual bytes to use.
+   * @param emitter {@link Emitter<StructuredRecord>} object to use to send the response back to CDAP
+   * @throws Exception Raised if there was an error coming back from the cloud vision API.
+   */
   private void transformBytes(StructuredRecord input, Emitter<StructuredRecord> emitter) throws Exception {
     Object content = input.get(config.getPathField());
     byte[] contentBytes = content instanceof ByteBuffer ? Bytes.getBytes((ByteBuffer) content) : (byte[]) content;
@@ -125,7 +142,13 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     emitter.emit(transformed);
   }
 
-  public Schema getSchema() {
+  /**
+   * Get the output Schema to use by combining the input Schema from CDAP and add the fields needed to store the
+   * information coming back from the cloud vision API.
+   *
+   * @return {@link Schema}
+   */
+  public Schema getOutputSchema() {
     List<Schema.Field> fields = new ArrayList<>();
     // Add the input fields
     if (inputSchema != null && inputSchema.getFields() != null) {
@@ -142,7 +165,7 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
    * File Annotation mapped to record with field "page" for page number and "feature" field for extracted image feature.
    *
    * @param imageFeatureSchema extracted image feature schema.
-   * @return File Annotation page schema.
+   * @return File Annotation page {@link Schema}.
    */
   private Schema pagesSchema(Schema imageFeatureSchema) {
     return Schema.arrayOf(

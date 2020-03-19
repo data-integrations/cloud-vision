@@ -45,6 +45,14 @@ public class LocalizedObjectAnnotationSchema {
    * Image region to which this object belongs. This must be populated.
    */
   public static final String POSITION_FIELD_NAME = "position";
+
+  /**
+   * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+   * that will be combined into a larger {@link Schema}.
+   *
+   * @param name {@link String} containing the name to give to the returned {@link Schema}.
+   * @return a {@link Schema} with the given name.
+   */
   public static final Schema SCHEMA = Schema.recordOf(
           "localized-object-annotation-component-record",
           Schema.Field.of(MID_FIELD_NAME, Schema.of(Schema.Type.STRING)),

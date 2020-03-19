@@ -112,10 +112,21 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     includeGeoResults = builder.includeGeoResults;
   }
 
+  /**
+   * Getter to retrieve a Builder object.
+   *
+   * @return a Builder object.
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * Helper function to get a Builder object based on an existing configuration.
+   *
+   * @param copy Configuration object to use as the source to copy from.
+   * @return Builer object.
+   */
   public static Builder builder(OfflineImageExtractorActionConfig copy) {
     return builder()
             .setServiceFilePath(copy.getServiceFilePath())
@@ -181,6 +192,12 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     return includeGeoResults != null ? includeGeoResults : false;
   }
 
+  /**
+   * Slit a comma separated list of properties and turn them into a List<String>.
+   *
+   * @param property Comma separated list of properties.
+   * @return A list of strings after splitting on commas.
+   */
   private List<String> convertPropertyToList(String property) {
     if (!Strings.isNullOrEmpty(property)) {
       return Arrays.asList(property.split(","));
@@ -189,6 +206,11 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     }
   }
 
+  /**
+   * Validate that the configuration is correct. If not, use the FailureCollector object passed to report errors.
+   *
+   * @param collector FailureCollector object to use to report errors.
+   */
   public void validate(FailureCollector collector) {
     ImageFeature feature = getImageFeature();
     if (feature == null) {

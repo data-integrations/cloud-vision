@@ -312,7 +312,7 @@ public class FullTextAnnotationSchema {
     public static final String BLOCKS_FIELD_NAME = "blocks";
 
     /**
-     * Property section that contains detected languages
+     * Property section that contains detected languages.
      */
     public static final String PROPERTY_FIELD_NAME = "property";
 
@@ -355,11 +355,13 @@ public class FullTextAnnotationSchema {
      */
     public static final String CONFIDENCE_FIELD_NAME = "confidence";
 
-//    public static final Schema SCHEMA = Schema.recordOf(
-//            "detectedLanguages",
-//            Schema.Field.of(LANGUAGE_CODE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-//            Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
-
+    /**
+     * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+     * that will be combined into a larger {@link Schema}.
+     *
+     * @param name {@link String} containing the name to give to the returned {@link Schema}.
+     * @return a {@link Schema} with the given name.
+     */
     public static Schema getSchema(String name) {
       return Schema.recordOf(
               name,

@@ -200,6 +200,13 @@ public class FaceAnnotationSchema {
     }
   }
 
+  /**
+   * Helper function to build a {@link List} from an array.
+   *
+   * @param input Array of type T.
+   * @param <T>   Type of the input array.
+   * @return {@link List}
+   */
   protected static <T> List<String> getIterableFromEnum(T[] input) {
     ArrayList<String> list = new ArrayList<>(input.length);
     for (T value : input) {

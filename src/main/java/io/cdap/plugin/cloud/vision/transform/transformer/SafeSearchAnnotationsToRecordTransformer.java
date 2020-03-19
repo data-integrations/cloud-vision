@@ -17,10 +17,13 @@
 package io.cdap.plugin.cloud.vision.transform.transformer;
 
 import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.Product;
+import com.google.cloud.vision.v1.ProductSearchResults;
 import com.google.cloud.vision.v1.SafeSearchAnnotation;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.SafeSearchAnnotationSchema;
+import io.cdap.plugin.cloud.vision.transform.schema.WebDetectionSchema;
 
 
 /**
@@ -33,6 +36,14 @@ public class SafeSearchAnnotationsToRecordTransformer extends ImageAnnotationToR
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link SafeSearchAnnotationSchema}. This {@link StructuredRecord} can then be turned into
+   * a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     SafeSearchAnnotation annotation = annotateImageResponse.getSafeSearchAnnotation();
@@ -41,6 +52,13 @@ public class SafeSearchAnnotationsToRecordTransformer extends ImageAnnotationToR
             .build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the safe search information from a
+   * {@link SafeSearchAnnotation} input using a {@link Schema} for the mapping.
+   *
+   * @param annotation The {@link SafeSearchAnnotation} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractSafeSearchAnnotation(SafeSearchAnnotation annotation) {
     Schema safeSearchAnnotationSchema = getSafeSearchAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(safeSearchAnnotationSchema);
