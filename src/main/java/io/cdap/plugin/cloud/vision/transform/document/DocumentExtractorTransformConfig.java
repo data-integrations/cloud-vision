@@ -104,7 +104,7 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
             !containsMacro(DocumentExtractorTransformConstants.CONTENT_FIELD) &&
             (Strings.isNullOrEmpty(getPathField()) && Strings.isNullOrEmpty(getContentField()) ||
                     !Strings.isNullOrEmpty(getPathField()) && !Strings.isNullOrEmpty(getContentField()))) {
-      collector.addFailure("Either path field or content field must be specified", null)
+      collector.addFailure("Either path field or content field must be specified.", null)
               .withConfigProperty(ExtractorTransformConstants.PATH_FIELD)
               .withConfigProperty(DocumentExtractorTransformConstants.CONTENT_FIELD);
     }
@@ -123,20 +123,6 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
   public void validateInputSchema(Schema inputSchema, FailureCollector collector) {
     Schema.Field contentField = inputSchema.getField(getContentField());
     Schema.Field pathField = inputSchema.getField(getPathField());
-
-    if (contentField == null && pathField == null) {
-      collector.addFailure("One of Content field or Path field must be provided.", null)
-              .withInputSchemaField(getContentField())
-              .withInputSchemaField(getPathField());
-      return;
-    }
-
-    if (contentField != null && pathField != null) {
-      collector.addFailure("Only one of Content field or Path field can be provided, not both.", null)
-              .withInputSchemaField(getContentField())
-              .withInputSchemaField(getPathField());
-      return;
-    }
 
     if (pathField != null && pathField.getSchema().getType() != Schema.Type.STRING) {
       collector.addFailure(String.format("Path field '%s' is expected to be a string", getPathField()), null)
