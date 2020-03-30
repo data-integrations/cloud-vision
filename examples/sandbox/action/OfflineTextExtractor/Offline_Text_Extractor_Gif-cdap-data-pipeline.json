@@ -1,11 +1,11 @@
 {
-    "name": "Offline_Text_Extractor_Pdf",
-    "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
         "version": "6.1.1",
         "scope": "SYSTEM"
     },
+    "description": "Data Pipeline Application",
+    "name": "Offline_Text_Extractor_Pdf",
     "config": {
         "resources": {
             "memoryMB": 2048,
@@ -53,15 +53,7 @@
                         "path": "${GCS_TEXT_EXTRACTED_DESTINATION_PATH}"
                     }
                 },
-                "outputSchema": [
-                    {
-                        "name": "etlSchemaBody",
-                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
-                    }
-                ],
-                "type": "batchsource",
-                "label": "GCS",
-                "icon": "fa-plug"
+                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
             },
             {
                 "name": "File",
@@ -88,10 +80,7 @@
                         "name": "GCS",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
                     }
-                ],
-                "type": "batchsink",
-                "label": "File",
-                "icon": "icon-file"
+                ]
             },
             {
                 "name": "Offline Text Extractor",
@@ -106,7 +95,7 @@
                     },
                     "properties": {
                         "serviceFilePath": "${GCP_JSON_KEY_PATH}",
-                        "mimeType": "application/pdf",
+                        "mimeType": "image/gif",
                         "sourcePath": "${GCS_IMAGE_SOURCE_PATH}",
                         "destinationPath": "${GCS_TEXT_EXTRACTED_DESTINATION_PATH}",
                         "batchSize": "2"
@@ -117,10 +106,7 @@
                         "name": "etlSchemaBody",
                         "schema": ""
                     }
-                ],
-                "type": "action",
-                "label": "Offline Text Extractor",
-                "icon": "fa-plug"
+                ]
             }
         ],
         "schedule": "0 * * * *",
