@@ -22,7 +22,6 @@ import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.VertexSchema;
 import org.junit.Assert;
-
 import java.util.Arrays;
 import java.util.List;
 

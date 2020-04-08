@@ -16,7 +16,6 @@
 package io.cdap.plugin.cloud.vision.transform;
 
 import io.cdap.plugin.cloud.vision.CloudVisionConfigBuilder;
-
 import javax.annotation.Nullable;
 
 /**

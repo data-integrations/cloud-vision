@@ -25,7 +25,6 @@ import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfigTest;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.List;
 
 /**

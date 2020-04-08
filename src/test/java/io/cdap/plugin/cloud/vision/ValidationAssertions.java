@@ -19,7 +19,6 @@ import io.cdap.cdap.etl.api.validation.CauseAttributes;
 import io.cdap.cdap.etl.api.validation.ValidationFailure;
 import io.cdap.cdap.etl.mock.validation.MockFailureCollector;
 import org.junit.Assert;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;

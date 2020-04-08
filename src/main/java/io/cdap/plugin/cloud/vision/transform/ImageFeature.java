@@ -29,7 +29,6 @@ import io.cdap.plugin.cloud.vision.transform.schema.ProductSearchResultsSchema;
 import io.cdap.plugin.cloud.vision.transform.schema.SafeSearchAnnotationSchema;
 import io.cdap.plugin.cloud.vision.transform.schema.TextAnnotationSchema;
 import io.cdap.plugin.cloud.vision.transform.schema.WebDetectionSchema;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;

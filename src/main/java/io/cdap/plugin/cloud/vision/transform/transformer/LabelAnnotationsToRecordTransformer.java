@@ -23,7 +23,6 @@ import com.google.cloud.vision.v1.Property;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationSchema;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

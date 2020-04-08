@@ -17,7 +17,6 @@
 package io.cdap.plugin.cloud.vision.transform.image;
 
 import com.google.api.client.util.Strings;
-import com.google.cloud.vision.v1.AnnotateFileResponse;
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
@@ -29,7 +28,6 @@ import com.google.cloud.vision.v1.ProductSearchParams;
 import io.cdap.plugin.cloud.vision.exception.CloudVisionExecutionException;
 import io.cdap.plugin.cloud.vision.transform.CloudVisionClient;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
-
 import java.util.Collections;
 import javax.annotation.Nullable;
 

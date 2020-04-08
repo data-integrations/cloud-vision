@@ -17,7 +17,6 @@ package io.cdap.plugin.cloud.vision.transform.document;
 
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfigBuilder;
-
 import javax.annotation.Nullable;
 
 /**

@@ -27,7 +27,6 @@ import io.cdap.plugin.cloud.vision.transform.ProductCategory;
 import io.cdap.plugin.cloud.vision.transform.schema.ProductSearchResultsSchema;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.List;
 
 /**

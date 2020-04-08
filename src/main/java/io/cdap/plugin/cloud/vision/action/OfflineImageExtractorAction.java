@@ -42,11 +42,9 @@ import io.cdap.cdap.etl.api.action.ActionContext;
 import io.cdap.plugin.cloud.vision.CredentialsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-
 import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_IMAGES_PER_BATCH;
 
 /**

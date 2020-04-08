@@ -29,7 +29,6 @@ import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.ProductCategory;
-
 import java.util.Objects;
 import javax.annotation.Nullable;
 

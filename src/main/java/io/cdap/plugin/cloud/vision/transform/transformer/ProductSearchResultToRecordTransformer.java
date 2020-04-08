@@ -23,8 +23,6 @@ import com.google.cloud.vision.v1.ProductSearchResults;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.ProductSearchResultsSchema;
-import io.cdap.plugin.cloud.vision.transform.schema.SafeSearchAnnotationSchema;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

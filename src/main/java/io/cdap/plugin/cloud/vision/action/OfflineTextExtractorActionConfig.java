@@ -23,7 +23,6 @@ import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConstants;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

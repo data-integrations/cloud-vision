@@ -24,7 +24,6 @@ import io.cdap.plugin.cloud.vision.transform.document.DocumentExtractorTransform
 import io.cdap.plugin.cloud.vision.transform.document.DocumentExtractorTransformConstants;
 import io.cdap.plugin.cloud.vision.transform.transformer.ImageAnnotationToRecordTransformer;
 import io.cdap.plugin.cloud.vision.transform.transformer.TransformerFactory;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -25,7 +25,6 @@ import com.google.cloud.vision.v1.ImageAnnotatorSettings;
 import com.google.cloud.vision.v1.ImageContext;
 import com.google.cloud.vision.v1.WebDetectionParams;
 import io.cdap.plugin.cloud.vision.CredentialsHelper;
-
 import java.io.IOException;
 import javax.annotation.Nullable;
 

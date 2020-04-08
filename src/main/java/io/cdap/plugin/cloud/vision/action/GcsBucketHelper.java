@@ -23,7 +23,6 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +38,8 @@ public class GcsBucketHelper {
   /**
    * Helper function that returns a List of Blobs that are found in a given path on GCS.
    *
-   * @param sourceFolderPath
-   * @param credentials
+   * @param sourceFolderPath Path in GCS to the source folder
+   * @param credentials      Credential object to use to get access
    * @return List of Blobs
    */
   public static List<Blob> getAllFilesInPath(String sourceFolderPath, Credentials credentials) {
