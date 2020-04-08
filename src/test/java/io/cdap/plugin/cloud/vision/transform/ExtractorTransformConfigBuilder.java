@@ -16,13 +16,16 @@
 package io.cdap.plugin.cloud.vision.transform;
 
 import io.cdap.plugin.cloud.vision.CloudVisionConfigBuilder;
+
 import javax.annotation.Nullable;
 
 /**
  * Builder class that provides handy methods to construct {@link ExtractorTransformConfig} for testing.
+ *
+ * @param <T> Generic type.
  */
 public abstract class ExtractorTransformConfigBuilder<T extends ExtractorTransformConfigBuilder>
-  extends CloudVisionConfigBuilder<T> {
+    extends CloudVisionConfigBuilder<T> {
 
   protected String pathField;
   protected String outputField;

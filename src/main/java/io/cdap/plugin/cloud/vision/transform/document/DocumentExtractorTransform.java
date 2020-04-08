@@ -34,6 +34,7 @@ import io.cdap.cdap.etl.api.Transform;
 import io.cdap.cdap.etl.api.TransformContext;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
 import io.cdap.plugin.cloud.vision.transform.document.transformer.FileAnnotationToRecordTransformer;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,34 +58,26 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   private DocumentExtractorTransformConfig config;
   private Schema inputSchema;
 
-  public DocumentExtractorTransform(DocumentExtractorTransformConfig config) {
-    this.config = config;
-  }
-
+  // Does not have values, check the macro
   @Override
   public void configurePipeline(PipelineConfigurer configurer) throws IllegalArgumentException {
     super.configurePipeline(configurer);
-    inputSchema = configurer.getStageConfigurer().getInputSchema();
+
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
+    inputSchema = stageConfigurer.getInputSchema();
     FailureCollector collector = stageConfigurer.getFailureCollector();
     config.validate(collector);
     collector.getOrThrowException();
+
     config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
-    Schema schema = getSchema();
-    Schema configuredSchema = config.getParsedSchema();
-    if (configuredSchema == null) {
-      configurer.getStageConfigurer().setOutputSchema(schema);
-      return;
-    }
-    config.validateOutputSchema(configuredSchema, collector);
-    collector.getOrThrowException();
-    ExtractorTransformConfig.validateFieldsMatch(schema, configuredSchema, collector);
-    collector.getOrThrowException();
-    configurer.getStageConfigurer().setOutputSchema(configuredSchema);
+
+    Schema outputSchema = getOutputSchema();
+    configurer.getStageConfigurer().setOutputSchema(outputSchema);
     configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
 
+  // That's where CDAP gives the actual value for a macro
   @Override
   public void prepareRun(StageSubmitterContext context) throws Exception {
     super.prepareRun(context);
@@ -105,6 +98,9 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
   @Override
   public void transform(StructuredRecord input, Emitter<StructuredRecord> emitter) {
     try {
+      // There are two ways the cloud vision API can be called.
+      // 1. By providing the path to a blob in GCS.
+      // 2. By providing the actual bytes of the image file.
       if (!Strings.isNullOrEmpty(config.getPathField())) {
         transformPath(input, emitter);
       } else {
@@ -112,12 +108,19 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
       }
     } catch (Exception e) {
       StructuredRecord errorRecord = StructuredRecord.builder(ExtractorTransformConfig.ERROR_SCHEMA)
-        .set("error", e.getMessage())
-        .build();
+          .set("error", e.getMessage())
+          .build();
       emitter.emitError(new InvalidEntry<>(400, e.getMessage(), errorRecord));
     }
   }
 
+  /**
+   * Method that gets a response back from the cloud vision API by providing the path to an image blob in GCS.
+   *
+   * @param input   {@link StructuredRecord} passed in by CDAP to work with. It contains the actual path to use.
+   * @param emitter {@link Emitter<StructuredRecord>} object to use to send the response back to CDAP
+   * @throws Exception Raised if there was an error coming back from the cloud vision API.
+   */
   private void transformPath(StructuredRecord input, Emitter<StructuredRecord> emitter) throws Exception {
     String documentPath = input.get(config.getPathField());
     AnnotateFileResponse response = documentAnnotatorClient.extractDocumentFeature(documentPath);
@@ -125,6 +128,13 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     emitter.emit(transformed);
   }
 
+  /**
+   * Method that gets a response back from the cloud vision API by providing the actual bytes of the image file.
+   *
+   * @param input   {@link StructuredRecord} passed in by CDAP to work with. It contains the actual bytes to use.
+   * @param emitter {@link Emitter<StructuredRecord>} object to use to send the response back to CDAP
+   * @throws Exception Raised if there was an error coming back from the cloud vision API.
+   */
   private void transformBytes(StructuredRecord input, Emitter<StructuredRecord> emitter) throws Exception {
     Object content = input.get(config.getPathField());
     byte[] contentBytes = content instanceof ByteBuffer ? Bytes.getBytes((ByteBuffer) content) : (byte[]) content;
@@ -133,14 +143,22 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
     emitter.emit(transformed);
   }
 
-  public Schema getSchema() {
+  /**
+   * Get the output Schema to use by combining the input Schema from CDAP and add the fields needed to store the
+   * information coming back from the cloud vision API.
+   *
+   * @return {@link Schema}
+   */
+  public Schema getOutputSchema() {
     List<Schema.Field> fields = new ArrayList<>();
-    if (inputSchema.getFields() != null) {
+    // Add the input fields
+    if (inputSchema != null && inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());
     }
-
+    // Add the fields of the image feature schema
     Schema pagesSchema = pagesSchema(config.getImageFeature().getSchema());
     fields.add(Schema.Field.of(config.getOutputField(), pagesSchema));
+    // Build a schema combining all
     return Schema.recordOf("record", fields);
   }
 
@@ -148,12 +166,12 @@ public class DocumentExtractorTransform extends Transform<StructuredRecord, Stru
    * File Annotation mapped to record with field "page" for page number and "feature" field for extracted image feature.
    *
    * @param imageFeatureSchema extracted image feature schema.
-   * @return File Annotation page schema.
+   * @return File Annotation page {@link Schema}.
    */
   private Schema pagesSchema(Schema imageFeatureSchema) {
     return Schema.arrayOf(
-      Schema.recordOf("page-record",
-        Schema.Field.of("page", Schema.of(Schema.Type.INT)),
-        Schema.Field.of("feature", imageFeatureSchema)));
+        Schema.recordOf("page-record",
+            Schema.Field.of("page", Schema.of(Schema.Type.INT)),
+            Schema.Field.of("feature", imageFeatureSchema)));
   }
 }

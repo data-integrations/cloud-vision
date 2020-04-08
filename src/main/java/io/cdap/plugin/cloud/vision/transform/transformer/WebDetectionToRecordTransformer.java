@@ -21,13 +21,13 @@ import com.google.cloud.vision.v1.WebDetection;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.WebDetectionSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
- * Transforms web detection of specified {@link AnnotateImageResponse} to {@link StructuredRecord} according
- * to the specified schema.
+ * Transforms web detection of specified {@link AnnotateImageResponse} to {@link StructuredRecord}
+ * according to the specified schema.
  */
 public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTransformer {
 
@@ -35,14 +35,28 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link WebDetectionSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     WebDetection webDetection = annotateImageResponse.getWebDetection();
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractWebDetection(webDetection))
-      .build();
+        .set(outputFieldName, extractWebDetection(webDetection))
+        .build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web detection information from a
+   * {@link WebDetection} input using a {@link Schema} for the mapping.
+   *
+   * @param webDetection The {@link WebDetection} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebDetection(WebDetection webDetection) {
     Schema webSchema = getWebDetectionSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(webSchema);
@@ -51,8 +65,8 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     if (entitiesField != null) {
       Schema entitySchema = getComponentSchema(entitiesField);
       List<StructuredRecord> entities = webDetection.getWebEntitiesList().stream()
-        .map(v -> extractEntity(v, entitySchema))
-        .collect(Collectors.toList());
+          .map(v -> extractEntity(v, entitySchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.ENTITIES_FIELD_NAME, entities);
     }
 
@@ -60,8 +74,8 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     if (fullMatchingImagesField != null) {
       Schema webImageSchema = getComponentSchema(fullMatchingImagesField);
       List<StructuredRecord> webImages = webDetection.getFullMatchingImagesList().stream()
-        .map(v -> extractWebImage(v, webImageSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractWebImage(v, webImageSchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.FULL_MATCHING_IMAGES_FIELD_NAME, webImages);
     }
 
@@ -69,8 +83,8 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     if (partialMatchingImagesField != null) {
       Schema webImageSchema = getComponentSchema(partialMatchingImagesField);
       List<StructuredRecord> webImages = webDetection.getPartialMatchingImagesList().stream()
-        .map(v -> extractWebImage(v, webImageSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractWebImage(v, webImageSchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.PARTIAL_MATCHING_IMAGES_FIELD_NAME, webImages);
     }
 
@@ -78,8 +92,8 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     if (pagesField != null) {
       Schema pageSchema = getComponentSchema(pagesField);
       List<StructuredRecord> pages = webDetection.getPagesWithMatchingImagesList().stream()
-        .map(v -> extractWebPage(v, pageSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractWebPage(v, pageSchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.PAGES_WITH_MATCHING_IMAGES_FIELD_NAME, pages);
     }
 
@@ -87,22 +101,30 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     if (visuallySimilarImagesField != null) {
       Schema webImageSchema = getComponentSchema(visuallySimilarImagesField);
       List<StructuredRecord> webImages = webDetection.getVisuallySimilarImagesList().stream()
-        .map(v -> extractWebImage(v, webImageSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractWebImage(v, webImageSchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.VISUALLY_SIMILAR_IMAGES, webImages);
     }
     Schema.Field labelsField = webSchema.getField(WebDetectionSchema.BEST_GUESS_LABELS_FIELD_NAME);
     if (labelsField != null) {
       Schema labelSchema = getComponentSchema(labelsField);
       List<StructuredRecord> webLabels = webDetection.getBestGuessLabelsList().stream()
-        .map(v -> extractWebLabel(v, labelSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractWebLabel(v, labelSchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.BEST_GUESS_LABELS_FIELD_NAME, webLabels);
     }
 
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web entity information from a
+   * {@link WebDetection.WebEntity} input using a {@link Schema} for the mapping.
+   *
+   * @param webEntity The {@link WebDetection.WebEntity} object containing the data.
+   * @param schema    The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractEntity(WebDetection.WebEntity webEntity, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.WebEntity.ENTITY_ID_FIELD_NAME) != null) {
@@ -118,6 +140,14 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web image information from a
+   * {@link WebDetection.WebImage} input using a {@link Schema} for the mapping.
+   *
+   * @param webImage The {@link WebDetection.WebImage} object containing the data.
+   * @param schema   The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebImage(WebDetection.WebImage webImage, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.WebImage.URL_FIELD_NAME) != null) {
@@ -130,6 +160,14 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web label information from a
+   * {@link WebDetection.WebLabel} input using a {@link Schema} for the mapping.
+   *
+   * @param webLabel The {@link WebDetection.WebLabel} object containing the data.
+   * @param schema   The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebLabel(WebDetection.WebLabel webLabel, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.BestGuessLabel.LABEL_FIELD_NAME) != null) {
@@ -142,6 +180,14 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web page information from a
+   * {@link WebDetection.WebPage} input using a {@link Schema} for the mapping.
+   *
+   * @param webPage The {@link WebDetection.WebPage} object containing the data.
+   * @param schema  The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebPage(WebDetection.WebPage webPage, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.WebPage.URL_FIELD_NAME) != null) {
@@ -158,8 +204,8 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     if (fullMatchingImgField != null) {
       Schema webImageSchema = getComponentSchema(fullMatchingImgField);
       List<StructuredRecord> webImages = webPage.getFullMatchingImagesList().stream()
-        .map(v -> extractWebImage(v, webImageSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractWebImage(v, webImageSchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.WebPage.FULL_MATCHING_IMAGES_FIELD_NAME, webImages);
     }
 
@@ -167,8 +213,8 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     if (partMatchingImgField != null) {
       Schema webImageSchema = getComponentSchema(partMatchingImgField);
       List<StructuredRecord> webImages = webPage.getPartialMatchingImagesList().stream()
-        .map(v -> extractWebImage(v, webImageSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractWebImage(v, webImageSchema))
+          .collect(Collectors.toList());
       builder.set(WebDetectionSchema.WebPage.PARTIAL_MATCHING_IMAGES_FIELD_NAME, webImages);
     }
 
@@ -184,6 +230,6 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
   private Schema getWebDetectionSchema() {
     Schema webDetectionAnnotationsFieldSchema = schema.getField(outputFieldName).getSchema();
     return webDetectionAnnotationsFieldSchema.isNullable() ? webDetectionAnnotationsFieldSchema.getNonNullable()
-      : webDetectionAnnotationsFieldSchema;
+        : webDetectionAnnotationsFieldSchema;
   }
 }

@@ -36,14 +36,14 @@ import java.util.stream.IntStream;
 public class OfflineImageExtractorActionConfigTest {
   private static final String MOCK_STAGE = "mockStage";
   private static final OfflineImageExtractorActionConfig VALID_CONFIG = new OfflineImageExtractorActionConfig(
-    CloudVisionConstants.AUTO_DETECT,
-    ImageFeature.FACE.getDisplayName(),
-    null,
-    null,
-    true,
-    "sourcePath",
-    "destinationPath",
-    "2"
+      CloudVisionConstants.AUTO_DETECT,
+      ImageFeature.FACE.getDisplayName(),
+      null,
+      null,
+      true,
+      "sourcePath",
+      "destinationPath",
+      "2"
   );
 
   @Test
@@ -58,10 +58,10 @@ public class OfflineImageExtractorActionConfigTest {
   public void testValidateIncorrectBatchSize() {
     MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(VALID_CONFIG)
-      .setBatchSize("1t")
-      .build();
+        .setBatchSize("1t")
+        .build();
     List<List<String>> paramNames = Collections.singletonList(
-      Collections.singletonList(ActionConstants.BATCH_SIZE)
+        Collections.singletonList(ActionConstants.BATCH_SIZE)
     );
 
     config.validate(collector);
@@ -72,10 +72,10 @@ public class OfflineImageExtractorActionConfigTest {
   public void testValidateNegativeBatchSize() {
     MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(VALID_CONFIG)
-      .setBatchSize("-1")
-      .build();
+        .setBatchSize("-100")
+        .build();
     List<List<String>> paramNames = Collections.singletonList(
-      Collections.singletonList(ActionConstants.BATCH_SIZE)
+        Collections.singletonList(ActionConstants.BATCH_SIZE)
     );
 
     config.validate(collector);
@@ -86,10 +86,10 @@ public class OfflineImageExtractorActionConfigTest {
   public void testValidatePositiveBatchSize() {
     MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(VALID_CONFIG)
-      .setBatchSize("102")
-      .build();
+        .setBatchSize("102")
+        .build();
     List<List<String>> paramNames = Collections.singletonList(
-      Collections.singletonList(ActionConstants.BATCH_SIZE)
+        Collections.singletonList(ActionConstants.BATCH_SIZE)
     );
 
     config.validate(collector);
@@ -100,8 +100,8 @@ public class OfflineImageExtractorActionConfigTest {
   public void testValidateCorrectBatchSize() {
     MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(VALID_CONFIG)
-      .setBatchSize("20")
-      .build();
+        .setBatchSize("20")
+        .build();
 
     config.validate(collector);
     Assert.assertTrue(collector.getValidationFailures().isEmpty());
@@ -111,15 +111,39 @@ public class OfflineImageExtractorActionConfigTest {
   public void testValidateAspectRatios() {
     MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(VALID_CONFIG)
-      .setFeatures(ImageFeature.CROP_HINTS.getDisplayName())
-      .setAspectRatios("1t")
-      .build();
+        .setFeatures(ImageFeature.CROP_HINTS.getDisplayName())
+        .setAspectRatios("1t")
+        .build();
     List<List<String>> paramNames = Collections.singletonList(
-      Collections.singletonList(ActionConstants.ASPECT_RATIOS)
+        Collections.singletonList(ActionConstants.ASPECT_RATIOS)
     );
 
     config.validate(collector);
     assertValidationFailed(collector, paramNames);
+  }
+
+  @Test
+  public void testValidateOneLanguageHint() {
+    // Those are all the language ids retrieved from 'widgets/DocumentExtractor-transform.json'
+    String[] languages = new String[]{"af", "sq", "ar", "hy", "be", "bn", "bg", "ca", "zh", "hr", "cs", "da", "nl",
+        "en", "et", "fil", "fi", "fr", "de", "el", "gu", "iw", "hu", "is", "id", "it", "ja", "kn", "km", "ko", "lo",
+        "lv", "lt", "mk", "ms", "ml", "mr", "ne", "no", "fa", "pl", "pt", "pa", "ro", "ru", "ru-PETR1708", "sr",
+        "sr-Latn", "sk", "sl", "es", "sv", "ta", "te", "th", "tr", "uk", "vi", "yi"};
+
+    MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
+    List<List<String>> paramNames = Collections.singletonList(
+        Collections.singletonList(ActionConstants.LANGUAGE_HINTS)
+    );
+
+    // Validate the languages one by one
+    for (String language : languages) {
+      OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(VALID_CONFIG)
+          .setFeatures(ImageFeature.TEXT.getDisplayName())
+          .setLanguageHints(language)
+          .build();
+      config.validate(collector);
+    }
+    Assert.assertTrue(collector.getValidationFailures().isEmpty());
   }
 
   private void assertValidationFailed(MockFailureCollector failureCollector, List<List<String>> paramNames) {
@@ -127,17 +151,17 @@ public class OfflineImageExtractorActionConfigTest {
     Assert.assertEquals(paramNames.size(), failureList.size());
     Iterator<List<String>> paramNameIterator = paramNames.iterator();
     failureList.stream().map(failure -> failure.getCauses()
-      .stream()
-      .filter(cause -> cause.getAttribute(CauseAttributes.STAGE_CONFIG) != null)
-      .collect(Collectors.toList()))
-      .filter(causeList -> paramNameIterator.hasNext())
-      .forEach(causeList -> {
-        List<String> parameters = paramNameIterator.next();
-        Assert.assertEquals(parameters.size(), causeList.size());
-        IntStream.range(0, parameters.size()).forEach(i -> {
-          ValidationFailure.Cause cause = causeList.get(i);
-          Assert.assertEquals(parameters.get(i), cause.getAttribute(CauseAttributes.STAGE_CONFIG));
+        .stream()
+        .filter(cause -> cause.getAttribute(CauseAttributes.STAGE_CONFIG) != null)
+        .collect(Collectors.toList()))
+        .filter(causeList -> paramNameIterator.hasNext())
+        .forEach(causeList -> {
+          List<String> parameters = paramNameIterator.next();
+          Assert.assertEquals(parameters.size(), causeList.size());
+          IntStream.range(0, parameters.size()).forEach(i -> {
+            ValidationFailure.Cause cause = causeList.get(i);
+            Assert.assertEquals(parameters.get(i), cause.getAttribute(CauseAttributes.STAGE_CONFIG));
+          });
         });
-      });
   }
 }

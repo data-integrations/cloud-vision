@@ -23,24 +23,24 @@ import io.cdap.cdap.api.data.schema.Schema;
  */
 public class EntityAnnotationWithPositionSchema extends EntityAnnotationSchema {
 
-  private EntityAnnotationWithPositionSchema() {
-    throw new AssertionError("Should not instantiate static utility class.");
-  }
-
   /**
    * Image region to which this entity belongs.
    */
   public static final String POSITION_FIELD_NAME = "position";
-
   public static final Schema SCHEMA = Schema.recordOf(
-    "landmark-entity-annotation-component-record",
-    Schema.Field.of(MID_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(LOCALE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-    Schema.Field.of(TOPICALITY_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-    Schema.Field.of(LOCATIONS_FIELD_NAME, Schema.arrayOf(LocationInfo.SCHEMA)),
-    Schema.Field.of(POSITION_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(VertexSchema.SCHEMA))),
-    Schema.Field.of(PROPERTIES_FIELD_NAME, Schema.arrayOf(Property.SCHEMA))
+      "landmark-entity-annotation-component-record",
+      Schema.Field.of(MID_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(LOCALE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+      Schema.Field.of(TOPICALITY_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+      Schema.Field.of(LOCATIONS_FIELD_NAME, Schema.arrayOf(LocationInfo.SCHEMA)),
+      Schema.Field.of(POSITION_FIELD_NAME, Schema.nullableOf(
+          Schema.arrayOf(VertexSchema.getSchema("entityAnnotation-position")))),
+      Schema.Field.of(PROPERTIES_FIELD_NAME, Schema.arrayOf(Property.SCHEMA))
   );
+
+  private EntityAnnotationWithPositionSchema() {
+    throw new AssertionError("Should not instantiate static utility class.");
+  }
 }

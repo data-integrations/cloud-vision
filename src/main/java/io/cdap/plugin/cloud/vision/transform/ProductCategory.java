@@ -31,7 +31,7 @@ public enum ProductCategory {
   TOYS("Toys", "toys");
 
   private static final Map<String, ProductCategory> byDisplayName = Arrays.stream(values())
-    .collect(Collectors.toMap(ProductCategory::getDisplayName, Function.identity()));
+      .collect(Collectors.toMap(ProductCategory::getDisplayName, Function.identity()));
 
   private final String displayName;
   private final String name;

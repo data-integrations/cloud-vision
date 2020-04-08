@@ -27,6 +27,7 @@ import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import io.cdap.plugin.cloud.vision.transform.schema.ColorInfoSchema;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,39 +37,39 @@ import java.util.List;
 public class ImagePropertiesAnnotationsToRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   private static final ColorInfo COLOR_1 = ColorInfo.newBuilder()
-    .setPixelFraction(0.18f)
-    .setScore(0.18f)
-    .setColor(Color.newBuilder().setRed(204).setGreen(205).setBlue(213))
-    .build();
+      .setPixelFraction(0.18f)
+      .setScore(0.18f)
+      .setColor(Color.newBuilder().setRed(204).setGreen(205).setBlue(213))
+      .build();
 
   private static final ColorInfo COLOR_2 = ColorInfo.newBuilder()
-    .setPixelFraction(0.38f)
-    .setScore(0.98f)
-    .setColor(Color.newBuilder().setRed(204).setGreen(205).setBlue(213))
-    .build();
+      .setPixelFraction(0.38f)
+      .setScore(0.98f)
+      .setColor(Color.newBuilder().setRed(204).setGreen(205).setBlue(213))
+      .build();
 
   private static final DominantColorsAnnotation DOMINANT_COLORS_ANNOTATION = DominantColorsAnnotation.newBuilder()
-    .addAllColors(Arrays.asList(COLOR_1, COLOR_2))
-    .build();
+      .addAllColors(Arrays.asList(COLOR_1, COLOR_2))
+      .build();
 
   private static final ImageProperties IMAGE_PROPERTIES = ImageProperties.newBuilder()
-    .setDominantColors(DOMINANT_COLORS_ANNOTATION)
-    .build();
+      .setDominantColors(DOMINANT_COLORS_ANNOTATION)
+      .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .setImagePropertiesAnnotation(IMAGE_PROPERTIES)
-    .build();
+      .setImagePropertiesAnnotation(IMAGE_PROPERTIES)
+      .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.IMAGE_PROPERTIES.getSchema()));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(output, ImageFeature.IMAGE_PROPERTIES.getSchema()));
 
     ImagePropertiesAnnotationsToRecordTransformer transformer =
-      new ImagePropertiesAnnotationsToRecordTransformer(schema, output);
+        new ImagePropertiesAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
 
     Assert.assertNotNull(transformed);
@@ -81,16 +82,16 @@ public class ImagePropertiesAnnotationsToRecordTransformerTest extends BaseAnnot
   public void testTransformEmptyAnnotation() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.IMAGE_PROPERTIES.getSchema()));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(output, ImageFeature.IMAGE_PROPERTIES.getSchema()));
 
     ImagePropertiesAnnotationsToRecordTransformer transformer =
-      new ImagePropertiesAnnotationsToRecordTransformer(schema, output);
+        new ImagePropertiesAnnotationsToRecordTransformer(schema, output);
 
     DominantColorsAnnotation emptyAnnotation = DominantColorsAnnotation.newBuilder().build();
     AnnotateImageResponse emptyTextAnnotation = AnnotateImageResponse.newBuilder()
-      .setImagePropertiesAnnotation(ImageProperties.newBuilder().setDominantColors(emptyAnnotation).build())
-      .build();
+        .setImagePropertiesAnnotation(ImageProperties.newBuilder().setDominantColors(emptyAnnotation).build())
+        .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, emptyTextAnnotation);
 
     Assert.assertNotNull(transformed);
@@ -103,14 +104,14 @@ public class ImagePropertiesAnnotationsToRecordTransformerTest extends BaseAnnot
   public void testTransformSingleField() {
     String output = "extracted";
     Schema textAnnotationSingleFieldSchema = Schema.recordOf(
-      "single-color-info-field",
-      Schema.Field.of(ColorInfoSchema.SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
+        "single-color-info-field",
+        Schema.Field.of(ColorInfoSchema.SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, Schema.arrayOf(textAnnotationSingleFieldSchema)));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(output, Schema.arrayOf(textAnnotationSingleFieldSchema)));
 
     ImagePropertiesAnnotationsToRecordTransformer transformer =
-      new ImagePropertiesAnnotationsToRecordTransformer(schema, output);
+        new ImagePropertiesAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
     Assert.assertNotNull(transformed);
     List<StructuredRecord> actual = transformed.get(output);
@@ -121,8 +122,8 @@ public class ImagePropertiesAnnotationsToRecordTransformerTest extends BaseAnnot
       ColorInfo expectedColorInfo = DOMINANT_COLORS_ANNOTATION.getColors(i);
       StructuredRecord actualColorInfo = actual.get(i);
       Assert.assertEquals(expectedColorInfo.getScore(),
-        actualColorInfo.<Float>get(ColorInfoSchema.SCORE_FIELD_NAME),
-        DELTA);
+          actualColorInfo.<Float>get(ColorInfoSchema.SCORE_FIELD_NAME),
+          DELTA);
     }
   }
 
@@ -143,10 +144,10 @@ public class ImagePropertiesAnnotationsToRecordTransformerTest extends BaseAnnot
     Assert.assertEquals(expected.getColor().getGreen(), actual.<Float>get(ColorInfoSchema.GREEN_FIELD_NAME), DELTA);
     Assert.assertEquals(expected.getColor().getBlue(), actual.<Float>get(ColorInfoSchema.BLUE_FIELD_NAME), DELTA);
     Assert.assertEquals(expected.getPixelFraction(),
-      actual.<Float>get(ColorInfoSchema.PIXEL_FRACTION_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(ColorInfoSchema.PIXEL_FRACTION_FIELD_NAME),
+        DELTA);
     Assert.assertEquals(expected.getColor().getAlpha().getValue(),
-      actual.<Float>get(ColorInfoSchema.ALPHA_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(ColorInfoSchema.ALPHA_FIELD_NAME),
+        DELTA);
   }
 }

@@ -3,7 +3,7 @@
 
 # Overview
 
-Following plugins are available in this repository.
+The following plugins are available in this repository.
 
   * Image Extractor Transform
   * Document Extractor Transform

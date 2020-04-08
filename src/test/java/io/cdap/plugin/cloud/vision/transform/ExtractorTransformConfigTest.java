@@ -28,9 +28,9 @@ public abstract class ExtractorTransformConfigTest {
 
   protected static final String MOCK_STAGE = "mockstage";
   protected static final Schema VALID_SCHEMA = Schema.recordOf(
-    "schema",
-    Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-    Schema.Field.of("extracted", ImageFeature.FACE.getSchema())
+      "schema",
+      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+      Schema.Field.of("extracted", ImageFeature.FACE.getSchema())
   );
 
   protected abstract ExtractorTransformConfigBuilder getValidConfigBuilder();
@@ -38,8 +38,8 @@ public abstract class ExtractorTransformConfigTest {
   @Test
   public void testValidateOutputFieldNull() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setOutputField(null)
-      .build();
+        .setOutputField(null)
+        .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -49,8 +49,8 @@ public abstract class ExtractorTransformConfigTest {
   @Test
   public void testValidateOutputFieldEmpty() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setOutputField("")
-      .build();
+        .setOutputField("")
+        .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -60,8 +60,8 @@ public abstract class ExtractorTransformConfigTest {
   @Test
   public void testValidateFeatureNull() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setFeatures(null)
-      .build();
+        .setFeatures(null)
+        .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -71,8 +71,8 @@ public abstract class ExtractorTransformConfigTest {
   @Test
   public void testValidateFeatureEmpty() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setFeatures("")
-      .build();
+        .setFeatures("")
+        .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -82,8 +82,8 @@ public abstract class ExtractorTransformConfigTest {
   @Test
   public void testValidateFeatureInvalid() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setFeatures("invalid-split-by")
-      .build();
+        .setFeatures("invalid-split-by")
+        .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);

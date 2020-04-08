@@ -19,6 +19,7 @@ import io.cdap.cdap.etl.api.validation.CauseAttributes;
 import io.cdap.cdap.etl.api.validation.ValidationFailure;
 import io.cdap.cdap.etl.mock.validation.MockFailureCollector;
 import org.junit.Assert;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -41,8 +42,8 @@ public final class ValidationAssertions {
   @Nonnull
   public static List<ValidationFailure.Cause> getCauses(ValidationFailure failure, String stacktrace) {
     return failure.getCauses()
-      .stream()
-      .filter(cause -> cause.getAttribute(stacktrace) != null)
-      .collect(Collectors.toList());
+        .stream()
+        .filter(cause -> cause.getAttribute(stacktrace) != null)
+        .collect(Collectors.toList());
   }
 }

@@ -24,6 +24,7 @@ import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import io.cdap.plugin.cloud.vision.transform.schema.TextAnnotationSchema;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.List;
 
 /**
@@ -32,22 +33,22 @@ import java.util.List;
 public class TextAnnotationsToRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   private static final EntityAnnotation TEXT_ANNOTATION = EntityAnnotation.newBuilder()
-    .setLocale("en")
-    .setDescription("Some Text")
-    .setBoundingPoly(POSITION)
-    .build();
+      .setLocale("en")
+      .setDescription("Some Text")
+      .setBoundingPoly(POSITION)
+      .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .addTextAnnotations(TEXT_ANNOTATION)
-    .build();
+      .addTextAnnotations(TEXT_ANNOTATION)
+      .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String outputFieldName = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, ImageFeature.TEXT.getSchema()));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(outputFieldName, ImageFeature.TEXT.getSchema()));
 
     TextAnnotationsToRecordTransformer transformer = new TextAnnotationsToRecordTransformer(schema, outputFieldName);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -65,15 +66,15 @@ public class TextAnnotationsToRecordTransformerTest extends BaseAnnotationsToRec
   public void testTransformEmptyAnnotation() {
     String outputFieldName = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, ImageFeature.TEXT.getSchema()));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(outputFieldName, ImageFeature.TEXT.getSchema()));
 
     TextAnnotationsToRecordTransformer transformer = new TextAnnotationsToRecordTransformer(schema, outputFieldName);
 
     EntityAnnotation emptyAnnotation = EntityAnnotation.newBuilder().build();
     AnnotateImageResponse emptyTextAnnotation = AnnotateImageResponse.newBuilder()
-      .addTextAnnotations(emptyAnnotation)
-      .build();
+        .addTextAnnotations(emptyAnnotation)
+        .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, emptyTextAnnotation);
 
     Assert.assertNotNull(transformed);
@@ -89,11 +90,11 @@ public class TextAnnotationsToRecordTransformerTest extends BaseAnnotationsToRec
   public void testTransformSingleField() {
     String outputFieldName = "extracted";
     Schema textAnnotationSingleFieldSchema = Schema.recordOf(
-      "single-text-field",
-      Schema.Field.of(TextAnnotationSchema.DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+        "single-text-field",
+        Schema.Field.of(TextAnnotationSchema.DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(outputFieldName, Schema.arrayOf(textAnnotationSingleFieldSchema)));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(outputFieldName, Schema.arrayOf(textAnnotationSingleFieldSchema)));
 
     TextAnnotationsToRecordTransformer transformer = new TextAnnotationsToRecordTransformer(schema, outputFieldName);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);

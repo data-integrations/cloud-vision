@@ -24,6 +24,8 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConstants;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,61 +35,66 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
- * Configuration for OfflineImageExtractorAction
+ * Configuration for OfflineImageExtractorAction.
  */
 public class OfflineImageExtractorActionConfig extends PluginConfig {
-
-  @Macro
-  @Name(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
-  @Description("Path on the local file system of the service account key used "
-    + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
-    + "When running on other clusters, the file must be present on every node in the cluster.")
-  @Nullable
-  protected String serviceFilePath;
-
-  @Macro
-  @Name(ActionConstants.SOURCE_PATH)
-  @Description("Path to a source object or directory.")
-  private String sourcePath;
-
-  @Macro
-  @Name(ActionConstants.DESTINATION_PATH)
-  @Description("Path to the destination. The bucket must already exist.")
-  private String destinationPath;
 
   @Macro
   @Name(ActionConstants.FEATURES)
   @Description("Features to extract from images.")
   protected final String features;
-
+  @Name(ActionConstants.LANGUAGE_HINTS)
+  @Nullable
+  @Description("Optional hints to provide to Cloud Vision API.")
+  protected final String languageHints;
+  @Name(ActionConstants.ASPECT_RATIOS)
+  @Nullable
+  @Description("Aspect ratios as a decimal number, representing the ratio of the width to the height of the image.")
+  protected final String aspectRatios;
+  @Name(ActionConstants.INCLUDE_GEO_RESULTS)
+  @Nullable
+  @Description("Whether to include results derived from the geo information in the image.")
+  protected final Boolean includeGeoResults;
+  @Macro
+  @Name(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
+  @Description("Path on the local file system of the service account key used "
+      + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
+      + "When running on other clusters, the file must be present on every node in the cluster.")
+  @Nullable
+  protected String serviceFilePath;
+  @Macro
+  @Name(ActionConstants.SOURCE_PATH)
+  @Description("Path to a source object or directory.")
+  private String sourcePath;
+  @Macro
+  @Name(ActionConstants.DESTINATION_PATH)
+  @Description("Path to the destination. The bucket must already exist.")
+  private String destinationPath;
   @Macro
   @Name(ActionConstants.BATCH_SIZE)
   @Description("The max number of responses to output in each JSON file.")
   @Nullable
   private String batchSize;
 
-  @Name(ActionConstants.LANGUAGE_HINTS)
-  @Nullable
-  @Description("Optional hints to provide to Cloud Vision API.")
-  protected final String languageHints;
-
-  @Name(ActionConstants.ASPECT_RATIOS)
-  @Nullable
-  @Description("Aspect ratios as a decimal number, representing the ratio of the width to the height of the image.")
-  protected final String aspectRatios;
-
-  @Name(ActionConstants.INCLUDE_GEO_RESULTS)
-  @Nullable
-  @Description("Whether to include results derived from the geo information in the image.")
-  protected final Boolean includeGeoResults;
+  // Debug
+  private static final Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
 
   public OfflineImageExtractorActionConfig(@Nullable String serviceFilePath, String features,
                                            @Nullable String languageHints, @Nullable String aspectRatios,
                                            @Nullable Boolean includeGeoResults, String sourcePath,
                                            String destinationPath, @Nullable String batchSize) {
     this.serviceFilePath = serviceFilePath;
+
+    if (sourcePath != null) {
+      sourcePath = sourcePath.trim();
+    }
     this.sourcePath = sourcePath;
+
+    if (destinationPath != null) {
+      destinationPath = destinationPath.trim();
+    }
     this.destinationPath = destinationPath;
+
     this.features = features;
     this.batchSize = batchSize;
     this.languageHints = languageHints;
@@ -97,8 +104,8 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
 
   private OfflineImageExtractorActionConfig(Builder builder) {
     serviceFilePath = builder.serviceFilePath;
-    sourcePath = builder.sourcePath;
-    destinationPath = builder.destinationPath;
+    sourcePath = builder.sourcePath.trim();
+    destinationPath = builder.destinationPath.trim();
     features = builder.features;
     batchSize = builder.batchSize;
     languageHints = builder.languageHints;
@@ -106,20 +113,31 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     includeGeoResults = builder.includeGeoResults;
   }
 
+  /**
+   * Getter to retrieve a Builder object.
+   *
+   * @return a Builder object.
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * Helper function to get a Builder object based on an existing configuration.
+   *
+   * @param copy Configuration object to use as the source to copy from.
+   * @return Builer object.
+   */
   public static Builder builder(OfflineImageExtractorActionConfig copy) {
     return builder()
-      .setServiceFilePath(copy.getServiceFilePath())
-      .setSourcePath(copy.getSourcePath())
-      .setDestinationPath(copy.getDestinationPath())
-      .setFeatures(copy.getFeatures())
-      .setBatchSize(copy.getBatchSize())
-      .setLanguageHints(copy.getLanguageHints())
-      .setAspectRatios(copy.getAspectRatios())
-      .setIncludeGeoResults(copy.getIncludeGeoResults());
+        .setServiceFilePath(copy.getServiceFilePath())
+        .setSourcePath(copy.getSourcePath())
+        .setDestinationPath(copy.getDestinationPath())
+        .setFeatures(copy.getFeatures())
+        .setBatchSize(copy.getBatchSize())
+        .setLanguageHints(copy.getLanguageHints())
+        .setAspectRatios(copy.getAspectRatios())
+        .setIncludeGeoResults(copy.getIncludeGeoResults());
   }
 
   @Nullable
@@ -167,14 +185,20 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
 
   public List<Float> getAspectRatiosList() {
     return convertPropertyToList(aspectRatios).stream()
-      .map(Float::parseFloat)
-      .collect(Collectors.toList());
+        .map(Float::parseFloat)
+        .collect(Collectors.toList());
   }
 
   public boolean getIncludeGeoResults() {
     return includeGeoResults != null ? includeGeoResults : false;
   }
 
+  /**
+   * Slit a comma separated list of properties and turn them into a List<String>.
+   *
+   * @param property Comma separated list of properties.
+   * @return A list of strings after splitting on commas.
+   */
   private List<String> convertPropertyToList(String property) {
     if (!Strings.isNullOrEmpty(property)) {
       return Arrays.asList(property.split(","));
@@ -183,11 +207,16 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     }
   }
 
+  /**
+   * Validate that the configuration is correct. If not, use the FailureCollector object passed to report errors.
+   *
+   * @param collector FailureCollector object to use to report errors.
+   */
   public void validate(FailureCollector collector) {
     ImageFeature feature = getImageFeature();
     if (feature == null) {
       collector.addFailure(String.format("Incorrect value '%s' for Features.", features), null)
-        .withConfigProperty(ActionConstants.FEATURES);
+          .withConfigProperty(ActionConstants.FEATURES);
     }
 
     if (!containsMacro(ActionConstants.BATCH_SIZE) && batchSize != null) {
@@ -196,14 +225,14 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
         batch = Integer.parseInt(batchSize);
       } catch (NumberFormatException e) {
         collector.addFailure(String.format("Incorrect value '%s' for Batch Size.", batchSize),
-                             "Provide correct value.")
-          .withConfigProperty(ActionConstants.BATCH_SIZE);
+            "Provide correct value.")
+            .withConfigProperty(ActionConstants.BATCH_SIZE);
         return;
       }
 
       if (batch < 1 || batch > 100) {
         collector.addFailure("Invalid Batch Size.", "The valid range is [1, 100]")
-          .withConfigProperty(ActionConstants.BATCH_SIZE);
+            .withConfigProperty(ActionConstants.BATCH_SIZE);
       }
     }
 
@@ -213,40 +242,56 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
           Float.parseFloat(v);
         } catch (NumberFormatException e) {
           collector.addFailure(String.format("Incorrect value '%s' for Aspect Ratios.", v), null)
-            .withConfigProperty(ActionConstants.ASPECT_RATIOS);
+              .withConfigProperty(ActionConstants.ASPECT_RATIOS);
         }
       });
     }
   }
 
+  public void setSourcePath(String sourcePath) {
+    this.sourcePath = sourcePath;
+  }
+
+  public void setDestinationPath(String destinationPath) {
+    this.destinationPath = destinationPath;
+  }
+
   /**
-   * Builder for creating a {@link OfflineImageExtractorActionConfig}
+   * Builder for creating a {@link OfflineImageExtractorActionConfig}.
    */
   public static final class Builder {
     @Nullable
     protected String serviceFilePath;
-    private String sourcePath;
-    private String destinationPath;
     protected String features;
-    @Nullable
-    private String batchSize;
     @Nullable
     protected String languageHints;
     @Nullable
     protected String aspectRatios;
     @Nullable
     protected Boolean includeGeoResults;
+    private String sourcePath;
+    private String destinationPath;
+    @Nullable
+    private String batchSize;
 
     private Builder() {
     }
 
     public Builder setSourcePath(String sourcePath) {
-      this.sourcePath = sourcePath;
+      if (sourcePath != null) {
+        this.sourcePath = sourcePath.trim();
+      } else {
+        this.sourcePath = sourcePath;
+      }
       return this;
     }
 
     public Builder setDestinationPath(String destinationPath) {
-      this.destinationPath = destinationPath;
+      if (destinationPath != null) {
+        this.destinationPath = destinationPath.trim();
+      } else {
+        this.destinationPath = destinationPath;
+      }
       return this;
     }
 

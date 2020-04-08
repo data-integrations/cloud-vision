@@ -23,61 +23,54 @@ import io.cdap.cdap.api.data.schema.Schema;
  */
 public class EntityAnnotationSchema {
 
-  protected EntityAnnotationSchema() {
-    throw new AssertionError("Should not instantiate static utility class.");
-  }
-
   /**
    * Opaque entity ID. Some IDs may be available in
    * <a href="https://developers.google.com/knowledge-graph/">Google Knowledge Graph Search API</a>
    */
   public static final String MID_FIELD_NAME = "mid";
-
   /**
    * The language code for the locale in which the entity textual description is expressed.
    */
   public static final String LOCALE_FIELD_NAME = "locale";
-
   /**
    * Entity textual description.
    */
   public static final String DESCRIPTION_FIELD_NAME = "description";
-
   /**
    * Overall score of the result. Range [0, 1].
    */
   public static final String SCORE_FIELD_NAME = "score";
-
   /**
    * The relevancy of the ICA (Image Content Annotation) label to the image. For example, the relevancy of "tower" is
    * likely higher to an image containing the detected "Eiffel Tower" than to an image containing a detected distant
    * towering building, even though the confidence that there is a tower in each image may be the same. Range [0, 1].
    */
   public static final String TOPICALITY_FIELD_NAME = "topicality";
-
   /**
    * The location information for the detected entity. Multiple location elements can be present because one
    * location may indicate the location of the scene in the image, and another location may indicate the location of
    * the place where the image was taken. Location information is usually present for landmarks.
    */
   public static final String LOCATIONS_FIELD_NAME = "locations";
-
   /**
    * Some entities may have optional user-supplied Property (name/value) fields, such a score or string that qualifies
    * the entity.
    */
   public static final String PROPERTIES_FIELD_NAME = "properties";
-
   public static final Schema SCHEMA = Schema.recordOf(
-    "label-entity-annotation-component-record",
-    Schema.Field.of(MID_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(LOCALE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-    Schema.Field.of(TOPICALITY_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-    Schema.Field.of(LOCATIONS_FIELD_NAME, Schema.arrayOf(LocationInfo.SCHEMA)),
-    Schema.Field.of(PROPERTIES_FIELD_NAME, Schema.arrayOf(Property.SCHEMA))
+      "label-entity-annotation-component-record",
+      Schema.Field.of(MID_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(LOCALE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+      Schema.Field.of(TOPICALITY_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+      Schema.Field.of(LOCATIONS_FIELD_NAME, Schema.arrayOf(LocationInfo.SCHEMA)),
+      Schema.Field.of(PROPERTIES_FIELD_NAME, Schema.arrayOf(Property.SCHEMA))
   );
+
+  protected EntityAnnotationSchema() {
+    throw new AssertionError("Should not instantiate static utility class.");
+  }
 
   /**
    * Detected entity location information.
@@ -95,9 +88,9 @@ public class EntityAnnotationSchema {
     public static final String LONGITUDE_FIELD_NAME = "longitude";
 
     public static final Schema SCHEMA = Schema.recordOf(
-      "location-info-record",
-      Schema.Field.of(LATITUDE_FIELD_NAME, Schema.of(Schema.Type.DOUBLE)),
-      Schema.Field.of(LONGITUDE_FIELD_NAME, Schema.of(Schema.Type.DOUBLE))
+        "location-info-record",
+        Schema.Field.of(LATITUDE_FIELD_NAME, Schema.of(Schema.Type.DOUBLE)),
+        Schema.Field.of(LONGITUDE_FIELD_NAME, Schema.of(Schema.Type.DOUBLE))
     );
   }
 
@@ -122,10 +115,10 @@ public class EntityAnnotationSchema {
     public static final String UINT_64_VALUE_FIELD_NAME = "uint64Value";
 
     public static final Schema SCHEMA = Schema.recordOf(
-      "property-record",
-      Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(VALUE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(UINT_64_VALUE_FIELD_NAME, Schema.of(Schema.Type.LONG))
+        "property-record",
+        Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(VALUE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(UINT_64_VALUE_FIELD_NAME, Schema.of(Schema.Type.LONG))
     );
   }
 }

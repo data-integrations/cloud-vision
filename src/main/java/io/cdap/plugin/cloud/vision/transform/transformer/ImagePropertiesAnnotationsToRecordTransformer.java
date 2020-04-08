@@ -21,6 +21,7 @@ import com.google.cloud.vision.v1.ColorInfo;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.ColorInfoSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,19 +36,40 @@ public class ImagePropertiesAnnotationsToRecordTransformer extends ImageAnnotati
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link ColorInfoSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractDominantColors(annotateImageResponse))
-      .build();
+        .set(outputFieldName, extractDominantColors(annotateImageResponse))
+        .build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the dominant colors information from a
+   * {@link AnnotateImageResponse} input using a {@link Schema} for the mapping.
+   *
+   * @param annotateImageResponse The {@link AnnotateImageResponse} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private List<StructuredRecord> extractDominantColors(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getImagePropertiesAnnotation().getDominantColors().getColorsList().stream()
-      .map(this::extractColorInfoRecord)
-      .collect(Collectors.toList());
+        .map(this::extractColorInfoRecord)
+        .collect(Collectors.toList());
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the color information from a
+   * {@link ColorInfo} input using a {@link Schema} for the mapping.
+   *
+   * @param colorInfo The {@link ColorInfo} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractColorInfoRecord(ColorInfo colorInfo) {
     Schema faceSchema = getColorInfoSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(faceSchema);

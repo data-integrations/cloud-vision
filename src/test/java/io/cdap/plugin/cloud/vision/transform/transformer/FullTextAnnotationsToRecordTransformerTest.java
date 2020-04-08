@@ -29,6 +29,7 @@ import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import io.cdap.plugin.cloud.vision.transform.schema.FullTextAnnotationSchema;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.List;
 
 /**
@@ -37,64 +38,76 @@ import java.util.List;
 public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   private static final Symbol SYMBOL = Symbol.newBuilder()
-    .setText("A")
-    .setConfidence(0.99f)
-    .setBoundingBox(POSITION)
-    .setProperty(
-      TextAnnotation.TextProperty.newBuilder()
-        .addDetectedLanguages(TextAnnotation.DetectedLanguage.newBuilder().setConfidence(0.5f).setLanguageCode("en"))
-    )
-    .build();
+      .setText("A")
+      .setConfidence(0.99f)
+      .setBoundingBox(POSITION)
+      .setProperty(
+          TextAnnotation.TextProperty.newBuilder()
+              .addDetectedLanguages(TextAnnotation
+                  .DetectedLanguage
+                  .newBuilder()
+                  .setConfidence(0.5f)
+                  .setLanguageCode("en"))
+      )
+      .build();
 
   private static final Word WORD = Word.newBuilder()
-    .addSymbols(SYMBOL)
-    .setConfidence(0.89f)
-    .setBoundingBox(POSITION)
-    .setProperty(
-      TextAnnotation.TextProperty.newBuilder()
-        .addDetectedLanguages(TextAnnotation.DetectedLanguage.newBuilder().setConfidence(0.7f).setLanguageCode("ru"))
-    )
-    .build();
+      .addSymbols(SYMBOL)
+      .setConfidence(0.89f)
+      .setBoundingBox(POSITION)
+      .setProperty(
+          TextAnnotation.TextProperty.newBuilder()
+              .addDetectedLanguages(TextAnnotation
+                  .DetectedLanguage
+                  .newBuilder()
+                  .setConfidence(0.7f)
+                  .setLanguageCode("ru"))
+      )
+      .build();
 
   private static final Paragraph PARAGRAPH = Paragraph.newBuilder()
-    .addWords(WORD)
-    .setConfidence(0.79f)
-    .setBoundingBox(POSITION)
-    .setProperty(
-      TextAnnotation.TextProperty.newBuilder()
-        .addDetectedLanguages(TextAnnotation.DetectedLanguage.newBuilder().setConfidence(0.6f).setLanguageCode("ru"))
-    )
-    .build();
+      .addWords(WORD)
+      .setConfidence(0.79f)
+      .setBoundingBox(POSITION)
+      .setProperty(
+          TextAnnotation.TextProperty.newBuilder()
+              .addDetectedLanguages(TextAnnotation
+                  .DetectedLanguage
+                  .newBuilder()
+                  .setConfidence(0.6f)
+                  .setLanguageCode("ru"))
+      )
+      .build();
 
   private static final Block BLOCK = Block.newBuilder()
-    .addParagraphs(PARAGRAPH)
-    .setConfidence(0.69f)
-    .setBoundingBox(POSITION)
-    .build();
+      .addParagraphs(PARAGRAPH)
+      .setConfidence(0.69f)
+      .setBoundingBox(POSITION)
+      .build();
 
   private static final Page PAGE = Page.newBuilder()
-    .addBlocks(BLOCK)
-    .setConfidence(0.49f)
-    .setWidth(100)
-    .setHeight(300)
-    .build();
+      .addBlocks(BLOCK)
+      .setConfidence(0.49f)
+      .setWidth(100)
+      .setHeight(300)
+      .build();
 
   private static final TextAnnotation TEXT_ANNOTATION = TextAnnotation.newBuilder()
-    .addPages(PAGE)
-    .setText("Some Text")
-    .build();
+      .addPages(PAGE)
+      .setText("Some Text")
+      .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .setFullTextAnnotation(TEXT_ANNOTATION)
-    .build();
+      .setFullTextAnnotation(TEXT_ANNOTATION)
+      .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.HANDWRITING.getSchema()));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(output, ImageFeature.HANDWRITING.getSchema()));
 
     FullTextAnnotationsToRecordTransformer transformer = new FullTextAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -108,15 +121,15 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
   public void testTransformEmptyAnnotation() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.HANDWRITING.getSchema()));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(output, ImageFeature.HANDWRITING.getSchema()));
 
     FullTextAnnotationsToRecordTransformer transformer = new FullTextAnnotationsToRecordTransformer(schema, output);
 
     TextAnnotation emptyAnnotation = TextAnnotation.newBuilder().build();
     AnnotateImageResponse emptyTextAnnotation = AnnotateImageResponse.newBuilder()
-      .setFullTextAnnotation(emptyAnnotation)
-      .build();
+        .setFullTextAnnotation(emptyAnnotation)
+        .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, emptyTextAnnotation);
     Assert.assertNotNull(transformed);
     StructuredRecord actual = transformed.get(output);
@@ -128,11 +141,11 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
   public void testTransformSingleField() {
     String output = "extracted";
     Schema textAnnotationSingleFieldSchema = Schema.recordOf(
-      "single-text-field",
-      Schema.Field.of(FullTextAnnotationSchema.TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+        "single-text-field",
+        Schema.Field.of(FullTextAnnotationSchema.TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, textAnnotationSingleFieldSchema));
+        Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(output, textAnnotationSingleFieldSchema));
 
     FullTextAnnotationsToRecordTransformer transformer = new FullTextAnnotationsToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -141,7 +154,7 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
     // actual record has single-field schema
     Assert.assertEquals(textAnnotationSingleFieldSchema, actual.getSchema());
     Assert.assertEquals(TEXT_ANNOTATION.getText(),
-      actual.get(FullTextAnnotationSchema.TEXT_FIELD_NAME));
+        actual.get(FullTextAnnotationSchema.TEXT_FIELD_NAME));
   }
 
   private void assertAnnotationEquals(TextAnnotation expected, StructuredRecord actual) {
@@ -159,8 +172,8 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
 
   private void assertPageEquals(Page expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getConfidence(),
-      actual.<Float>get(FullTextAnnotationSchema.TextPage.CONFIDENCE_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(FullTextAnnotationSchema.TextPage.CONFIDENCE_FIELD_NAME),
+        DELTA);
 
     List<StructuredRecord> blocks = actual.get(FullTextAnnotationSchema.TextPage.BLOCKS_FIELD_NAME);
     Assert.assertNotNull(blocks);
@@ -187,16 +200,16 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
 
   private void assertLanguageEquals(TextAnnotation.DetectedLanguage expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getConfidence(),
-      actual.<Float>get(FullTextAnnotationSchema.DetectedLanguage.CONFIDENCE_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(FullTextAnnotationSchema.DetectedLanguage.CONFIDENCE_FIELD_NAME),
+        DELTA);
     Assert.assertEquals(expected.getLanguageCode(),
-      actual.get(FullTextAnnotationSchema.DetectedLanguage.CODE_FIELD_NAME));
+        actual.get(FullTextAnnotationSchema.DetectedLanguage.LANGUAGE_CODE_FIELD_NAME));
   }
 
   private void assertBlockEquals(Block expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getConfidence(),
-      actual.<Float>get(FullTextAnnotationSchema.TextBlock.CONFIDENCE_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(FullTextAnnotationSchema.TextBlock.CONFIDENCE_FIELD_NAME),
+        DELTA);
 
     List<StructuredRecord> paragraphs = actual.get(FullTextAnnotationSchema.TextBlock.PARAGRAPHS_FIELD_NAME);
     Assert.assertNotNull(paragraphs);
@@ -223,8 +236,8 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
 
   private void assertParagraphEquals(Paragraph expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getConfidence(),
-      actual.<Float>get(FullTextAnnotationSchema.TextParagraph.CONFIDENCE_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(FullTextAnnotationSchema.TextParagraph.CONFIDENCE_FIELD_NAME),
+        DELTA);
 
     List<StructuredRecord> paragraphs = actual.get(FullTextAnnotationSchema.TextParagraph.WORDS_FIELD_NAME);
     Assert.assertNotNull(paragraphs);
@@ -247,13 +260,13 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
     TextAnnotation.DetectedBreak expectedBreak = expectedProperty.getDetectedBreak();
     String expectedBreakName = expectedBreak.getType().name();
     Assert.assertEquals(expectedBreakName,
-      actual.get(FullTextAnnotationSchema.TextParagraph.DETECTED_BREAK_FIELD_NAME));
+        actual.get(FullTextAnnotationSchema.TextParagraph.DETECTED_BREAK_FIELD_NAME));
   }
 
   private void assertWordEquals(Word expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getConfidence(),
-      actual.<Float>get(FullTextAnnotationSchema.TextWord.CONFIDENCE_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(FullTextAnnotationSchema.TextWord.CONFIDENCE_FIELD_NAME),
+        DELTA);
 
     List<StructuredRecord> paragraphs = actual.get(FullTextAnnotationSchema.TextWord.SYMBOLS_FIELD_NAME);
     Assert.assertNotNull(paragraphs);
@@ -281,8 +294,8 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
   private void assertSymbolEquals(Symbol expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getText(), actual.get(FullTextAnnotationSchema.TextSymbol.TEXT_FIELD_NAME));
     Assert.assertEquals(expected.getConfidence(),
-      actual.<Float>get(FullTextAnnotationSchema.TextSymbol.CONFIDENCE_FIELD_NAME),
-      DELTA);
+        actual.<Float>get(FullTextAnnotationSchema.TextSymbol.CONFIDENCE_FIELD_NAME),
+        DELTA);
 
     List<StructuredRecord> languages = actual.get(FullTextAnnotationSchema.TextSymbol.DETECTED_LANGUAGES_FIELD_NAME);
     Assert.assertNotNull(languages);

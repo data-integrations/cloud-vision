@@ -23,6 +23,7 @@ import com.google.cloud.vision.v1.Property;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.schema.EntityAnnotationSchema;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,19 +38,41 @@ public class LabelAnnotationsToRecordTransformer extends ImageAnnotationToRecord
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link io.cdap.plugin.cloud.vision.transform.schema.LocalizedObjectAnnotationSchema}.
+   * This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractLabelAnnotations(annotateImageResponse))
-      .build();
+        .set(outputFieldName, extractLabelAnnotations(annotateImageResponse))
+        .build();
   }
 
+  /**
+   * Extract a {@link List} of {@link StructuredRecord} containing the label information from a
+   * {@link AnnotateImageResponse} input using a {@link Schema} for the mapping.
+   *
+   * @param annotateImageResponse The {@link AnnotateImageResponse} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private List<StructuredRecord> extractLabelAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getLabelAnnotationsList().stream()
-      .map(this::extractAnnotation)
-      .collect(Collectors.toList());
+        .map(this::extractAnnotation)
+        .collect(Collectors.toList());
   }
 
+  /**
+   * Extract a {@link List} of {@link StructuredRecord} containing the entity annotation information from a
+   * {@link AnnotateImageResponse} input using a {@link Schema} for the mapping.
+   *
+   * @param annotation The {@link EntityAnnotation} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   protected StructuredRecord extractAnnotation(EntityAnnotation annotation) {
     Schema labelSchema = getEntityAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(labelSchema);
@@ -72,22 +95,30 @@ public class LabelAnnotationsToRecordTransformer extends ImageAnnotationToRecord
     if (locField != null) {
       Schema locationSchema = getComponentSchema(locField);
       List<StructuredRecord> location = annotation.getLocationsList().stream()
-        .map(v -> extractLocation(v, locationSchema))
-        .collect(Collectors.toList());
+          .map(v -> extractLocation(v, locationSchema))
+          .collect(Collectors.toList());
       builder.set(EntityAnnotationSchema.LOCATIONS_FIELD_NAME, location);
     }
     Schema.Field propField = labelSchema.getField(EntityAnnotationSchema.PROPERTIES_FIELD_NAME);
     if (propField != null) {
       Schema propertySchema = getComponentSchema(propField);
       List<StructuredRecord> location = annotation.getPropertiesList().stream()
-        .map(v -> extractProperty(v, propertySchema))
-        .collect(Collectors.toList());
+          .map(v -> extractProperty(v, propertySchema))
+          .collect(Collectors.toList());
       builder.set(EntityAnnotationSchema.PROPERTIES_FIELD_NAME, location);
     }
 
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the location information from a
+   * {@link LocationInfo} input using a {@link Schema} for the mapping.
+   *
+   * @param locationInfo The {@link LocationInfo} object containing the data.
+   * @param schema       The {@link Schema} to use for the mapping.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   protected StructuredRecord extractLocation(LocationInfo locationInfo, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(EntityAnnotationSchema.LocationInfo.LATITUDE_FIELD_NAME) != null) {
@@ -102,6 +133,14 @@ public class LabelAnnotationsToRecordTransformer extends ImageAnnotationToRecord
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the property information from a
+   * {@link Property} input using a {@link Schema} for the mapping.
+   *
+   * @param property The {@link Property} object containing the data.
+   * @param schema   The {@link Schema} to use for the mapping.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   protected StructuredRecord extractProperty(Property property, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(EntityAnnotationSchema.Property.NAME_FIELD_NAME) != null) {

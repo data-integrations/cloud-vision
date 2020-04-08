@@ -23,50 +23,44 @@ import io.cdap.cdap.api.data.schema.Schema;
  */
 public class WebDetectionSchema {
 
-  private WebDetectionSchema() {
-    throw new AssertionError("Should not instantiate static utility class.");
-  }
-
   /**
    * Deduced entities from similar images on the Internet.
    */
   public static final String ENTITIES_FIELD_NAME = "webEntities";
-
   /**
    * Fully matching images from the Internet. Can include resized copies of the query image.
    */
   public static final String FULL_MATCHING_IMAGES_FIELD_NAME = "fullMatchingImages";
-
   /**
    * Partial matching images from the Internet. Those images are similar enough to share some key-point features.
    * For example an original image will likely have partial matching for its crops.
    */
   public static final String PARTIAL_MATCHING_IMAGES_FIELD_NAME = "partialMatchingImages";
-
   /**
    * Web pages containing the matching images from the Internet.
    */
   public static final String PAGES_WITH_MATCHING_IMAGES_FIELD_NAME = "pagesWithMatchingImages";
-
   /**
    * The visually similar image results.
    */
   public static final String VISUALLY_SIMILAR_IMAGES = "visuallySimilarImages";
-
   /**
    * The service's best guess as to the topic of the request image. Inferred from similar images on the open web.
    */
   public static final String BEST_GUESS_LABELS_FIELD_NAME = "bestGuessLabels";
-
   public static final Schema SCHEMA = Schema.recordOf(
-    "web-detection-record",
-    Schema.Field.of(ENTITIES_FIELD_NAME, Schema.arrayOf(WebEntity.SCHEMA)),
-    Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA)),
-    Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA)),
-    Schema.Field.of(PAGES_WITH_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebPage.SCHEMA)),
-    Schema.Field.of(VISUALLY_SIMILAR_IMAGES, Schema.arrayOf(WebImage.SCHEMA)),
-    Schema.Field.of(BEST_GUESS_LABELS_FIELD_NAME, Schema.arrayOf(BestGuessLabel.SCHEMA))
+      "web-detection-record",
+      Schema.Field.of(ENTITIES_FIELD_NAME, Schema.arrayOf(WebEntity.SCHEMA)),
+      Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.getSchema("fmiWebImage"))),
+      Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.getSchema("pmiWebImage"))),
+      Schema.Field.of(PAGES_WITH_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebPage.SCHEMA)),
+      Schema.Field.of(VISUALLY_SIMILAR_IMAGES, Schema.arrayOf(WebImage.getSchema("vsiWebImage"))),
+      Schema.Field.of(BEST_GUESS_LABELS_FIELD_NAME, Schema.arrayOf(BestGuessLabel.SCHEMA))
   );
+
+  private WebDetectionSchema() {
+    throw new AssertionError("Should not instantiate static utility class.");
+  }
 
   /**
    * Entity deduced from similar images on the Internet.
@@ -89,10 +83,10 @@ public class WebDetectionSchema {
     public static final String DESCRIPTION_FIELD_NAME = "description";
 
     public static final Schema SCHEMA = Schema.recordOf(
-      "web-entity-record",
-      Schema.Field.of(ENTITY_ID_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-      Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING))
+        "web-entity-record",
+        Schema.Field.of(ENTITY_ID_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+        Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING))
     );
   }
 
@@ -128,12 +122,14 @@ public class WebDetectionSchema {
     public static final String PARTIAL_MATCHING_IMAGES_FIELD_NAME = "partialMatchingImages";
 
     public static final Schema SCHEMA = Schema.recordOf(
-      "page-with-matching-images-record",
-      Schema.Field.of(URL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(PAGE_TITLE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-      Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA)),
-      Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(WebImage.SCHEMA))
+        "page-with-matching-images-record",
+        Schema.Field.of(URL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(PAGE_TITLE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
+        Schema.Field.of(FULL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(
+            WebImage.getSchema("webPage-fmiWebImage"))),
+        Schema.Field.of(PARTIAL_MATCHING_IMAGES_FIELD_NAME, Schema.arrayOf(
+            WebImage.getSchema("webPage-pmiWebImage")))
     );
   }
 
@@ -148,15 +144,15 @@ public class WebDetectionSchema {
     public static final String LABEL_FIELD_NAME = "label";
 
     /**
-     * The BCP-47 language code, such as "en-US" or "sr-Latn". For more information, see
+     * The BCP-47 language code, such as "en-US" or "sr-Latin". For more information, see
      * http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
      */
     public static final String LANGUAGE_CODE_FIELD_NAME = "languageCode";
 
     public static final Schema SCHEMA = Schema.recordOf(
-      "best-guess-label-record",
-      Schema.Field.of(LABEL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(LANGUAGE_CODE_FIELD_NAME, Schema.of(Schema.Type.STRING))
+        "best-guess-label-record",
+        Schema.Field.of(LABEL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(LANGUAGE_CODE_FIELD_NAME, Schema.of(Schema.Type.STRING))
     );
   }
 
@@ -175,10 +171,19 @@ public class WebDetectionSchema {
      */
     public static final String SCORE_FIELD_NAME = "score";
 
-    public static final Schema SCHEMA = Schema.recordOf(
-      "web-image-record",
-      Schema.Field.of(URL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT))
-    );
+    /**
+     * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+     * that will be combined into a larger {@link Schema}.
+     *
+     * @param name {@link String} containing the name to give to the returned {@link Schema}.
+     * @return a {@link Schema} with the given name.
+     */
+    public static Schema getSchema(String name) {
+      return Schema.recordOf(
+          name,
+          Schema.Field.of(URL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+          Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT))
+      );
+    }
   }
 }

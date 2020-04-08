@@ -24,44 +24,39 @@ import io.cdap.cdap.api.data.schema.Schema;
  */
 public class SafeSearchAnnotationSchema {
 
-  private SafeSearchAnnotationSchema() {
-    throw new AssertionError("Should not instantiate static utility class.");
-  }
-
   /**
    * Represents the adult content likelihood for the image. Adult content may contain elements such as nudity,
    * pornographic images or cartoons, or sexual activities.
    */
   public static final String ADULT_FIELD_NAME = "adult";
-
   /**
    * Spoof likelihood. The likelihood that an modification was made to the image's canonical version to make it appear
    * funny or offensive.
    */
   public static final String SPOOF_FIELD_NAME = "spoof";
-
   /**
    * Likelihood that this is a medical image.
    */
   public static final String MEDICAL_FIELD_NAME = "medical";
-
   /**
    * Likelihood that this image contains violent content.
    */
   public static final String VIOLENCE_FIELD_NAME = "violence";
-
   /**
    * Likelihood that the request image contains racy content. Racy content may include (but is not limited to) skimpy
    * or sheer clothing, strategically covered nudity, lewd or provocative poses, or close-ups of sensitive body areas.
    */
   public static final String RACY_FIELD_NAME = "racy";
-
   public static final Schema SCHEMA = Schema.recordOf(
-    "safe-search-annotation-record",
-    Schema.Field.of(ADULT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(SPOOF_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(MEDICAL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(VIOLENCE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(RACY_FIELD_NAME, Schema.of(Schema.Type.STRING))
+      "safe-search-annotation-record",
+      Schema.Field.of(ADULT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(SPOOF_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(MEDICAL_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(VIOLENCE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+      Schema.Field.of(RACY_FIELD_NAME, Schema.of(Schema.Type.STRING))
   );
+
+  private SafeSearchAnnotationSchema() {
+    throw new AssertionError("Should not instantiate static utility class.");
+  }
 }
