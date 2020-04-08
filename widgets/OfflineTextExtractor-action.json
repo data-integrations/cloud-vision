@@ -1,0 +1,303 @@
+{
+  "metadata": {
+    "spec-version": "1.5"
+  },
+  "display-name": "Offline Text Extractor",
+  "configuration-groups": [
+    {
+      "label": "Basic",
+      "properties": [
+        {
+          "widget-type": "textbox",
+          "label": "Service Account File Path",
+          "name": "serviceFilePath",
+          "widget-attributes": {
+            "default": "auto-detect"
+          }
+        },
+        {
+          "widget-type": "textbox",
+          "label": "Source Path",
+          "name": "sourcePath"
+        },
+        {
+          "widget-type": "textbox",
+          "label": "Destination Path",
+          "name": "destinationPath"
+        },
+        {
+          "widget-type": "select",
+          "label": "Mime Type",
+          "name": "mimeType",
+          "widget-attributes": {
+            "default": "application/pdf",
+            "values": [
+              "application/pdf",
+              "image/tiff",
+              "image/gif"
+            ]
+          }
+        },
+        {
+          "widget-type": "number",
+          "label": "Batch Size",
+          "name": "batchSize",
+          "widget-attributes": {
+            "default": "20"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Advanced",
+      "properties": [
+        {
+          "name": "languageHints",
+          "label": "Language Hints",
+          "widget-type": "multi-select",
+          "widget-attributes": {
+            "delimiter": ",",
+            "options": [
+              {
+                "label": "Afrikaans",
+                "id": "af"
+              },
+              {
+                "label": "Albanian",
+                "id": "sq"
+              },
+              {
+                "label": "Arabic",
+                "id": "ar"
+              },
+              {
+                "label": "Armenian",
+                "id": "hy"
+              },
+              {
+                "label": "Belorussian",
+                "id": "be"
+              },
+              {
+                "label": "Bengali",
+                "id": "bn"
+              },
+              {
+                "label": "Bulgarian",
+                "id": "bg"
+              },
+              {
+                "label": "Catalan",
+                "id": "ca"
+              },
+              {
+                "label": "Chinese",
+                "id": "zh"
+              },
+              {
+                "label": "Croatian",
+                "id": "hr"
+              },
+              {
+                "label": "Czech",
+                "id": "cs"
+              },
+              {
+                "label": "Danish",
+                "id": "da"
+              },
+              {
+                "label": "Dutch",
+                "id": "nl"
+              },
+              {
+                "label": "English",
+                "id": "en"
+              },
+              {
+                "label": "Estonian",
+                "id": "et"
+              },
+              {
+                "label": "Filipino",
+                "id": "fil"
+              },
+              {
+                "label": "Finnish",
+                "id": "fi"
+              },
+              {
+                "label": "French",
+                "id": "fr"
+              },
+              {
+                "label": "German",
+                "id": "de"
+              },
+              {
+                "label": "Greek",
+                "id": "el"
+              },
+              {
+                "label": "Gujarati",
+                "id": "gu"
+              },
+              {
+                "label": "Hebrew",
+                "id": "iw"
+              },
+              {
+                "label": "Hungarian",
+                "id": "hu"
+              },
+              {
+                "label": "Icelandic",
+                "id": "is"
+              },
+              {
+                "label": "Indonesian",
+                "id": "id"
+              },
+              {
+                "label": "Italian",
+                "id": "it"
+              },
+              {
+                "label": "Japanese",
+                "id": "ja"
+              },
+              {
+                "label": "Kannada",
+                "id": "kn"
+              },
+              {
+                "label": "Khmer",
+                "id": "km"
+              },
+              {
+                "label": "Korean",
+                "id": "ko"
+              },
+              {
+                "label": "Lao",
+                "id": "lo"
+              },
+              {
+                "label": "Latvian",
+                "id": "lv"
+              },
+              {
+                "label": "Lithuanian",
+                "id": "lt"
+              },
+              {
+                "label": "Macedonian",
+                "id": "mk"
+              },
+              {
+                "label": "Malay",
+                "id": "ms"
+              },
+              {
+                "label": "Malayalam",
+                "id": "ml"
+              },
+              {
+                "label": "Marathi",
+                "id": "mr"
+              },
+              {
+                "label": "Nepali",
+                "id": "ne"
+              },
+              {
+                "label": "Norwegian",
+                "id": "no"
+              },
+              {
+                "label": "Persian",
+                "id": "fa"
+              },
+              {
+                "label": "Polish",
+                "id": "pl"
+              },
+              {
+                "label": "Portuguese",
+                "id": "pt"
+              },
+              {
+                "label": "Punjabi",
+                "id": "pa"
+              },
+              {
+                "label": "Romanian",
+                "id": "ro"
+              },
+              {
+                "label": "Russian",
+                "id": "ru"
+              },
+              {
+                "label": "RussianOld Orthography}",
+                "id": "ru-PETR1708"
+              },
+              {
+                "label": "Serbian",
+                "id": "sr"
+              },
+              {
+                "label": "SerbianLatin}",
+                "id": "sr-Latn"
+              },
+              {
+                "label": "Slovak",
+                "id": "sk"
+              },
+              {
+                "label": "Slovenian",
+                "id": "sl"
+              },
+              {
+                "label": "Spanish",
+                "id": "es"
+              },
+              {
+                "label": "Swedish",
+                "id": "sv"
+              },
+              {
+                "label": "Tamil",
+                "id": "ta"
+              },
+              {
+                "label": "Telugu",
+                "id": "te"
+              },
+              {
+                "label": "Thai",
+                "id": "th"
+              },
+              {
+                "label": "Turkish",
+                "id": "tr"
+              },
+              {
+                "label": "Ukrainian",
+                "id": "uk"
+              },
+              {
+                "label": "Vietnamese",
+                "id": "vi"
+              },
+              {
+                "label": "Ylabeldish",
+                "id": "yi"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
