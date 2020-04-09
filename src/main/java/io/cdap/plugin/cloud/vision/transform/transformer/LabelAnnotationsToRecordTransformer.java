@@ -115,7 +115,7 @@ public class LabelAnnotationsToRecordTransformer extends ImageAnnotationToRecord
    * {@link LocationInfo} input using a {@link Schema} for the mapping.
    *
    * @param locationInfo The {@link LocationInfo} object containing the data.
-   * @param schema The {@link Schema} to use for the mapping.
+   * @param schema       The {@link Schema} to use for the mapping.
    * @return A {@link StructuredRecord} containing the data mapped.
    */
   protected StructuredRecord extractLocation(LocationInfo locationInfo, Schema schema) {

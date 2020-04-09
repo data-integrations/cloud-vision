@@ -121,7 +121,7 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
    * {@link Product} input using a {@link Schema} for the mapping.
    *
    * @param product The {@link Product} object containing the data.
-   * @param schema The {@link Schema} to use.
+   * @param schema  The {@link Schema} to use.
    * @return A {@link StructuredRecord} containing the data mapped.
    */
   private StructuredRecord extractProductRecord(Product product, Schema schema) {
@@ -154,7 +154,7 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
    * Extract a {@link StructuredRecord} containing the label information from a
    * {@link Product.KeyValue} input using a {@link Schema} for the mapping.
    *
-   * @param label The {@link Product.KeyValue} object containing the data.
+   * @param label  The {@link Product.KeyValue} object containing the data.
    * @param schema The {@link Schema} to use.
    * @return A {@link StructuredRecord} containing the data mapped.
    */
