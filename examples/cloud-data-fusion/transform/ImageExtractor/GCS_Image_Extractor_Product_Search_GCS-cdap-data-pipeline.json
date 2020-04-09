@@ -1,0 +1,336 @@
+{
+    "artifact": {
+        "name": "cdap-data-pipeline",
+        "version": "6.1.1",
+        "scope": "SYSTEM"
+    },
+    "description": "Data Pipeline Application",
+    "name": "GCS_Image_Extractor_Product_Search_GCS",
+    "config": {
+        "resources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "driverResources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "connections": [
+            {
+                "from": "GCS",
+                "to": "Image Extractor"
+            },
+            {
+                "from": "Image Extractor",
+                "to": "GCS2"
+            }
+        ],
+        "comments": [],
+        "postActions": [],
+        "properties": {},
+        "processTimingEnabled": true,
+        "stageLoggingEnabled": false,
+        "stages": [
+            {
+                "name": "GCS",
+                "plugin": {
+                    "name": "GCSFile",
+                    "type": "batchsource",
+                    "label": "GCS",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.13.2",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "format": "text",
+                        "serviceFilePath": "auto-detect",
+                        "filenameOnly": "false",
+                        "recursive": "false",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
+                        "path": "${GS_PATH_TO_IMAGE_LIST_FILE}",
+                        "referenceName": "Paths_to_images"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "Image Extractor",
+                "plugin": {
+                    "name": "ImageExtractor",
+                    "type": "transform",
+                    "label": "Image Extractor",
+                    "artifact": {
+                        "name": "cloud-vision",
+                        "version": "1.0.0-SNAPSHOT",
+                        "scope": "USER"
+                    },
+                    "properties": {
+                        "serviceFilePath": "auto-detect",
+                        "project": "auto-detect",
+                        "features": "Product Search",
+                        "productCategories": "Homegoods",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"record\",\"name\":\"productSearch-resultRecord\",\"fields\":[{\"name\":\"indexTime\",\"type\":[\"string\",\"null\"]},{\"name\":\"results\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"productSearch-result\",\"fields\":[{\"name\":\"image\",\"type\":\"string\"},{\"name\":\"score\",\"type\":\"float\"},{\"name\":\"product\",\"type\":{\"type\":\"record\",\"name\":\"productSearch-resultresult-product\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"displayName\",\"type\":\"string\"},{\"name\":\"description\",\"type\":\"string\"},{\"name\":\"productCategory\",\"type\":\"string\"},{\"name\":\"productLabels\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"productSearch-resultresult-product-keyValue\",\"fields\":[{\"name\":\"key\",\"type\":\"string\"},{\"name\":\"value\",\"type\":\"string\"}]}}}]}}]}}},{\"name\":\"productGroupedResults\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"groupedResult-record\",\"fields\":[{\"name\":\"position\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"groupedResult-position\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"results\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"groupedResult-results\",\"fields\":[{\"name\":\"image\",\"type\":\"string\"},{\"name\":\"score\",\"type\":\"float\"},{\"name\":\"product\",\"type\":{\"type\":\"record\",\"name\":\"groupedResult-resultsresult-product\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"displayName\",\"type\":\"string\"},{\"name\":\"description\",\"type\":\"string\"},{\"name\":\"productCategory\",\"type\":\"string\"},{\"name\":\"productLabels\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"groupedResult-resultsresult-product-keyValue\",\"type\":\"record\",\"fields\":[{\"name\":\"key\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"value\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}}]}}}]}}}]}}]}",
+                        "pathField": "body",
+                        "outputField": "output",
+                        "productSet": "${PRODUCT_SET_RESOURCE_NAME}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": {
+                            "type": "record",
+                            "name": "etlSchemaBody",
+                            "fields": [
+                                {
+                                    "name": "offset",
+                                    "type": "long"
+                                },
+                                {
+                                    "name": "body",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "output",
+                                    "type": {
+                                        "type": "record",
+                                        "name": "productSearch-resultRecord",
+                                        "fields": [
+                                            {
+                                                "name": "indexTime",
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ]
+                                            },
+                                            {
+                                                "name": "results",
+                                                "type": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "record",
+                                                        "name": "productSearch-result",
+                                                        "fields": [
+                                                            {
+                                                                "name": "image",
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "name": "score",
+                                                                "type": "float"
+                                                            },
+                                                            {
+                                                                "name": "product",
+                                                                "type": {
+                                                                    "type": "record",
+                                                                    "name": "productSearch-resultresult-product",
+                                                                    "fields": [
+                                                                        {
+                                                                            "name": "name",
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "name": "displayName",
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "name": "description",
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "name": "productCategory",
+                                                                            "type": "string"
+                                                                        },
+                                                                        {
+                                                                            "name": "productLabels",
+                                                                            "type": {
+                                                                                "type": "array",
+                                                                                "items": {
+                                                                                    "type": "record",
+                                                                                    "name": "productSearch-resultresult-product-keyValue",
+                                                                                    "fields": [
+                                                                                        {
+                                                                                            "name": "key",
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "value",
+                                                                                            "type": "string"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "name": "productGroupedResults",
+                                                "type": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "record",
+                                                        "name": "groupedResult-record",
+                                                        "fields": [
+                                                            {
+                                                                "name": "position",
+                                                                "type": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "record",
+                                                                        "name": "groupedResult-position",
+                                                                        "fields": [
+                                                                            {
+                                                                                "name": "x",
+                                                                                "type": "int"
+                                                                            },
+                                                                            {
+                                                                                "name": "y",
+                                                                                "type": "int"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "results",
+                                                                "type": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "record",
+                                                                        "name": "groupedResult-results",
+                                                                        "fields": [
+                                                                            {
+                                                                                "name": "image",
+                                                                                "type": "string"
+                                                                            },
+                                                                            {
+                                                                                "name": "score",
+                                                                                "type": "float"
+                                                                            },
+                                                                            {
+                                                                                "name": "product",
+                                                                                "type": {
+                                                                                    "type": "record",
+                                                                                    "name": "groupedResult-resultsresult-product",
+                                                                                    "fields": [
+                                                                                        {
+                                                                                            "name": "name",
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "displayName",
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "description",
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "productCategory",
+                                                                                            "type": "string"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "productLabels",
+                                                                                            "type": {
+                                                                                                "type": "array",
+                                                                                                "items": {
+                                                                                                    "name": "groupedResult-resultsresult-product-keyValue",
+                                                                                                    "type": "record",
+                                                                                                    "fields": [
+                                                                                                        {
+                                                                                                            "name": "key",
+                                                                                                            "type": "string",
+                                                                                                            "order": "ascending",
+                                                                                                            "aliases": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "value",
+                                                                                                            "type": "string",
+                                                                                                            "order": "ascending",
+                                                                                                            "aliases": []
+                                                                                                        }
+                                                                                                    ],
+                                                                                                    "aliases": []
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "GCS",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "GCS2",
+                "plugin": {
+                    "name": "GCS",
+                    "type": "batchsink",
+                    "label": "GCS2",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.13.2",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "suffix": "yyyy-MM-dd-HH-mm",
+                        "format": "json",
+                        "serviceFilePath": "auto-detect",
+                        "location": "us",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-annotation-component-record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\"},{\"name\":\"panAngle\",\"type\":\"float\"},{\"name\":\"tiltAngle\",\"type\":\"float\"},{\"name\":\"detectionConfidence\",\"type\":\"float\"},{\"name\":\"landmarkingConfidence\",\"type\":\"float\"},{\"name\":\"angerLikelihood\",\"type\":\"string\"},{\"name\":\"joyLikelihood\",\"type\":\"string\"},{\"name\":\"surpriseLikelihood\",\"type\":\"string\"},{\"name\":\"blurredLikelihood\",\"type\":\"string\"},{\"name\":\"underExposedLikelihood\",\"type\":\"string\"},{\"name\":\"sorrowLikelihood\",\"type\":\"string\"},{\"name\":\"headwearLikelihood\",\"type\":\"string\"},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"fd-bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-landmark-record\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"symbols\":[\"UNKNOWN_LANDMARK\",\"LEFT_EYE\",\"RIGHT_EYE\",\"LEFT_OF_LEFT_EYEBROW\",\"RIGHT_OF_LEFT_EYEBROW\",\"LEFT_OF_RIGHT_EYEBROW\",\"RIGHT_OF_RIGHT_EYEBROW\",\"MIDPOINT_BETWEEN_EYES\",\"NOSE_TIP\",\"UPPER_LIP\",\"LOWER_LIP\",\"MOUTH_LEFT\",\"MOUTH_RIGHT\",\"MOUTH_CENTER\",\"NOSE_BOTTOM_RIGHT\",\"NOSE_BOTTOM_LEFT\",\"NOSE_BOTTOM_CENTER\",\"LEFT_EYE_TOP_BOUNDARY\",\"LEFT_EYE_RIGHT_CORNER\",\"LEFT_EYE_BOTTOM_BOUNDARY\",\"LEFT_EYE_LEFT_CORNER\",\"RIGHT_EYE_TOP_BOUNDARY\",\"RIGHT_EYE_RIGHT_CORNER\",\"RIGHT_EYE_BOTTOM_BOUNDARY\",\"RIGHT_EYE_LEFT_CORNER\",\"LEFT_EYEBROW_UPPER_MIDPOINT\",\"RIGHT_EYEBROW_UPPER_MIDPOINT\",\"LEFT_EAR_TRAGION\",\"RIGHT_EAR_TRAGION\",\"LEFT_EYE_PUPIL\",\"RIGHT_EYE_PUPIL\",\"FOREHEAD_GLABELLA\",\"CHIN_GNATHION\",\"CHIN_LEFT_GONION\",\"CHIN_RIGHT_GONION\",\"UNRECOGNIZED\"]}},{\"name\":\"x\",\"type\":\"float\"},{\"name\":\"y\",\"type\":\"float\"},{\"name\":\"z\",\"type\":\"float\"}]}}}]}}}]}",
+                        "referenceName": "SaveResults",
+                        "path": "${GS_PATH_TO_PRODUCT_SEARCH_RESULTS}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-annotation-component-record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\"},{\"name\":\"panAngle\",\"type\":\"float\"},{\"name\":\"tiltAngle\",\"type\":\"float\"},{\"name\":\"detectionConfidence\",\"type\":\"float\"},{\"name\":\"landmarkingConfidence\",\"type\":\"float\"},{\"name\":\"angerLikelihood\",\"type\":\"string\"},{\"name\":\"joyLikelihood\",\"type\":\"string\"},{\"name\":\"surpriseLikelihood\",\"type\":\"string\"},{\"name\":\"blurredLikelihood\",\"type\":\"string\"},{\"name\":\"underExposedLikelihood\",\"type\":\"string\"},{\"name\":\"sorrowLikelihood\",\"type\":\"string\"},{\"name\":\"headwearLikelihood\",\"type\":\"string\"},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"fd-bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-landmark-record\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"symbols\":[\"UNKNOWN_LANDMARK\",\"LEFT_EYE\",\"RIGHT_EYE\",\"LEFT_OF_LEFT_EYEBROW\",\"RIGHT_OF_LEFT_EYEBROW\",\"LEFT_OF_RIGHT_EYEBROW\",\"RIGHT_OF_RIGHT_EYEBROW\",\"MIDPOINT_BETWEEN_EYES\",\"NOSE_TIP\",\"UPPER_LIP\",\"LOWER_LIP\",\"MOUTH_LEFT\",\"MOUTH_RIGHT\",\"MOUTH_CENTER\",\"NOSE_BOTTOM_RIGHT\",\"NOSE_BOTTOM_LEFT\",\"NOSE_BOTTOM_CENTER\",\"LEFT_EYE_TOP_BOUNDARY\",\"LEFT_EYE_RIGHT_CORNER\",\"LEFT_EYE_BOTTOM_BOUNDARY\",\"LEFT_EYE_LEFT_CORNER\",\"RIGHT_EYE_TOP_BOUNDARY\",\"RIGHT_EYE_RIGHT_CORNER\",\"RIGHT_EYE_BOTTOM_BOUNDARY\",\"RIGHT_EYE_LEFT_CORNER\",\"LEFT_EYEBROW_UPPER_MIDPOINT\",\"RIGHT_EYEBROW_UPPER_MIDPOINT\",\"LEFT_EAR_TRAGION\",\"RIGHT_EAR_TRAGION\",\"LEFT_EYE_PUPIL\",\"RIGHT_EYE_PUPIL\",\"FOREHEAD_GLABELLA\",\"CHIN_GNATHION\",\"CHIN_LEFT_GONION\",\"CHIN_RIGHT_GONION\",\"UNRECOGNIZED\"]}},{\"name\":\"x\",\"type\":\"float\"},{\"name\":\"y\",\"type\":\"float\"},{\"name\":\"z\",\"type\":\"float\"}]}}}]}}}]}"
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "Image Extractor",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"record\",\"name\":\"web-detection-record\",\"fields\":[{\"name\":\"webEntities\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"web-entity-record\",\"fields\":[{\"name\":\"entityId\",\"type\":\"string\"},{\"name\":\"score\",\"type\":\"float\"},{\"name\":\"description\",\"type\":\"string\"}]}}},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"fmiWebImage\",\"fields\":[{\"name\":\"url\",\"type\":\"string\"},{\"name\":\"score\",\"type\":\"float\"}]}}},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"pmiWebImage\",\"fields\":[{\"name\":\"url\",\"type\":\"string\"},{\"name\":\"score\",\"type\":\"float\"}]}}},{\"name\":\"pagesWithMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"page-with-matching-images-record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\"},{\"name\":\"pageTitle\",\"type\":\"string\"},{\"name\":\"score\",\"type\":\"float\"},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-fmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-pmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}}},{\"name\":\"visuallySimilarImages\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"vsiWebImage\",\"fields\":[{\"name\":\"url\",\"type\":\"string\"},{\"name\":\"score\",\"type\":\"float\"}]}}},{\"name\":\"bestGuessLabels\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"best-guess-label-record\",\"fields\":[{\"name\":\"label\",\"type\":\"string\"},{\"name\":\"languageCode\",\"type\":\"string\"}]}}}]}}]}"
+                    }
+                ]
+            }
+        ],
+        "schedule": "0 * * * *",
+        "engine": "spark",
+        "numOfRecordsPreview": 100,
+        "description": "Data Pipeline Application",
+        "maxConcurrentRuns": 1
+    }
+}

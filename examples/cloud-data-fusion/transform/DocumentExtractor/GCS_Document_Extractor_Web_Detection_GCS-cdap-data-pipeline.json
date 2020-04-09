@@ -1,0 +1,141 @@
+{
+    "artifact": {
+        "name": "cdap-data-pipeline",
+        "version": "6.1.1",
+        "scope": "SYSTEM"
+    },
+    "description": "Data Pipeline Application",
+    "name": "GCS_Document_Extractor_Web_Detection_GCS",
+    "config": {
+        "resources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "driverResources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "connections": [
+            {
+                "from": "GCS",
+                "to": "Document Extractor"
+            },
+            {
+                "from": "Document Extractor",
+                "to": "GCS2"
+            }
+        ],
+        "comments": [],
+        "postActions": [],
+        "properties": {},
+        "processTimingEnabled": true,
+        "stageLoggingEnabled": false,
+        "stages": [
+            {
+                "name": "GCS",
+                "plugin": {
+                    "name": "GCSFile",
+                    "type": "batchsource",
+                    "label": "GCS",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.13.2",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "format": "text",
+                        "serviceFilePath": "auto-detect",
+                        "filenameOnly": "false",
+                        "recursive": "false",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
+                        "path": "${GS_PATH_TO_DOCUMENT_LIST_FILE}",
+                        "referenceName": "Paths_to_images"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "Document Extractor",
+                "plugin": {
+                    "name": "DocumentExtractor",
+                    "type": "transform",
+                    "label": "Document Extractor",
+                    "artifact": {
+                        "name": "cloud-vision",
+                        "version": "1.0.0-SNAPSHOT",
+                        "scope": "USER"
+                    },
+                    "properties": {
+                        "serviceFilePath": "auto-detect",
+                        "project": "auto-detect",
+                        "features": "Web Detection",
+                        "mimeType": "application/pdf",
+                        "pages": "1,2,3,4,5",
+                        "includeGeoResults": "true",
+                        "pathField": "body",
+                        "outputField": "output",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-record\",\"type\":\"record\",\"fields\":[{\"name\":\"page\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"feature\",\"type\":{\"name\":\"web-detection-record\",\"type\":\"record\",\"fields\":[{\"name\":\"webEntities\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"web-entity-record\",\"type\":\"record\",\"fields\":[{\"name\":\"entityId\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"description\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"fmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"pmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pagesWithMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-with-matching-images-record\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pageTitle\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-fmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-pmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"visuallySimilarImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vsiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"bestGuessLabels\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"best-guess-label-record\",\"type\":\"record\",\"fields\":[{\"name\":\"label\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-record\",\"type\":\"record\",\"fields\":[{\"name\":\"page\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"feature\",\"type\":{\"name\":\"web-detection-record\",\"type\":\"record\",\"fields\":[{\"name\":\"webEntities\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"web-entity-record\",\"type\":\"record\",\"fields\":[{\"name\":\"entityId\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"description\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"fmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"pmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pagesWithMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-with-matching-images-record\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pageTitle\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-fmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-pmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"visuallySimilarImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vsiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"bestGuessLabels\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"best-guess-label-record\",\"type\":\"record\",\"fields\":[{\"name\":\"label\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}"
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "GCS",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "GCS2",
+                "plugin": {
+                    "name": "GCS",
+                    "type": "batchsink",
+                    "label": "GCS2",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.13.2",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "suffix": "yyyy-MM-dd-HH-mm",
+                        "format": "json",
+                        "serviceFilePath": "auto-detect",
+                        "location": "us",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-annotation-component-record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\"},{\"name\":\"panAngle\",\"type\":\"float\"},{\"name\":\"tiltAngle\",\"type\":\"float\"},{\"name\":\"detectionConfidence\",\"type\":\"float\"},{\"name\":\"landmarkingConfidence\",\"type\":\"float\"},{\"name\":\"angerLikelihood\",\"type\":\"string\"},{\"name\":\"joyLikelihood\",\"type\":\"string\"},{\"name\":\"surpriseLikelihood\",\"type\":\"string\"},{\"name\":\"blurredLikelihood\",\"type\":\"string\"},{\"name\":\"underExposedLikelihood\",\"type\":\"string\"},{\"name\":\"sorrowLikelihood\",\"type\":\"string\"},{\"name\":\"headwearLikelihood\",\"type\":\"string\"},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"fd-bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-landmark-record\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"symbols\":[\"UNKNOWN_LANDMARK\",\"LEFT_EYE\",\"RIGHT_EYE\",\"LEFT_OF_LEFT_EYEBROW\",\"RIGHT_OF_LEFT_EYEBROW\",\"LEFT_OF_RIGHT_EYEBROW\",\"RIGHT_OF_RIGHT_EYEBROW\",\"MIDPOINT_BETWEEN_EYES\",\"NOSE_TIP\",\"UPPER_LIP\",\"LOWER_LIP\",\"MOUTH_LEFT\",\"MOUTH_RIGHT\",\"MOUTH_CENTER\",\"NOSE_BOTTOM_RIGHT\",\"NOSE_BOTTOM_LEFT\",\"NOSE_BOTTOM_CENTER\",\"LEFT_EYE_TOP_BOUNDARY\",\"LEFT_EYE_RIGHT_CORNER\",\"LEFT_EYE_BOTTOM_BOUNDARY\",\"LEFT_EYE_LEFT_CORNER\",\"RIGHT_EYE_TOP_BOUNDARY\",\"RIGHT_EYE_RIGHT_CORNER\",\"RIGHT_EYE_BOTTOM_BOUNDARY\",\"RIGHT_EYE_LEFT_CORNER\",\"LEFT_EYEBROW_UPPER_MIDPOINT\",\"RIGHT_EYEBROW_UPPER_MIDPOINT\",\"LEFT_EAR_TRAGION\",\"RIGHT_EAR_TRAGION\",\"LEFT_EYE_PUPIL\",\"RIGHT_EYE_PUPIL\",\"FOREHEAD_GLABELLA\",\"CHIN_GNATHION\",\"CHIN_LEFT_GONION\",\"CHIN_RIGHT_GONION\",\"UNRECOGNIZED\"]}},{\"name\":\"x\",\"type\":\"float\"},{\"name\":\"y\",\"type\":\"float\"},{\"name\":\"z\",\"type\":\"float\"}]}}}]}}}]}",
+                        "referenceName": "SaveResults",
+                        "path": "${GS_PATH_TO_OBJECT_WEB_DETECTION_RESULTS}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-annotation-component-record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\"},{\"name\":\"panAngle\",\"type\":\"float\"},{\"name\":\"tiltAngle\",\"type\":\"float\"},{\"name\":\"detectionConfidence\",\"type\":\"float\"},{\"name\":\"landmarkingConfidence\",\"type\":\"float\"},{\"name\":\"angerLikelihood\",\"type\":\"string\"},{\"name\":\"joyLikelihood\",\"type\":\"string\"},{\"name\":\"surpriseLikelihood\",\"type\":\"string\"},{\"name\":\"blurredLikelihood\",\"type\":\"string\"},{\"name\":\"underExposedLikelihood\",\"type\":\"string\"},{\"name\":\"sorrowLikelihood\",\"type\":\"string\"},{\"name\":\"headwearLikelihood\",\"type\":\"string\"},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"fd-bounding-vertex\",\"fields\":[{\"name\":\"x\",\"type\":\"int\"},{\"name\":\"y\",\"type\":\"int\"}]}}},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"face-landmark-record\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"symbols\":[\"UNKNOWN_LANDMARK\",\"LEFT_EYE\",\"RIGHT_EYE\",\"LEFT_OF_LEFT_EYEBROW\",\"RIGHT_OF_LEFT_EYEBROW\",\"LEFT_OF_RIGHT_EYEBROW\",\"RIGHT_OF_RIGHT_EYEBROW\",\"MIDPOINT_BETWEEN_EYES\",\"NOSE_TIP\",\"UPPER_LIP\",\"LOWER_LIP\",\"MOUTH_LEFT\",\"MOUTH_RIGHT\",\"MOUTH_CENTER\",\"NOSE_BOTTOM_RIGHT\",\"NOSE_BOTTOM_LEFT\",\"NOSE_BOTTOM_CENTER\",\"LEFT_EYE_TOP_BOUNDARY\",\"LEFT_EYE_RIGHT_CORNER\",\"LEFT_EYE_BOTTOM_BOUNDARY\",\"LEFT_EYE_LEFT_CORNER\",\"RIGHT_EYE_TOP_BOUNDARY\",\"RIGHT_EYE_RIGHT_CORNER\",\"RIGHT_EYE_BOTTOM_BOUNDARY\",\"RIGHT_EYE_LEFT_CORNER\",\"LEFT_EYEBROW_UPPER_MIDPOINT\",\"RIGHT_EYEBROW_UPPER_MIDPOINT\",\"LEFT_EAR_TRAGION\",\"RIGHT_EAR_TRAGION\",\"LEFT_EYE_PUPIL\",\"RIGHT_EYE_PUPIL\",\"FOREHEAD_GLABELLA\",\"CHIN_GNATHION\",\"CHIN_LEFT_GONION\",\"CHIN_RIGHT_GONION\",\"UNRECOGNIZED\"]}},{\"name\":\"x\",\"type\":\"float\"},{\"name\":\"y\",\"type\":\"float\"},{\"name\":\"z\",\"type\":\"float\"}]}}}]}}}]}"
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "Document Extractor",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-record\",\"type\":\"record\",\"fields\":[{\"name\":\"page\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"feature\",\"type\":{\"name\":\"web-detection-record\",\"type\":\"record\",\"fields\":[{\"name\":\"webEntities\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"web-entity-record\",\"type\":\"record\",\"fields\":[{\"name\":\"entityId\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"description\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"fmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"pmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pagesWithMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-with-matching-images-record\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pageTitle\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"fullMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-fmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"partialMatchingImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"webPage-pmiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"visuallySimilarImages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"vsiWebImage\",\"type\":\"record\",\"fields\":[{\"name\":\"url\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"score\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"bestGuessLabels\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"best-guess-label-record\",\"type\":\"record\",\"fields\":[{\"name\":\"label\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}"
+                    }
+                ]
+            }
+        ],
+        "schedule": "0 * * * *",
+        "engine": "spark",
+        "numOfRecordsPreview": 100,
+        "description": "Data Pipeline Application",
+        "maxConcurrentRuns": 1
+    }
+}

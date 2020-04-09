@@ -1,0 +1,9 @@
+gs://vision-api-pbo2/images/demo-img.jpg
+gs://vision-api-pbo2/images/croissant-CW88ysx7Amk.jpg
+gs://vision-api-pbo2/images/curology-A9CUBfntOFQ.jpg
+gs://vision-api-pbo2/images/fallon-michael-8LKQfBumjMo.jpg
+gs://vision-api-pbo2/images/keyur-nandaniya-3isjMlIlj4A.jpg
+gs://vision-api-pbo2/images/keyur-nandaniya-oEgiJNbYw8w.jpg
+gs://vision-api-pbo2/images/thought-catalog-EMX1eJ1BcgU.jpg
+gs://vision-api-pbo2/images/wesley-tingey-0are122T4ho.jpg
+gs://vision-api-pbo2/images/20200317_191230.jpg

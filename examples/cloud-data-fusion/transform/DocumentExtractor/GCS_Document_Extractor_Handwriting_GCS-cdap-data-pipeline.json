@@ -1,0 +1,878 @@
+{
+    "artifact": {
+        "name": "cdap-data-pipeline",
+        "version": "6.1.1",
+        "scope": "SYSTEM"
+    },
+    "description": "Data Pipeline Application",
+    "name": "GCS_Document_Extractor_Handwriting_GCS",
+    "config": {
+        "resources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "driverResources": {
+            "memoryMB": 2048,
+            "virtualCores": 1
+        },
+        "connections": [
+            {
+                "from": "GCS",
+                "to": "Document Extractor"
+            },
+            {
+                "from": "Document Extractor",
+                "to": "GCS2"
+            }
+        ],
+        "comments": [],
+        "postActions": [],
+        "properties": {},
+        "processTimingEnabled": true,
+        "stageLoggingEnabled": false,
+        "stages": [
+            {
+                "name": "GCS",
+                "plugin": {
+                    "name": "GCSFile",
+                    "type": "batchsource",
+                    "label": "GCS",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.13.2",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "format": "text",
+                        "serviceFilePath": "auto-detect",
+                        "filenameOnly": "false",
+                        "recursive": "false",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}",
+                        "path": "${GS_PATH_TO_DOCUMENT_LIST_FILE}",
+                        "referenceName": "Paths_to_images"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "Document Extractor",
+                "plugin": {
+                    "name": "DocumentExtractor",
+                    "type": "transform",
+                    "label": "Document Extractor",
+                    "artifact": {
+                        "name": "cloud-vision",
+                        "version": "1.0.0-SNAPSHOT",
+                        "scope": "USER"
+                    },
+                    "properties": {
+                        "serviceFilePath": "auto-detect",
+                        "project": "auto-detect",
+                        "features": "Handwriting",
+                        "mimeType": "application/pdf",
+                        "pages": "1,2,3,4,5",
+                        "pathField": "body",
+                        "outputField": "output",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-record\",\"type\":\"record\",\"fields\":[{\"name\":\"page\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"feature\",\"type\":{\"name\":\"fullTextAnnotation\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"width\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"height\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"blocks\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-block-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"blockType\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"paragraphs\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-paragraph-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"words\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-word-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"symbols\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-symbol-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textSymbol-detectedLanguages\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textSymbol-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textWord-detectedLanguage\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textWord-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textParagraph-detectedLanguages\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textParagraph-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textBlock-detectedLanguages\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textBlock-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"property\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textPage-property\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": {
+                            "type": "record",
+                            "name": "etlSchemaBody",
+                            "fields": [
+                                {
+                                    "name": "offset",
+                                    "type": "long"
+                                },
+                                {
+                                    "name": "body",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "output",
+                                    "type": {
+                                        "type": "array",
+                                        "items": {
+                                            "name": "page-record",
+                                            "type": "record",
+                                            "fields": [
+                                                {
+                                                    "name": "page",
+                                                    "type": "int",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "feature",
+                                                    "type": {
+                                                        "name": "fullTextAnnotation",
+                                                        "type": "record",
+                                                        "fields": [
+                                                            {
+                                                                "name": "text",
+                                                                "type": "string",
+                                                                "order": "ascending",
+                                                                "aliases": []
+                                                            },
+                                                            {
+                                                                "name": "pages",
+                                                                "type": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "name": "document-text-page-record",
+                                                                        "type": "record",
+                                                                        "fields": [
+                                                                            {
+                                                                                "name": "text",
+                                                                                "type": "string",
+                                                                                "order": "ascending",
+                                                                                "aliases": []
+                                                                            },
+                                                                            {
+                                                                                "name": "width",
+                                                                                "type": "int",
+                                                                                "order": "ascending",
+                                                                                "aliases": []
+                                                                            },
+                                                                            {
+                                                                                "name": "height",
+                                                                                "type": "int",
+                                                                                "order": "ascending",
+                                                                                "aliases": []
+                                                                            },
+                                                                            {
+                                                                                "name": "confidence",
+                                                                                "type": "float",
+                                                                                "order": "ascending",
+                                                                                "aliases": []
+                                                                            },
+                                                                            {
+                                                                                "name": "blocks",
+                                                                                "type": {
+                                                                                    "type": "array",
+                                                                                    "items": {
+                                                                                        "name": "document-text-page-block-record",
+                                                                                        "type": "record",
+                                                                                        "fields": [
+                                                                                            {
+                                                                                                "name": "text",
+                                                                                                "type": "string",
+                                                                                                "order": "ascending",
+                                                                                                "aliases": []
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "blockType",
+                                                                                                "type": "string",
+                                                                                                "order": "ascending",
+                                                                                                "aliases": []
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "confidence",
+                                                                                                "type": "float",
+                                                                                                "order": "ascending",
+                                                                                                "aliases": []
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "paragraphs",
+                                                                                                "type": {
+                                                                                                    "type": "array",
+                                                                                                    "items": {
+                                                                                                        "name": "document-text-page-paragraph-record",
+                                                                                                        "type": "record",
+                                                                                                        "fields": [
+                                                                                                            {
+                                                                                                                "name": "text",
+                                                                                                                "type": "string",
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "name": "confidence",
+                                                                                                                "type": "float",
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "name": "words",
+                                                                                                                "type": {
+                                                                                                                    "type": "array",
+                                                                                                                    "items": {
+                                                                                                                        "name": "document-text-page-word-record",
+                                                                                                                        "type": "record",
+                                                                                                                        "fields": [
+                                                                                                                            {
+                                                                                                                                "name": "text",
+                                                                                                                                "type": "string",
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "name": "confidence",
+                                                                                                                                "type": "float",
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "name": "symbols",
+                                                                                                                                "type": {
+                                                                                                                                    "type": "array",
+                                                                                                                                    "items": {
+                                                                                                                                        "name": "document-text-page-symbol-record",
+                                                                                                                                        "type": "record",
+                                                                                                                                        "fields": [
+                                                                                                                                            {
+                                                                                                                                                "name": "text",
+                                                                                                                                                "type": "string",
+                                                                                                                                                "order": "ascending",
+                                                                                                                                                "aliases": []
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "name": "confidence",
+                                                                                                                                                "type": "float",
+                                                                                                                                                "order": "ascending",
+                                                                                                                                                "aliases": []
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "name": "detectedLanguages",
+                                                                                                                                                "type": [
+                                                                                                                                                    {
+                                                                                                                                                        "type": "array",
+                                                                                                                                                        "items": {
+                                                                                                                                                            "name": "textSymbol-detectedLanguages",
+                                                                                                                                                            "type": "record",
+                                                                                                                                                            "fields": [
+                                                                                                                                                                {
+                                                                                                                                                                    "name": "languageCode",
+                                                                                                                                                                    "type": "string",
+                                                                                                                                                                    "order": "ascending",
+                                                                                                                                                                    "aliases": []
+                                                                                                                                                                },
+                                                                                                                                                                {
+                                                                                                                                                                    "name": "confidence",
+                                                                                                                                                                    "type": "float",
+                                                                                                                                                                    "order": "ascending",
+                                                                                                                                                                    "aliases": []
+                                                                                                                                                                }
+                                                                                                                                                            ],
+                                                                                                                                                            "aliases": []
+                                                                                                                                                        }
+                                                                                                                                                    },
+                                                                                                                                                    "null"
+                                                                                                                                                ],
+                                                                                                                                                "order": "ascending",
+                                                                                                                                                "aliases": []
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "name": "detectedBreak",
+                                                                                                                                                "type": [
+                                                                                                                                                    "string",
+                                                                                                                                                    "null"
+                                                                                                                                                ],
+                                                                                                                                                "order": "ascending",
+                                                                                                                                                "aliases": []
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "name": "boundingBox",
+                                                                                                                                                "type": {
+                                                                                                                                                    "type": "array",
+                                                                                                                                                    "items": {
+                                                                                                                                                        "name": "textSymbol-boundingBox",
+                                                                                                                                                        "type": "record",
+                                                                                                                                                        "fields": [
+                                                                                                                                                            {
+                                                                                                                                                                "name": "x",
+                                                                                                                                                                "type": "int",
+                                                                                                                                                                "order": "ascending",
+                                                                                                                                                                "aliases": []
+                                                                                                                                                            },
+                                                                                                                                                            {
+                                                                                                                                                                "name": "y",
+                                                                                                                                                                "type": "int",
+                                                                                                                                                                "order": "ascending",
+                                                                                                                                                                "aliases": []
+                                                                                                                                                            }
+                                                                                                                                                        ],
+                                                                                                                                                        "aliases": []
+                                                                                                                                                    }
+                                                                                                                                                },
+                                                                                                                                                "order": "ascending",
+                                                                                                                                                "aliases": []
+                                                                                                                                            }
+                                                                                                                                        ],
+                                                                                                                                        "aliases": []
+                                                                                                                                    }
+                                                                                                                                },
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "name": "detectedLanguages",
+                                                                                                                                "type": [
+                                                                                                                                    {
+                                                                                                                                        "type": "array",
+                                                                                                                                        "items": {
+                                                                                                                                            "name": "textWord-detectedLanguage",
+                                                                                                                                            "type": "record",
+                                                                                                                                            "fields": [
+                                                                                                                                                {
+                                                                                                                                                    "name": "languageCode",
+                                                                                                                                                    "type": "string",
+                                                                                                                                                    "order": "ascending",
+                                                                                                                                                    "aliases": []
+                                                                                                                                                },
+                                                                                                                                                {
+                                                                                                                                                    "name": "confidence",
+                                                                                                                                                    "type": "float",
+                                                                                                                                                    "order": "ascending",
+                                                                                                                                                    "aliases": []
+                                                                                                                                                }
+                                                                                                                                            ],
+                                                                                                                                            "aliases": []
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    "null"
+                                                                                                                                ],
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "name": "detectedBreak",
+                                                                                                                                "type": [
+                                                                                                                                    "string",
+                                                                                                                                    "null"
+                                                                                                                                ],
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "name": "boundingBox",
+                                                                                                                                "type": {
+                                                                                                                                    "type": "array",
+                                                                                                                                    "items": {
+                                                                                                                                        "name": "textWord-boundingBox",
+                                                                                                                                        "type": "record",
+                                                                                                                                        "fields": [
+                                                                                                                                            {
+                                                                                                                                                "name": "x",
+                                                                                                                                                "type": "int",
+                                                                                                                                                "order": "ascending",
+                                                                                                                                                "aliases": []
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "name": "y",
+                                                                                                                                                "type": "int",
+                                                                                                                                                "order": "ascending",
+                                                                                                                                                "aliases": []
+                                                                                                                                            }
+                                                                                                                                        ],
+                                                                                                                                        "aliases": []
+                                                                                                                                    }
+                                                                                                                                },
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            }
+                                                                                                                        ],
+                                                                                                                        "aliases": []
+                                                                                                                    }
+                                                                                                                },
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "name": "detectedLanguages",
+                                                                                                                "type": [
+                                                                                                                    {
+                                                                                                                        "type": "array",
+                                                                                                                        "items": {
+                                                                                                                            "name": "textParagraph-detectedLanguages",
+                                                                                                                            "type": "record",
+                                                                                                                            "fields": [
+                                                                                                                                {
+                                                                                                                                    "name": "languageCode",
+                                                                                                                                    "type": "string",
+                                                                                                                                    "order": "ascending",
+                                                                                                                                    "aliases": []
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                    "name": "confidence",
+                                                                                                                                    "type": "float",
+                                                                                                                                    "order": "ascending",
+                                                                                                                                    "aliases": []
+                                                                                                                                }
+                                                                                                                            ],
+                                                                                                                            "aliases": []
+                                                                                                                        }
+                                                                                                                    },
+                                                                                                                    "null"
+                                                                                                                ],
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "name": "detectedBreak",
+                                                                                                                "type": [
+                                                                                                                    "string",
+                                                                                                                    "null"
+                                                                                                                ],
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "name": "boundingBox",
+                                                                                                                "type": {
+                                                                                                                    "type": "array",
+                                                                                                                    "items": {
+                                                                                                                        "name": "textParagraph-boundingBox",
+                                                                                                                        "type": "record",
+                                                                                                                        "fields": [
+                                                                                                                            {
+                                                                                                                                "name": "x",
+                                                                                                                                "type": "int",
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "name": "y",
+                                                                                                                                "type": "int",
+                                                                                                                                "order": "ascending",
+                                                                                                                                "aliases": []
+                                                                                                                            }
+                                                                                                                        ],
+                                                                                                                        "aliases": []
+                                                                                                                    }
+                                                                                                                },
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "aliases": []
+                                                                                                    }
+                                                                                                },
+                                                                                                "order": "ascending",
+                                                                                                "aliases": []
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "detectedLanguages",
+                                                                                                "type": [
+                                                                                                    {
+                                                                                                        "type": "array",
+                                                                                                        "items": {
+                                                                                                            "name": "textBlock-detectedLanguages",
+                                                                                                            "type": "record",
+                                                                                                            "fields": [
+                                                                                                                {
+                                                                                                                    "name": "languageCode",
+                                                                                                                    "type": "string",
+                                                                                                                    "order": "ascending",
+                                                                                                                    "aliases": []
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    "name": "confidence",
+                                                                                                                    "type": "float",
+                                                                                                                    "order": "ascending",
+                                                                                                                    "aliases": []
+                                                                                                                }
+                                                                                                            ],
+                                                                                                            "aliases": []
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "null"
+                                                                                                ],
+                                                                                                "order": "ascending",
+                                                                                                "aliases": []
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "detectedBreak",
+                                                                                                "type": [
+                                                                                                    "string",
+                                                                                                    "null"
+                                                                                                ],
+                                                                                                "order": "ascending",
+                                                                                                "aliases": []
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "boundingBox",
+                                                                                                "type": {
+                                                                                                    "type": "array",
+                                                                                                    "items": {
+                                                                                                        "name": "textBlock-boundingBox",
+                                                                                                        "type": "record",
+                                                                                                        "fields": [
+                                                                                                            {
+                                                                                                                "name": "x",
+                                                                                                                "type": "int",
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "name": "y",
+                                                                                                                "type": "int",
+                                                                                                                "order": "ascending",
+                                                                                                                "aliases": []
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "aliases": []
+                                                                                                    }
+                                                                                                },
+                                                                                                "order": "ascending",
+                                                                                                "aliases": []
+                                                                                            }
+                                                                                        ],
+                                                                                        "aliases": []
+                                                                                    }
+                                                                                },
+                                                                                "order": "ascending",
+                                                                                "aliases": []
+                                                                            },
+                                                                            {
+                                                                                "name": "property",
+                                                                                "type": [
+                                                                                    {
+                                                                                        "type": "array",
+                                                                                        "items": {
+                                                                                            "name": "textPage-property",
+                                                                                            "type": "record",
+                                                                                            "fields": [
+                                                                                                {
+                                                                                                    "name": "languageCode",
+                                                                                                    "type": "string",
+                                                                                                    "order": "ascending",
+                                                                                                    "aliases": []
+                                                                                                },
+                                                                                                {
+                                                                                                    "name": "confidence",
+                                                                                                    "type": "float",
+                                                                                                    "order": "ascending",
+                                                                                                    "aliases": []
+                                                                                                }
+                                                                                            ],
+                                                                                            "aliases": []
+                                                                                        }
+                                                                                    },
+                                                                                    "null"
+                                                                                ],
+                                                                                "order": "ascending",
+                                                                                "aliases": []
+                                                                            },
+                                                                            {
+                                                                                "name": "detectedBreak",
+                                                                                "type": [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                                "order": "ascending",
+                                                                                "aliases": []
+                                                                            }
+                                                                        ],
+                                                                        "aliases": []
+                                                                    }
+                                                                },
+                                                                "order": "ascending",
+                                                                "aliases": []
+                                                            }
+                                                        ],
+                                                        "aliases": []
+                                                    },
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                }
+                                            ],
+                                            "aliases": []
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "GCS",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"}]}"
+                    }
+                ]
+            },
+            {
+                "name": "GCS2",
+                "plugin": {
+                    "name": "GCS",
+                    "type": "batchsink",
+                    "label": "GCS2",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.13.2",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "suffix": "yyyy-MM-dd-HH-mm",
+                        "format": "json",
+                        "serviceFilePath": "auto-detect",
+                        "location": "us",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"face-annotation-component-record\",\"type\":\"record\",\"fields\":[{\"name\":\"rollAngle\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"panAngle\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"tiltAngle\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectionConfidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"landmarkingConfidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"angerLikelihood\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"joyLikelihood\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"surpriseLikelihood\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"blurredLikelihood\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"underExposedLikelihood\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"sorrowLikelihood\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"headwearLikelihood\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"bounding-vertex\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"fdBoundingPoly\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"fd-bounding-vertex\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"landmarks\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"face-landmark-record\",\"type\":\"record\",\"fields\":[{\"name\":\"type\",\"type\":{\"type\":\"enum\",\"symbols\":[\"UNKNOWN_LANDMARK\",\"LEFT_EYE\",\"RIGHT_EYE\",\"LEFT_OF_LEFT_EYEBROW\",\"RIGHT_OF_LEFT_EYEBROW\",\"LEFT_OF_RIGHT_EYEBROW\",\"RIGHT_OF_RIGHT_EYEBROW\",\"MIDPOINT_BETWEEN_EYES\",\"NOSE_TIP\",\"UPPER_LIP\",\"LOWER_LIP\",\"MOUTH_LEFT\",\"MOUTH_RIGHT\",\"MOUTH_CENTER\",\"NOSE_BOTTOM_RIGHT\",\"NOSE_BOTTOM_LEFT\",\"NOSE_BOTTOM_CENTER\",\"LEFT_EYE_TOP_BOUNDARY\",\"LEFT_EYE_RIGHT_CORNER\",\"LEFT_EYE_BOTTOM_BOUNDARY\",\"LEFT_EYE_LEFT_CORNER\",\"RIGHT_EYE_TOP_BOUNDARY\",\"RIGHT_EYE_RIGHT_CORNER\",\"RIGHT_EYE_BOTTOM_BOUNDARY\",\"RIGHT_EYE_LEFT_CORNER\",\"LEFT_EYEBROW_UPPER_MIDPOINT\",\"RIGHT_EYEBROW_UPPER_MIDPOINT\",\"LEFT_EAR_TRAGION\",\"RIGHT_EAR_TRAGION\",\"LEFT_EYE_PUPIL\",\"RIGHT_EYE_PUPIL\",\"FOREHEAD_GLABELLA\",\"CHIN_GNATHION\",\"CHIN_LEFT_GONION\",\"CHIN_RIGHT_GONION\",\"UNRECOGNIZED\"],\"aliases\":[]},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"x\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"z\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}",
+                        "referenceName": "SaveResults",
+                        "path": "${GS_PATH_TO_HANDWRITING_RESULTS}"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": {
+                            "type": "record",
+                            "name": "etlSchemaBody",
+                            "fields": [
+                                {
+                                    "name": "offset",
+                                    "type": "long"
+                                },
+                                {
+                                    "name": "body",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "output",
+                                    "type": {
+                                        "type": "array",
+                                        "items": {
+                                            "name": "face-annotation-component-record",
+                                            "type": "record",
+                                            "fields": [
+                                                {
+                                                    "name": "rollAngle",
+                                                    "type": "float",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "panAngle",
+                                                    "type": "float",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "tiltAngle",
+                                                    "type": "float",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "detectionConfidence",
+                                                    "type": "float",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "landmarkingConfidence",
+                                                    "type": "float",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "angerLikelihood",
+                                                    "type": "string",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "joyLikelihood",
+                                                    "type": "string",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "surpriseLikelihood",
+                                                    "type": "string",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "blurredLikelihood",
+                                                    "type": "string",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "underExposedLikelihood",
+                                                    "type": "string",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "sorrowLikelihood",
+                                                    "type": "string",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "headwearLikelihood",
+                                                    "type": "string",
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "boundingPoly",
+                                                    "type": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "name": "bounding-vertex",
+                                                            "type": "record",
+                                                            "fields": [
+                                                                {
+                                                                    "name": "x",
+                                                                    "type": "int",
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                },
+                                                                {
+                                                                    "name": "y",
+                                                                    "type": "int",
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                }
+                                                            ],
+                                                            "aliases": []
+                                                        }
+                                                    },
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "fdBoundingPoly",
+                                                    "type": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "name": "fd-bounding-vertex",
+                                                            "type": "record",
+                                                            "fields": [
+                                                                {
+                                                                    "name": "x",
+                                                                    "type": "int",
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                },
+                                                                {
+                                                                    "name": "y",
+                                                                    "type": "int",
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                }
+                                                            ],
+                                                            "aliases": []
+                                                        }
+                                                    },
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                },
+                                                {
+                                                    "name": "landmarks",
+                                                    "type": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "name": "face-landmark-record",
+                                                            "type": "record",
+                                                            "fields": [
+                                                                {
+                                                                    "name": "type",
+                                                                    "type": {
+                                                                        "type": "enum",
+                                                                        "symbols": [
+                                                                            "UNKNOWN_LANDMARK",
+                                                                            "LEFT_EYE",
+                                                                            "RIGHT_EYE",
+                                                                            "LEFT_OF_LEFT_EYEBROW",
+                                                                            "RIGHT_OF_LEFT_EYEBROW",
+                                                                            "LEFT_OF_RIGHT_EYEBROW",
+                                                                            "RIGHT_OF_RIGHT_EYEBROW",
+                                                                            "MIDPOINT_BETWEEN_EYES",
+                                                                            "NOSE_TIP",
+                                                                            "UPPER_LIP",
+                                                                            "LOWER_LIP",
+                                                                            "MOUTH_LEFT",
+                                                                            "MOUTH_RIGHT",
+                                                                            "MOUTH_CENTER",
+                                                                            "NOSE_BOTTOM_RIGHT",
+                                                                            "NOSE_BOTTOM_LEFT",
+                                                                            "NOSE_BOTTOM_CENTER",
+                                                                            "LEFT_EYE_TOP_BOUNDARY",
+                                                                            "LEFT_EYE_RIGHT_CORNER",
+                                                                            "LEFT_EYE_BOTTOM_BOUNDARY",
+                                                                            "LEFT_EYE_LEFT_CORNER",
+                                                                            "RIGHT_EYE_TOP_BOUNDARY",
+                                                                            "RIGHT_EYE_RIGHT_CORNER",
+                                                                            "RIGHT_EYE_BOTTOM_BOUNDARY",
+                                                                            "RIGHT_EYE_LEFT_CORNER",
+                                                                            "LEFT_EYEBROW_UPPER_MIDPOINT",
+                                                                            "RIGHT_EYEBROW_UPPER_MIDPOINT",
+                                                                            "LEFT_EAR_TRAGION",
+                                                                            "RIGHT_EAR_TRAGION",
+                                                                            "LEFT_EYE_PUPIL",
+                                                                            "RIGHT_EYE_PUPIL",
+                                                                            "FOREHEAD_GLABELLA",
+                                                                            "CHIN_GNATHION",
+                                                                            "CHIN_LEFT_GONION",
+                                                                            "CHIN_RIGHT_GONION",
+                                                                            "UNRECOGNIZED"
+                                                                        ],
+                                                                        "aliases": []
+                                                                    },
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                },
+                                                                {
+                                                                    "name": "x",
+                                                                    "type": "float",
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                },
+                                                                {
+                                                                    "name": "y",
+                                                                    "type": "float",
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                },
+                                                                {
+                                                                    "name": "z",
+                                                                    "type": "float",
+                                                                    "order": "ascending",
+                                                                    "aliases": []
+                                                                }
+                                                            ],
+                                                            "aliases": []
+                                                        }
+                                                    },
+                                                    "order": "ascending",
+                                                    "aliases": []
+                                                }
+                                            ],
+                                            "aliases": []
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "Document Extractor",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"offset\",\"type\":\"long\"},{\"name\":\"body\",\"type\":\"string\"},{\"name\":\"output\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"page-record\",\"type\":\"record\",\"fields\":[{\"name\":\"page\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"feature\",\"type\":{\"name\":\"fullTextAnnotation\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"pages\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"width\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"height\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"blocks\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-block-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"blockType\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"paragraphs\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-paragraph-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"words\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-word-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"symbols\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"document-text-page-symbol-record\",\"type\":\"record\",\"fields\":[{\"name\":\"text\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textSymbol-detectedLanguages\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textSymbol-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textWord-detectedLanguage\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textWord-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textParagraph-detectedLanguages\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textParagraph-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedLanguages\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textBlock-detectedLanguages\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"boundingBox\",\"type\":{\"type\":\"array\",\"items\":{\"name\":\"textBlock-boundingBox\",\"type\":\"record\",\"fields\":[{\"name\":\"x\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"y\",\"type\":\"int\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"property\",\"type\":[{\"type\":\"array\",\"items\":{\"name\":\"textPage-property\",\"type\":\"record\",\"fields\":[{\"name\":\"languageCode\",\"type\":\"string\",\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"confidence\",\"type\":\"float\",\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"null\"],\"order\":\"ascending\",\"aliases\":[]},{\"name\":\"detectedBreak\",\"type\":[\"string\",\"null\"],\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]},\"order\":\"ascending\",\"aliases\":[]}],\"aliases\":[]}}}]}"
+                    }
+                ]
+            }
+        ],
+        "schedule": "0 * * * *",
+        "engine": "spark",
+        "numOfRecordsPreview": 100,
+        "description": "Data Pipeline Application",
+        "maxConcurrentRuns": 1
+    }
+}
