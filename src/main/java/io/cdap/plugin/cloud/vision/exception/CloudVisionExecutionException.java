@@ -13,10 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package io.cdap.plugin.cloud.vision.exception;
 
 /**
- * Runtime Cloud Vision execution exception thrown when there were errors during execution of Cloud Vision requests.
+ * Runtime Cloud Vision execution exception thrown when there were errors during execution of Cloud
+ * Vision requests.
  */
 public class CloudVisionExecutionException extends RuntimeException {
 

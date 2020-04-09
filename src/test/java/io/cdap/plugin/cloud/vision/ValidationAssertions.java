@@ -41,8 +41,8 @@ public final class ValidationAssertions {
   @Nonnull
   public static List<ValidationFailure.Cause> getCauses(ValidationFailure failure, String stacktrace) {
     return failure.getCauses()
-      .stream()
-      .filter(cause -> cause.getAttribute(stacktrace) != null)
-      .collect(Collectors.toList());
+            .stream()
+            .filter(cause -> cause.getAttribute(stacktrace) != null)
+            .collect(Collectors.toList());
   }
 }

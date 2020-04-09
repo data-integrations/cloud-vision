@@ -32,54 +32,54 @@ import java.util.List;
 public class WebDetectionRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   private static final WebDetection.WebImage WEB_IMAGE_1 = WebDetection.WebImage.newBuilder()
-    .setUrl("https://1000lugaresparair.files.wordpress.com/2017/11/quinten-de-graaf-278848.jpg")
-    .setScore(0.442f)
-    .build();
+          .setUrl("https://1000lugaresparair.files.wordpress.com/2017/11/quinten-de-graaf-278848.jpg")
+          .setScore(0.442f)
+          .build();
 
   private static final WebDetection.WebImage WEB_IMAGE_2 = WebDetection.WebImage.newBuilder()
-    .setUrl("https://1000lugaresparair.files.wordpress.com/2017/11/278848.jpg")
-    .setScore(0.442f)
-    .build();
+          .setUrl("https://1000lugaresparair.files.wordpress.com/2017/11/278848.jpg")
+          .setScore(0.442f)
+          .build();
 
   private static final WebDetection.WebImage WEB_IMAGE_3 = WebDetection.WebImage.newBuilder()
-    .setUrl("https://1000lugaresparair.com/some.jpg")
-    .setScore(0.442f)
-    .build();
+          .setUrl("https://1000lugaresparair.com/some.jpg")
+          .setScore(0.442f)
+          .build();
 
   private static final WebDetection.WebPage WEB_PAGE = WebDetection.WebPage.newBuilder()
-    .setUrl("https://1000lugaresparair.com/some-page")
-    .setScore(0.95f)
-    .setPageTitle("Page Title")
-    .addFullMatchingImages(WEB_IMAGE_3)
-    .addPartialMatchingImages(WEB_IMAGE_1)
-    .build();
+          .setUrl("https://1000lugaresparair.com/some-page")
+          .setScore(0.95f)
+          .setPageTitle("Page Title")
+          .addFullMatchingImages(WEB_IMAGE_3)
+          .addPartialMatchingImages(WEB_IMAGE_1)
+          .build();
 
   private static final WebDetection.WebEntity WEB_ENTITY = WebDetection.WebEntity.newBuilder()
-    .setEntityId("/m/02p7_j8")
-    .setScore(1.442f)
-    .setDescription("Carnival in Rio de Janeiro")
-    .build();
+          .setEntityId("/m/02p7_j8")
+          .setScore(1.442f)
+          .setDescription("Carnival in Rio de Janeiro")
+          .build();
 
   private static final WebDetection WEB_DETECTION = WebDetection.newBuilder()
-    .addWebEntities(WEB_ENTITY)
-    .addFullMatchingImages(WEB_IMAGE_1)
-    .addPartialMatchingImages(WEB_IMAGE_2)
-    .addVisuallySimilarImages(WEB_IMAGE_3)
-    .addPagesWithMatchingImages(WEB_PAGE)
-    .addBestGuessLabels(WebDetection.WebLabel.newBuilder().setLabel("Label").setLanguageCode("en"))
-    .build();
+          .addWebEntities(WEB_ENTITY)
+          .addFullMatchingImages(WEB_IMAGE_1)
+          .addPartialMatchingImages(WEB_IMAGE_2)
+          .addVisuallySimilarImages(WEB_IMAGE_3)
+          .addPagesWithMatchingImages(WEB_PAGE)
+          .addBestGuessLabels(WebDetection.WebLabel.newBuilder().setLabel("Label").setLanguageCode("en"))
+          .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .setWebDetection(WEB_DETECTION)
-    .build();
+          .setWebDetection(WEB_DETECTION)
+          .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.WEB_DETECTION.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.WEB_DETECTION.getSchema()));
 
     WebDetectionToRecordTransformer transformer = new WebDetectionToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -93,15 +93,15 @@ public class WebDetectionRecordTransformerTest extends BaseAnnotationsToRecordTr
   public void testTransformEmptyDetection() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.WEB_DETECTION.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.WEB_DETECTION.getSchema()));
 
     WebDetectionToRecordTransformer transformer = new WebDetectionToRecordTransformer(schema, output);
 
     WebDetection emptyWebDetection = WebDetection.newBuilder().build();
     AnnotateImageResponse response = AnnotateImageResponse.newBuilder()
-      .setWebDetection(emptyWebDetection)
-      .build();
+            .setWebDetection(emptyWebDetection)
+            .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, response);
     Assert.assertNotNull(transformed);
     StructuredRecord actual = transformed.get(output);
@@ -113,12 +113,12 @@ public class WebDetectionRecordTransformerTest extends BaseAnnotationsToRecordTr
   public void testTransformSingleField() {
     String output = "extracted";
     Schema singleFieldSchema = Schema.recordOf("single-field", Schema.Field.of(
-      WebDetectionSchema.BEST_GUESS_LABELS_FIELD_NAME,
-      Schema.arrayOf(WebDetectionSchema.BestGuessLabel.SCHEMA)));
+            WebDetectionSchema.BEST_GUESS_LABELS_FIELD_NAME,
+            Schema.arrayOf(WebDetectionSchema.BestGuessLabel.SCHEMA)));
 
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, singleFieldSchema));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, singleFieldSchema));
 
     WebDetectionToRecordTransformer transformer = new WebDetectionToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -194,31 +194,31 @@ public class WebDetectionRecordTransformerTest extends BaseAnnotationsToRecordTr
   private void assertWebEntityEquals(WebDetection.WebEntity expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getEntityId(), actual.get(WebDetectionSchema.WebEntity.ENTITY_ID_FIELD_NAME));
     Assert.assertEquals(expected.getDescription(),
-      actual.get(WebDetectionSchema.WebEntity.DESCRIPTION_FIELD_NAME));
+            actual.get(WebDetectionSchema.WebEntity.DESCRIPTION_FIELD_NAME));
     Assert.assertEquals(expected.getScore(),
-      actual.<Float>get(WebDetectionSchema.WebEntity.SCORE_FIELD_NAME),
-      DELTA);
+            actual.<Float>get(WebDetectionSchema.WebEntity.SCORE_FIELD_NAME),
+            DELTA);
   }
 
   private void assertWebImageEquals(WebDetection.WebImage expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getUrl(), actual.get(WebDetectionSchema.WebImage.URL_FIELD_NAME));
     Assert.assertEquals(expected.getScore(),
-      actual.<Float>get(WebDetectionSchema.WebImage.SCORE_FIELD_NAME),
-      DELTA);
+            actual.<Float>get(WebDetectionSchema.WebImage.SCORE_FIELD_NAME),
+            DELTA);
   }
 
   private void assertWebLabelEquals(WebDetection.WebLabel expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getLabel(), actual.get(WebDetectionSchema.BestGuessLabel.LABEL_FIELD_NAME));
     Assert.assertEquals(expected.getLanguageCode(),
-      actual.get(WebDetectionSchema.BestGuessLabel.LANGUAGE_CODE_FIELD_NAME));
+            actual.get(WebDetectionSchema.BestGuessLabel.LANGUAGE_CODE_FIELD_NAME));
   }
 
   private void assertWebPageEquals(WebDetection.WebPage expected, StructuredRecord actual) {
     Assert.assertEquals(expected.getUrl(), actual.get(WebDetectionSchema.WebPage.URL_FIELD_NAME));
     Assert.assertEquals(expected.getPageTitle(), actual.get(WebDetectionSchema.WebPage.PAGE_TITLE_FIELD_NAME));
     Assert.assertEquals(expected.getScore(),
-      actual.<Float>get(WebDetectionSchema.WebPage.SCORE_FIELD_NAME),
-      DELTA);
+            actual.<Float>get(WebDetectionSchema.WebPage.SCORE_FIELD_NAME),
+            DELTA);
     List<StructuredRecord> fullMatchingImages = actual.get(WebDetectionSchema.WebPage.FULL_MATCHING_IMAGES_FIELD_NAME);
     Assert.assertNotNull(fullMatchingImages);
     Assert.assertEquals(expected.getFullMatchingImagesCount(), fullMatchingImages.size());

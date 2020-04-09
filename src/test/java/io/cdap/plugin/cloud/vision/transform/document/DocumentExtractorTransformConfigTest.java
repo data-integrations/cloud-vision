@@ -35,19 +35,19 @@ public class DocumentExtractorTransformConfigTest extends ExtractorTransformConf
   @Override
   protected DocumentExtractorTransformConfigBuilder getValidConfigBuilder() {
     return DocumentExtractorTransformConfigBuilder.builder()
-      .setPathField("path")
-      .setOutputField("extracted")
-      .setFeatures(ImageFeature.FACE.getDisplayName())
-      .setMimeType("application/pdf")
-      .setSchema(VALID_SCHEMA.toString());
+            .setPathField("path")
+            .setOutputField("extracted")
+            .setFeatures(ImageFeature.FACE.getDisplayName())
+            .setMimeType("application/pdf")
+            .setSchema(VALID_SCHEMA.toString());
   }
 
   @Test
   public void testValidatePathFieldAndContentFieldNotSet() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setPathField(null)
-      .setContentField(null)
-      .build();
+            .setPathField(null)
+            .setContentField(null)
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -58,18 +58,18 @@ public class DocumentExtractorTransformConfigTest extends ExtractorTransformConf
     Assert.assertEquals(2, causeList.size());
     ValidationFailure.Cause firstCause = causeList.get(0);
     Assert.assertEquals(DocumentExtractorTransformConstants.PATH_FIELD,
-      firstCause.getAttribute(CauseAttributes.STAGE_CONFIG));
+            firstCause.getAttribute(CauseAttributes.STAGE_CONFIG));
     ValidationFailure.Cause secondCause = causeList.get(1);
     Assert.assertEquals(DocumentExtractorTransformConstants.CONTENT_FIELD,
-      secondCause.getAttribute(CauseAttributes.STAGE_CONFIG));
+            secondCause.getAttribute(CauseAttributes.STAGE_CONFIG));
   }
 
   @Test
   public void testValidateValidOnlyPathFieldSet() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setPathField("path")
-      .setContentField(null)
-      .build();
+            .setPathField("path")
+            .setContentField(null)
+            .build();
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
     Assert.assertTrue(failureCollector.getValidationFailures().isEmpty());
@@ -78,9 +78,9 @@ public class DocumentExtractorTransformConfigTest extends ExtractorTransformConf
   @Test
   public void testValidateValidOnlyContentFieldSet() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setPathField(null)
-      .setContentField("content")
-      .build();
+            .setPathField(null)
+            .setContentField("content")
+            .build();
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
     Assert.assertTrue(failureCollector.getValidationFailures().isEmpty());
@@ -89,8 +89,8 @@ public class DocumentExtractorTransformConfigTest extends ExtractorTransformConf
   @Test
   public void testValidateMimeTypeNull() {
     DocumentExtractorTransformConfig config = getValidConfigBuilder()
-      .setMimeType(null)
-      .build();
+            .setMimeType(null)
+            .build();
 
     MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
     config.validate(collector);
@@ -100,8 +100,8 @@ public class DocumentExtractorTransformConfigTest extends ExtractorTransformConf
   @Test
   public void testValidateMimeTypeEmpty() {
     DocumentExtractorTransformConfig config = getValidConfigBuilder()
-      .setMimeType("")
-      .build();
+            .setMimeType("")
+            .build();
 
     MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
     config.validate(collector);

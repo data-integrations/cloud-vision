@@ -23,17 +23,17 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test class for {@link TextExtractorActionConfigTest}.
+ * Test class for {@link OfflineOfflineTextExtractorActionConfigTest}.
  */
-public class TextExtractorActionConfigTest {
+public class OfflineOfflineTextExtractorActionConfigTest {
   private static final String MOCK_STAGE = "mockStage";
-  private static final TextExtractorActionConfig VALID_CONFIG = new TextExtractorActionConfig(
-    "/path",
-    "/path",
-    "/path",
-    "application/pdf",
-    2,
-    null
+  private static final OfflineTextExtractorActionConfig VALID_CONFIG = new OfflineTextExtractorActionConfig(
+          "/path",
+          "/path",
+          "/path",
+          "application/pdf",
+          2,
+          null
   );
 
   @Test
@@ -45,21 +45,21 @@ public class TextExtractorActionConfigTest {
 
   @Test
   public void testEmptyServiceFilePath() {
-    TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
-      .setServiceFilePath("")
-      .build();
+    OfflineTextExtractorActionConfig config = OfflineTextExtractorActionConfig.builder(VALID_CONFIG)
+            .setServiceFilePath("")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
     ValidationAssertions.assertPropertyValidationFailed(failureCollector,
-                                                        CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
+            CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
   }
 
   @Test
   public void testEmptySourcePath() {
-    TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
-      .setSourcePath("")
-      .build();
+    OfflineTextExtractorActionConfig config = OfflineTextExtractorActionConfig.builder(VALID_CONFIG)
+            .setSourcePath("")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -68,9 +68,9 @@ public class TextExtractorActionConfigTest {
 
   @Test
   public void testEmptyDestinationPath() {
-    TextExtractorActionConfig config = TextExtractorActionConfig.builder(VALID_CONFIG)
-      .setDestinationPath("")
-      .build();
+    OfflineTextExtractorActionConfig config = OfflineTextExtractorActionConfig.builder(VALID_CONFIG)
+            .setDestinationPath("")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);

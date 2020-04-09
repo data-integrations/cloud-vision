@@ -53,12 +53,12 @@ public enum ImageFeature {
   WEB_DETECTION("Web Detection", Feature.Type.WEB_DETECTION, WebDetectionSchema.SCHEMA),
   PRODUCT_SEARCH("Product Search", Feature.Type.PRODUCT_SEARCH, ProductSearchResultsSchema.SCHEMA),
   OBJECT_LOCALIZATION(
-    "Object Localization",
-    Feature.Type.OBJECT_LOCALIZATION,
-    Schema.arrayOf(LocalizedObjectAnnotationSchema.SCHEMA));
+          "Object Localization",
+          Feature.Type.OBJECT_LOCALIZATION,
+          Schema.arrayOf(LocalizedObjectAnnotationSchema.SCHEMA));
 
   private static final Map<String, ImageFeature> byDisplayName = Arrays.stream(values())
-    .collect(Collectors.toMap(ImageFeature::getDisplayName, Function.identity()));
+          .collect(Collectors.toMap(ImageFeature::getDisplayName, Function.identity()));
 
   private final String displayName;
   private final Feature.Type featureType;

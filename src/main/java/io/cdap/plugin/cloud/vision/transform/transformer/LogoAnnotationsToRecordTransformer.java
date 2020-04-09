@@ -19,7 +19,6 @@ package io.cdap.plugin.cloud.vision.transform.transformer;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,16 +33,31 @@ public class LogoAnnotationsToRecordTransformer extends LandmarkAnnotationsToRec
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link io.cdap.plugin.cloud.vision.transform.schema.LocalizedObjectAnnotationSchema}.
+   * This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractLogoAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractLogoAnnotations(annotateImageResponse))
+            .build();
   }
 
+  /**
+   * Extract a {@link List} of {@link StructuredRecord} containing the logo information from a
+   * {@link AnnotateImageResponse} input using a {@link Schema} for the mapping.
+   *
+   * @param annotateImageResponse The {@link AnnotateImageResponse} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private List<StructuredRecord> extractLogoAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getLogoAnnotationsList().stream()
-      .map(this::extractAnnotation)
-      .collect(Collectors.toList());
+            .map(this::extractAnnotation)
+            .collect(Collectors.toList());
   }
 }

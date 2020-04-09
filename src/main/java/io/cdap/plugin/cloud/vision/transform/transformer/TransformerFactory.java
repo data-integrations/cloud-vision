@@ -19,11 +19,12 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 
 /**
- * A factory which creates instance of {@ImageAnnotationToRecordTransformer} in accordance to feature and output schema
- * configured in input config.
+ * A factory which creates instances of {@ImageAnnotationToRecordTransformer} in accordance to
+ * the feature and output schema configured in input config.
  */
 public class TransformerFactory {
-  public static ImageAnnotationToRecordTransformer createInstance(ImageFeature imageFeature, String outputFieldName,
+  public static ImageAnnotationToRecordTransformer createInstance(ImageFeature imageFeature,
+                                                                  String outputFieldName,
                                                                   Schema schema) {
     switch (imageFeature) {
       case FACE:

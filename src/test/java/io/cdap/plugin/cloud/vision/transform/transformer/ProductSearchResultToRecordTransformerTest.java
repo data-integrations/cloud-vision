@@ -35,39 +35,40 @@ import java.util.List;
 public class ProductSearchResultToRecordTransformerTest extends BaseAnnotationsToRecordTransformerTest {
 
   private static final ProductSearchResults.Result RESULT = ProductSearchResults.Result.newBuilder()
-    .setImage("gs://product-search-tutorial/dress-shoe-dataset/469a896b70ba11e8be97d20059124800.jpg")
-    .setScore(0.5f)
-    .setProduct(Product.newBuilder()
-      .setName("projects/prj-prod-search-tutorials/locations/us-east1/products/P_CLOTH-SHOE_46903668_070318")
-      .setDisplayName("Blue Dress")
-      .setProductCategory(ProductCategory.APPAREL.getName())
-      .setDescription("Short sleeved and 1950s style satin dress")
-      .addProductLabels(Product.KeyValue.newBuilder().setKey("color").setValue("blue").build())
-      .build())
-    .build();
+          .setImage("gs://product-search-tutorial/dress-shoe-dataset/469a896b70ba11e8be97d20059124800.jpg")
+          .setScore(0.5f)
+          .setProduct(Product.newBuilder()
+                  .setName("projects/prj-prod-search-tutorials/locations/us-east1/products/"
+                          + "P_CLOTH-SHOE_46903668_070318")
+                  .setDisplayName("Blue Dress")
+                  .setProductCategory(ProductCategory.APPAREL.getName())
+                  .setDescription("Short sleeved and 1950s style satin dress")
+                  .addProductLabels(Product.KeyValue.newBuilder().setKey("color").setValue("blue").build())
+                  .build())
+          .build();
 
   private static final ProductSearchResults.GroupedResult GROUPED = ProductSearchResults.GroupedResult.newBuilder()
-    .setBoundingPoly(POSITION)
-    .addResults(RESULT)
-    .build();
+          .setBoundingPoly(POSITION)
+          .addResults(RESULT)
+          .build();
 
   private static final ProductSearchResults PRODUCT_SEARCH_RESULTS = ProductSearchResults.newBuilder()
-    .setIndexTime(Timestamp.parseTimestamp("2018-10-02T15:01:23.045123456Z").toProto())
-    .addResults(RESULT)
-    .addProductGroupedResults(GROUPED)
-    .build();
+          .setIndexTime(Timestamp.parseTimestamp("2018-10-02T15:01:23.045123456Z").toProto())
+          .addResults(RESULT)
+          .addProductGroupedResults(GROUPED)
+          .build();
 
   private static final AnnotateImageResponse RESPONSE = AnnotateImageResponse.newBuilder()
-    .setProductSearchResults(PRODUCT_SEARCH_RESULTS)
-    .build();
+          .setProductSearchResults(PRODUCT_SEARCH_RESULTS)
+          .build();
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testTransform() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.PRODUCT_SEARCH.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.PRODUCT_SEARCH.getSchema()));
 
     ProductSearchResultToRecordTransformer transformer = new ProductSearchResultToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -82,15 +83,15 @@ public class ProductSearchResultToRecordTransformerTest extends BaseAnnotationsT
   public void testTransformEmptyAnnotation() {
     String output = "extracted";
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, ImageFeature.PRODUCT_SEARCH.getSchema()));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, ImageFeature.PRODUCT_SEARCH.getSchema()));
 
     ProductSearchResultToRecordTransformer transformer = new ProductSearchResultToRecordTransformer(schema, output);
 
     ProductSearchResults emptyResults = ProductSearchResults.newBuilder().build();
     AnnotateImageResponse response = AnnotateImageResponse.newBuilder()
-      .setProductSearchResults(emptyResults)
-      .build();
+            .setProductSearchResults(emptyResults)
+            .build();
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, response);
 
     Assert.assertNotNull(transformed);
@@ -103,11 +104,11 @@ public class ProductSearchResultToRecordTransformerTest extends BaseAnnotationsT
   public void testTransformSingleField() {
     String output = "extracted";
     Schema singleFieldSchema = Schema.recordOf(
-      "single-field",
-      Schema.Field.of(ProductSearchResultsSchema.INDEX_TIME_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+            "single-field",
+            Schema.Field.of(ProductSearchResultsSchema.INDEX_TIME_FIELD_NAME, Schema.of(Schema.Type.STRING)));
     Schema schema = Schema.recordOf("transformed-record-schema",
-      Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(output, singleFieldSchema));
+            Schema.Field.of("path", Schema.of(Schema.Type.STRING)),
+            Schema.Field.of(output, singleFieldSchema));
 
     ProductSearchResultToRecordTransformer transformer = new ProductSearchResultToRecordTransformer(schema, output);
     StructuredRecord transformed = transformer.transform(INPUT_RECORD, RESPONSE);
@@ -117,7 +118,7 @@ public class ProductSearchResultToRecordTransformerTest extends BaseAnnotationsT
     // actual record has single-field schema
     Assert.assertEquals(singleFieldSchema, actual.getSchema());
     Assert.assertEquals(Timestamp.fromProto(PRODUCT_SEARCH_RESULTS.getIndexTime()).toString(),
-      actual.get(ProductSearchResultsSchema.INDEX_TIME_FIELD_NAME));
+            actual.get(ProductSearchResultsSchema.INDEX_TIME_FIELD_NAME));
   }
 
   private void assertProductSearchResultsEquals(ProductSearchResults expected, StructuredRecord actual) {
@@ -163,9 +164,9 @@ public class ProductSearchResultToRecordTransformerTest extends BaseAnnotationsT
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected.getImage(), actual.get(ProductSearchResultsSchema.Result.IMAGE_FIELD_NAME));
     Assert.assertEquals(
-      expected.getScore(),
-      actual.<Float>get(ProductSearchResultsSchema.Result.SCORE_FIELD_NAME),
-      DELTA);
+            expected.getScore(),
+            actual.<Float>get(ProductSearchResultsSchema.Result.SCORE_FIELD_NAME),
+            DELTA);
     assertProductEquals(expected.getProduct(), actual.get(ProductSearchResultsSchema.Result.PRODUCT_FIELD_NAME));
   }
 
@@ -173,11 +174,11 @@ public class ProductSearchResultToRecordTransformerTest extends BaseAnnotationsT
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected.getName(), actual.get(ProductSearchResultsSchema.Product.NAME_FIELD_NAME));
     Assert.assertEquals(expected.getDisplayName(),
-      actual.get(ProductSearchResultsSchema.Product.DISPLAY_NAME_FIELD_NAME));
+            actual.get(ProductSearchResultsSchema.Product.DISPLAY_NAME_FIELD_NAME));
     Assert.assertEquals(expected.getDescription(),
-      actual.get(ProductSearchResultsSchema.Product.DESCRIPTION_FIELD_NAME));
+            actual.get(ProductSearchResultsSchema.Product.DESCRIPTION_FIELD_NAME));
     Assert.assertEquals(expected.getProductCategory(),
-      actual.get(ProductSearchResultsSchema.Product.PRODUCT_CATEGORY_FIELD_NAME));
+            actual.get(ProductSearchResultsSchema.Product.PRODUCT_CATEGORY_FIELD_NAME));
 
     List<StructuredRecord> labels = actual.get(ProductSearchResultsSchema.Product.PRODUCT_LABELS_FIELD_NAME);
     Assert.assertNotNull(labels);

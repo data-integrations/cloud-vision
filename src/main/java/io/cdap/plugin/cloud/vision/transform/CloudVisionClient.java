@@ -43,7 +43,8 @@ public abstract class CloudVisionClient {
 
   protected ImageAnnotatorClient createImageAnnotatorClient() throws IOException {
     String serviceAccountPath = config.getServiceAccountFilePath();
-    Credentials credentials = serviceAccountPath == null ? null : CredentialsHelper.getCredentials(serviceAccountPath);
+    Credentials credentials = serviceAccountPath == null ? null
+            : CredentialsHelper.getCredentials(serviceAccountPath);
     ImageAnnotatorSettings.Builder imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder();
     if (credentials != null) {
       imageAnnotatorSettings.setCredentialsProvider(FixedCredentialsProvider.create(credentials));
@@ -56,19 +57,19 @@ public abstract class CloudVisionClient {
     switch (config.getImageFeature()) {
       case TEXT:
         return Strings.isNullOrEmpty(config.getLanguageHints()) ? null
-          : ImageContext.newBuilder().addAllLanguageHints(config.getLanguages()).build();
+                : ImageContext.newBuilder().addAllLanguageHints(config.getLanguages()).build();
       case CROP_HINTS:
         if (Strings.isNullOrEmpty(config.getAspectRatios())) {
           return null;
         }
         CropHintsParams cropHintsParams = CropHintsParams.newBuilder()
-          .addAllAspectRatios(config.getAspectRatiosList())
-          .build();
+                .addAllAspectRatios(config.getAspectRatiosList())
+                .build();
         return ImageContext.newBuilder().setCropHintsParams(cropHintsParams).build();
       case WEB_DETECTION:
         WebDetectionParams webDetectionParams = WebDetectionParams.newBuilder()
-          .setIncludeGeoResults(config.isIncludeGeoResults())
-          .build();
+                .setIncludeGeoResults(config.isIncludeGeoResults())
+                .build();
         return ImageContext.newBuilder().setWebDetectionParams(webDetectionParams).build();
       default:
         return null;

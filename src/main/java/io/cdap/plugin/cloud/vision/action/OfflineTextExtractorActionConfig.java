@@ -23,49 +23,44 @@ import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConstants;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * Config class for {@link TextExtractorAction}.
+ * Config class for {@link OfflineTextExtractorAction}.
  */
-public class TextExtractorActionConfig extends PluginConfig {
-
-  @Name(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
-  @Description("Path on the local file system of the service account key used "
-    + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
-    + "When running on other clusters, the file must be present on every node in the cluster.")
-  @Macro
-  private String serviceFilePath;
+public class OfflineTextExtractorActionConfig extends PluginConfig {
 
   @Name(ActionConstants.SOURCE_PATH)
   @Macro
   @Description("Path to the location of the directory on GCS where the input files are stored.")
-  private final String sourcePath;
-
+  private String sourcePath;
   @Name(ActionConstants.DESTINATION_PATH)
   @Macro
   @Description("Path to the location of the directory on GCS where output files should be stored.")
-  private final String destinationPath;
-
+  private String destinationPath;
   @Name(CloudVisionConstants.MIME_TYPE)
   @Description("Document type.")
   private final String mimeType;
-
   @Name(ActionConstants.BATCH_SIZE)
   @Description("The max number of responses.")
   private final Integer batchSize;
-
   @Name(CloudVisionConstants.LANGUAGE_HINTS)
   @Nullable
   @Description("Optional hints to provide to Cloud Vision API.")
   private final String languageHints;
+  @Name(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
+  @Description("Path on the local file system of the service account key used "
+          + "for authorization. Can be set to 'auto-detect' when running on a Dataproc cluster. "
+          + "When running on other clusters, the file must be present on every node in the cluster.")
+  @Macro
+  private String serviceFilePath;
 
-  public TextExtractorActionConfig(String serviceFilePath, String sourcePath, String destinationPath, String mimeType,
-                                   Integer batchSize, @Nullable String languageHints) {
+  public OfflineTextExtractorActionConfig(String serviceFilePath, String sourcePath,
+                                          String destinationPath, String mimeType,
+                                          Integer batchSize, @Nullable String languageHints) {
     this.serviceFilePath = serviceFilePath;
     this.sourcePath = sourcePath;
     this.destinationPath = destinationPath;
@@ -74,7 +69,7 @@ public class TextExtractorActionConfig extends PluginConfig {
     this.languageHints = languageHints;
   }
 
-  private TextExtractorActionConfig(Builder builder) {
+  private OfflineTextExtractorActionConfig(Builder builder) {
     serviceFilePath = builder.serviceFilePath;
     sourcePath = builder.sourcePath;
     destinationPath = builder.destinationPath;
@@ -87,7 +82,13 @@ public class TextExtractorActionConfig extends PluginConfig {
     return new Builder();
   }
 
-  public static Builder builder(TextExtractorActionConfig copy) {
+  /**
+   * Helper function to get a Builder object based on an existing configuration.
+   *
+   * @param copy Configuration object to use as the source to copy from.
+   * @return Builer object.
+   */
+  public static Builder builder(OfflineTextExtractorActionConfig copy) {
     Builder builder = new Builder();
 
     builder.setServiceFilePath(copy.getServiceFilePath());
@@ -106,7 +107,8 @@ public class TextExtractorActionConfig extends PluginConfig {
 
   @Nullable
   public String getServiceAccountFilePath() {
-    if (containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH) || Strings.isNullOrEmpty(serviceFilePath)) {
+    if (containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
+            || Strings.isNullOrEmpty(serviceFilePath)) {
       return null;
     }
 
@@ -142,25 +144,39 @@ public class TextExtractorActionConfig extends PluginConfig {
     return Collections.emptyList();
   }
 
+  public void setSourcePath(String sourcePath) {
+    this.sourcePath = sourcePath;
+  }
+
+  public void setDestinationPath(String destinationPath) {
+    this.destinationPath = destinationPath;
+  }
+
+  /**
+   * Validate that the configuration is correct. If not, use the FailureCollector object passed to report errors.
+   *
+   * @param collector FailureCollector object to use to report errors.
+   */
   public void validate(FailureCollector collector) {
-    if (!containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH) && Strings.isNullOrEmpty(serviceFilePath)) {
+    if (!containsMacro(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH)
+            && Strings.isNullOrEmpty(serviceFilePath)) {
       collector.addFailure("Service account file path must be specified.", null)
-        .withConfigProperty(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
+              .withConfigProperty(CloudVisionConstants.SERVICE_ACCOUNT_FILE_PATH);
     }
 
     if (!containsMacro(ActionConstants.SOURCE_PATH) && Strings.isNullOrEmpty(sourcePath)) {
       collector.addFailure("Source path must be specified.", null)
-        .withConfigProperty(ActionConstants.SOURCE_PATH);
+              .withConfigProperty(ActionConstants.SOURCE_PATH);
     }
 
     if (!containsMacro(ActionConstants.DESTINATION_PATH) && Strings.isNullOrEmpty(destinationPath)) {
       collector.addFailure("Destination path must be specified.", null)
-        .withConfigProperty(ActionConstants.DESTINATION_PATH);
+              .withConfigProperty(ActionConstants.DESTINATION_PATH);
     }
   }
 
   /**
-   * Builder for creating a {@link TextExtractorActionConfig}.
+   * Builder for creating a {@link OfflineTextExtractorActionConfig}.
    */
   public static final class Builder {
     private String serviceFilePath;
@@ -205,8 +221,8 @@ public class TextExtractorActionConfig extends PluginConfig {
       return this;
     }
 
-    public TextExtractorActionConfig build() {
-      return new TextExtractorActionConfig(this);
+    public OfflineTextExtractorActionConfig build() {
+      return new OfflineTextExtractorActionConfig(this);
     }
   }
 }

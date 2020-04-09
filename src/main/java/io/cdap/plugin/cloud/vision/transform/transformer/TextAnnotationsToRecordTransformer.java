@@ -35,19 +35,40 @@ public class TextAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link TextAnnotationSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractTextAnnotations(annotateImageResponse))
-      .build();
+            .set(outputFieldName, extractTextAnnotations(annotateImageResponse))
+            .build();
   }
 
+  /**
+   * Extract a {@link List} of {@link StructuredRecord} containing the text information from a
+   * {@link AnnotateImageResponse} input using a {@link Schema} for the mapping.
+   *
+   * @param annotateImageResponse The {@link AnnotateImageResponse} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private List<StructuredRecord> extractTextAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getTextAnnotationsList().stream()
-      .map(this::extractTextAnnotationRecord)
-      .collect(Collectors.toList());
+            .map(this::extractTextAnnotationRecord)
+            .collect(Collectors.toList());
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the text annotation information from a
+   * {@link EntityAnnotation} input using a {@link Schema} for the mapping.
+   *
+   * @param annotation The {@link EntityAnnotation} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractTextAnnotationRecord(EntityAnnotation annotation) {
     Schema textSchema = getTextAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(textSchema);
@@ -61,8 +82,8 @@ public class TextAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
       List<StructuredRecord> position = annotation.getBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
       builder.set(TextAnnotationSchema.POSITION_FIELD_NAME, position);
     }
 

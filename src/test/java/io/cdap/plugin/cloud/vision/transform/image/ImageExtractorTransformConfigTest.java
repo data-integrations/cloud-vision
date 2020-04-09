@@ -35,17 +35,17 @@ public class ImageExtractorTransformConfigTest extends ExtractorTransformConfigT
   @Override
   protected ImageExtractorTransformConfigBuilder getValidConfigBuilder() {
     return ImageExtractorTransformConfigBuilder.builder()
-      .setPathField("path")
-      .setOutputField("extracted")
-      .setFeatures(ImageFeature.FACE.getDisplayName())
-      .setSchema(VALID_SCHEMA.toString());
+            .setPathField("path")
+            .setOutputField("extracted")
+            .setFeatures(ImageFeature.FACE.getDisplayName())
+            .setSchema(VALID_SCHEMA.toString());
   }
 
   @Test
   public void testValidatePathFieldNull() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setPathField(null)
-      .build();
+            .setPathField(null)
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -55,8 +55,8 @@ public class ImageExtractorTransformConfigTest extends ExtractorTransformConfigT
   @Test
   public void testValidatePathFieldEmpty() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setPathField("")
-      .build();
+            .setPathField("")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);
@@ -66,14 +66,14 @@ public class ImageExtractorTransformConfigTest extends ExtractorTransformConfigT
   @Test
   public void testValidateBoundingPoly() throws Exception {
     String polyJson = "{ \"vertices\": [ " +
-      "{ \"y\": 520 }, " +
-      "{ \"x\": 2369, \"y\": 520 }, " +
-      "{ \"x\": 2369, \"y\": 1729 }, " +
-      "{ \"y\": 1729 } " +
-      "] }";
+            "{ \"y\": 520 }, " +
+            "{ \"x\": 2369, \"y\": 520 }, " +
+            "{ \"x\": 2369, \"y\": 1729 }, " +
+            "{ \"y\": 1729 } " +
+            "] }";
     ImageExtractorTransformConfig config = getValidConfigBuilder()
-      .setBoundingPolygon(polyJson)
-      .build();
+            .setBoundingPolygon(polyJson)
+            .build();
 
     BoundingPoly.Builder builder = BoundingPoly.newBuilder();
     JsonFormat.parser().ignoringUnknownFields().merge(polyJson, builder);
@@ -87,8 +87,8 @@ public class ImageExtractorTransformConfigTest extends ExtractorTransformConfigT
   @Test
   public void testValidateBoundingPolyInvalid() {
     ExtractorTransformConfig config = getValidConfigBuilder()
-      .setBoundingPolygon("invalid json")
-      .build();
+            .setBoundingPolygon("invalid json")
+            .build();
 
     MockFailureCollector failureCollector = new MockFailureCollector(MOCK_STAGE);
     config.validate(failureCollector);

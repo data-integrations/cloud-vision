@@ -20,14 +20,15 @@ import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.FaceAnnotation;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
+import io.cdap.plugin.cloud.vision.transform.schema.ColorInfoSchema;
 import io.cdap.plugin.cloud.vision.transform.schema.FaceAnnotationSchema;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 /**
- * Transforms face annotations of specified {@link AnnotateImageResponse} to {@link StructuredRecord} according to
- * the specified schema.
+ * Transforms face annotations of specified {@link AnnotateImageResponse} to
+ * {@link StructuredRecord} according to the specified schema.
  */
 public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordTransformer {
 
@@ -35,19 +36,39 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link FaceAnnotationSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
-    return getOutputRecordBuilder(input)
-      .set(outputFieldName, extractFaceAnnotations(annotateImageResponse))
-      .build();
+    StructuredRecord.Builder builder = getOutputRecordBuilder(input);
+    List<StructuredRecord> extracted = extractFaceAnnotations(annotateImageResponse);
+    return builder.set(outputFieldName, extracted).build();
   }
 
+  /**
+   * Extract a complete {@link List} of {@link StructuredRecord} objects mapped from the {@link AnnotateImageResponse}
+   * passed in, using the {@link FaceAnnotationSchema}.
+   *
+   * @param annotateImageResponse Input {@link AnnotateImageResponse} object to get the data from.
+   * @return {@link List} containing the {@link StructuredRecord} mapped from the input.
+   */
   private List<StructuredRecord> extractFaceAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getFaceAnnotationsList().stream()
-      .map(this::extractFaceAnnotationRecord)
-      .collect(Collectors.toList());
+            .map(this::extractFaceAnnotationRecord)
+            .collect(Collectors.toList());
   }
 
+  /**
+   * Extract a {@link StructuredRecord} from a {@link FaceAnnotation} input.
+   *
+   * @param annotation The {@link FaceAnnotation} object to get the data from.
+   * @return {@link StructuredRecord} containing the data mapped to the {@link Schema}.
+   */
   private StructuredRecord extractFaceAnnotationRecord(FaceAnnotation annotation) {
     Schema faceSchema = getFaceAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(faceSchema);
@@ -62,11 +83,11 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
     }
     if (faceSchema.getField(FaceAnnotationSchema.DETECTION_CONFIDENCE_FIELD_NAME) != null) {
       builder.set(FaceAnnotationSchema.DETECTION_CONFIDENCE_FIELD_NAME,
-        annotation.getDetectionConfidence());
+              annotation.getDetectionConfidence());
     }
     if (faceSchema.getField(FaceAnnotationSchema.LANDMARKING_CONFIDENCE_FIELD_NAME) != null) {
       builder.set(FaceAnnotationSchema.LANDMARKING_CONFIDENCE_FIELD_NAME,
-        annotation.getLandmarkingConfidence());
+              annotation.getLandmarkingConfidence());
     }
     if (faceSchema.getField(FaceAnnotationSchema.ANGER_FIELD_NAME) != null) {
       builder.set(FaceAnnotationSchema.ANGER_FIELD_NAME, annotation.getAngerLikelihood().name());
@@ -90,34 +111,41 @@ public class FaceAnnotationsToRecordTransformer extends ImageAnnotationToRecordT
       String surprise = annotation.getSurpriseLikelihood().name();
       builder.set(FaceAnnotationSchema.SURPRISE_FIELD_NAME, surprise);
     }
-    Schema.Field positionField = faceSchema.getField(FaceAnnotationSchema.POSITION_FIELD_NAME);
+    Schema.Field positionField = faceSchema.getField(FaceAnnotationSchema.BOUNDING_POLY_NAME);
     if (positionField != null) {
       Schema positionSchema = getComponentSchema(positionField);
       List<StructuredRecord> position = annotation.getBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
-      builder.set(FaceAnnotationSchema.POSITION_FIELD_NAME, position);
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
+      builder.set(FaceAnnotationSchema.BOUNDING_POLY_NAME, position);
     }
-    Schema.Field fdPositionField = faceSchema.getField(FaceAnnotationSchema.FD_POSITION_FIELD_NAME);
+    Schema.Field fdPositionField = faceSchema.getField(FaceAnnotationSchema.FD_BOUNDING_POLY_NAME);
     if (fdPositionField != null) {
       Schema positionSchema = getComponentSchema(fdPositionField);
       List<StructuredRecord> position = annotation.getFdBoundingPoly().getVerticesList().stream()
-        .map(v -> extractVertex(v, positionSchema))
-        .collect(Collectors.toList());
-      builder.set(FaceAnnotationSchema.FD_POSITION_FIELD_NAME, position);
+              .map(v -> extractVertex(v, positionSchema))
+              .collect(Collectors.toList());
+      builder.set(FaceAnnotationSchema.FD_BOUNDING_POLY_NAME, position);
     }
     Schema.Field landmarksField = faceSchema.getField(FaceAnnotationSchema.LANDMARKS_FIELD_NAME);
     if (landmarksField != null) {
       Schema landmarkSchema = getComponentSchema(landmarksField);
       List<StructuredRecord> position = annotation.getLandmarksList().stream()
-        .map(v -> extractLandmark(v, landmarkSchema))
-        .collect(Collectors.toList());
+              .map(v -> extractLandmark(v, landmarkSchema))
+              .collect(Collectors.toList());
       builder.set(FaceAnnotationSchema.LANDMARKS_FIELD_NAME, position);
     }
 
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} from a {@link FaceAnnotation} input.
+   *
+   * @param landmark The {@link FaceAnnotation.Landmark} object to get the data from.
+   * @param schema   The {@link Schema} to use for the mapping.
+   * @return {@link StructuredRecord} containing the data mapped to the {@link Schema}.
+   */
   private StructuredRecord extractLandmark(FaceAnnotation.Landmark landmark, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FaceAnnotationSchema.FaceLandmark.TYPE_FIELD_NAME) != null) {

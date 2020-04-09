@@ -31,21 +31,22 @@ import java.util.List;
 public class BaseAnnotationsToRecordTransformerTest {
 
   protected static final Schema INPUT_RECORD_SCHEMA = Schema.recordOf(
-    "input-record-schema",
-    Schema.Field.of("path", Schema.of(Schema.Type.STRING)));
+          "input-record-schema",
+          Schema.Field.of("path", Schema.of(Schema.Type.STRING)));
 
-  protected static final StructuredRecord INPUT_RECORD = StructuredRecord.builder(INPUT_RECORD_SCHEMA)
-    .set("path", "gs://dummy/image.png")
-    .build();
+  protected static final StructuredRecord INPUT_RECORD = StructuredRecord
+          .builder(INPUT_RECORD_SCHEMA)
+          .set("path", "gs://dummy/image.png")
+          .build();
 
   protected static final BoundingPoly POSITION = BoundingPoly.newBuilder()
-    .addAllVertices(Arrays.asList(
-      Vertex.newBuilder().setX(0).setY(0).build(),
-      Vertex.newBuilder().setX(100).setY(0).build(),
-      Vertex.newBuilder().setX(100).setY(100).build(),
-      Vertex.newBuilder().setX(0).setY(100).build()
-    ))
-    .build();
+          .addAllVertices(Arrays.asList(
+                  Vertex.newBuilder().setX(0).setY(0).build(),
+                  Vertex.newBuilder().setX(100).setY(0).build(),
+                  Vertex.newBuilder().setX(100).setY(100).build(),
+                  Vertex.newBuilder().setX(0).setY(100).build()
+          ))
+          .build();
 
   protected static final int SINGLE_FEATURE_INDEX = 0;
   protected static final double DELTA = 0.0001;

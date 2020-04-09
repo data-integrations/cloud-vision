@@ -24,7 +24,11 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConfig;
+import io.cdap.plugin.cloud.vision.transform.document.DocumentExtractorTransform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +42,7 @@ import javax.annotation.Nullable;
 public class ExtractorTransformConfig extends CloudVisionConfig {
 
   public static final Schema ERROR_SCHEMA = Schema.recordOf("error",
-    Schema.Field.of("error", Schema.of(Schema.Type.STRING)));
+          Schema.Field.of("error", Schema.of(Schema.Type.STRING)));
 
   @Name(ExtractorTransformConstants.PATH_FIELD)
   @Description("Field in the input schema containing the path to the image.")
@@ -46,9 +50,8 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
   private String pathField;
 
   @Name(ExtractorTransformConstants.OUTPUT_FIELD)
-  @Description("Field to store the extracted image features. If the specified output field name already exists " +
-    "in the input record, it will be overwritten.")
-  @Macro
+  @Description("Field to store the extracted image features. If the specified output field name already exists "
+          + "in the input record, it will be overwritten.")
   private String outputField;
 
   @Name(ExtractorTransformConstants.FEATURES)
@@ -92,6 +95,51 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
     this.schema = schema;
   }
 
+  /**
+   * Validate that the provided schema is compatible with the inferred schema. The provided schema is compatible if
+   * every field is compatible with the corresponding field in the inferred schema. A field is compatible if it is of
+   * the same type or is a nullable version of that type. It is assumed that both schemas are record schemas.
+   *
+   * @param inferredSchema the inferred schema
+   * @param providedSchema the provided schema to check compatibility
+   * @param collector      failure collector
+   * @throws IllegalArgumentException if the schemas are not type compatible
+   */
+  public static void validateFieldsMatch(Schema inferredSchema, Schema providedSchema, FailureCollector collector) {
+    for (Schema.Field field : providedSchema.getFields()) {
+      Schema.Field inferredField = inferredSchema.getField(field.getName());
+      Schema inferredFieldSchema = inferredField.getSchema();
+      Schema providedFieldSchema = field.getSchema();
+
+      boolean isInferredFieldNullable = inferredFieldSchema.isNullable();
+      boolean isProvidedFieldNullable = providedFieldSchema.isNullable();
+
+      Schema inferredFieldNonNullableSchema = isInferredFieldNullable
+              ? inferredFieldSchema.getNonNullable() : inferredFieldSchema;
+      Schema providedFieldNonNullableSchema = isProvidedFieldNullable
+              ? providedFieldSchema.getNonNullable() : providedFieldSchema;
+
+      Schema.Type inferredType = inferredFieldNonNullableSchema.getType();
+      Schema.LogicalType inferredLogicalType = inferredFieldNonNullableSchema.getLogicalType();
+      Schema.Type providedType = providedFieldNonNullableSchema.getType();
+      Schema.LogicalType providedLogicalType = providedFieldNonNullableSchema.getLogicalType();
+      if (inferredType != providedType && inferredLogicalType != providedLogicalType) {
+        String errorMessage = String.format("Expected field '%s' to be of type '%s', but it is of type '%s'",
+                field.getName(), inferredFieldNonNullableSchema.getDisplayName(),
+                providedFieldNonNullableSchema.getDisplayName());
+
+        collector.addFailure(errorMessage, String.format("Change field '%s' to be a supported type", field.getName()))
+                .withOutputSchemaField(field.getName(), null);
+      }
+
+      if (!isInferredFieldNullable && isProvidedFieldNullable) {
+        String errorMessage = String.format("Field '%s' should not be nullable", field.getName());
+        collector.addFailure(errorMessage, String.format("Change field '%s' to be non-nullable", field.getName()))
+                .withOutputSchemaField(field.getName(), null);
+      }
+    }
+  }
+
   public String getPathField() {
     return pathField;
   }
@@ -133,8 +181,8 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
     }
 
     return Arrays.stream(aspectRatios.split(","))
-      .map(Float::valueOf)
-      .collect(Collectors.toList());
+            .map(Float::valueOf)
+            .collect(Collectors.toList());
   }
 
   @Nullable
@@ -166,60 +214,15 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
   public void validate(FailureCollector collector) {
     if (!containsMacro(ExtractorTransformConstants.OUTPUT_FIELD) && Strings.isNullOrEmpty(outputField)) {
       collector.addFailure("Output field must be specified", null)
-        .withConfigProperty(ExtractorTransformConstants.OUTPUT_FIELD);
+              .withConfigProperty(ExtractorTransformConstants.OUTPUT_FIELD);
     }
     if (!containsMacro(ExtractorTransformConstants.FEATURES)) {
       if (Strings.isNullOrEmpty(features)) {
         collector.addFailure("Features must be specified", null)
-          .withConfigProperty(ExtractorTransformConstants.FEATURES);
+                .withConfigProperty(ExtractorTransformConstants.FEATURES);
       } else if (ImageFeature.fromDisplayName(features) == null) {
         collector.addFailure("Invalid image feature name", null)
-          .withConfigProperty(ExtractorTransformConstants.FEATURES);
-      }
-    }
-  }
-
-  /**
-   * Validate that the provided schema is compatible with the inferred schema. The provided schema is compatible if
-   * every field is compatible with the corresponding field in the inferred schema. A field is compatible if it is of
-   * the same type or is a nullable version of that type. It is assumed that both schemas are record schemas.
-   *
-   * @param inferredSchema the inferred schema
-   * @param providedSchema the provided schema to check compatibility
-   * @param collector      failure collector
-   * @throws IllegalArgumentException if the schemas are not type compatible
-   */
-  public static void validateFieldsMatch(Schema inferredSchema, Schema providedSchema, FailureCollector collector) {
-    for (Schema.Field field : providedSchema.getFields()) {
-      Schema.Field inferredField = inferredSchema.getField(field.getName());
-      Schema inferredFieldSchema = inferredField.getSchema();
-      Schema providedFieldSchema = field.getSchema();
-
-      boolean isInferredFieldNullable = inferredFieldSchema.isNullable();
-      boolean isProvidedFieldNullable = providedFieldSchema.isNullable();
-
-      Schema inferredFieldNonNullableSchema = isInferredFieldNullable
-        ? inferredFieldSchema.getNonNullable() : inferredFieldSchema;
-      Schema providedFieldNonNullableSchema = isProvidedFieldNullable ?
-        providedFieldSchema.getNonNullable() : providedFieldSchema;
-
-      Schema.Type inferredType = inferredFieldNonNullableSchema.getType();
-      Schema.LogicalType inferredLogicalType = inferredFieldNonNullableSchema.getLogicalType();
-      Schema.Type providedType = providedFieldNonNullableSchema.getType();
-      Schema.LogicalType providedLogicalType = providedFieldNonNullableSchema.getLogicalType();
-      if (inferredType != providedType && inferredLogicalType != providedLogicalType) {
-        String errorMessage = String.format("Expected field '%s' to be of type '%s', but it is of type '%s'",
-          field.getName(), inferredFieldNonNullableSchema.getDisplayName(),
-          providedFieldNonNullableSchema.getDisplayName());
-
-        collector.addFailure(errorMessage, String.format("Change field '%s' to be a supported type", field.getName()))
-          .withOutputSchemaField(field.getName(), null);
-      }
-
-      if (!isInferredFieldNullable && isProvidedFieldNullable) {
-        String errorMessage = String.format("Field '%s' should not be nullable", field.getName());
-        collector.addFailure(errorMessage, String.format("Change field '%s' to be non-nullable", field.getName()))
-          .withOutputSchemaField(field.getName(), null);
+                .withConfigProperty(ExtractorTransformConstants.FEATURES);
       }
     }
   }
