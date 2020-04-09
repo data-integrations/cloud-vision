@@ -1,0 +1,2 @@
+gs://vision-api-pbo2/pdfs/Google-Cloud-Platform.pdf
+gs://vision-api-pbo2/pdfs/vision_document_understanding_custom_0773375000.pdf
