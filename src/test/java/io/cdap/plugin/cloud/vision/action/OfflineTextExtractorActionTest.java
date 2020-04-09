@@ -28,20 +28,19 @@ import com.google.gson.JsonParser;
 import io.cdap.cdap.etl.api.action.ActionContext;
 import io.cdap.cdap.etl.mock.action.MockActionContext;
 import io.cdap.plugin.cloud.vision.CredentialsHelper;
-import io.cdap.plugin.cloud.vision.source.GCSPath;
+import io.cdap.plugin.gcp.gcs.GCSPath;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import javax.annotation.Nullable;
 
 /**
- * Test class for {@link TextExtractorAction}.
+ * Test class for {@link OfflineTextExtractorAction}.
  */
-public class TextExtractorActionTest {
+public class OfflineTextExtractorActionTest {
   protected static final String PROJECT = System.getProperty("project", "auto-detect");
   protected static final String SERVICE_ACCOUNT_FILE_PATH = System.getProperty("serviceFilePath", "auto-detect");
   protected static final String PATH = System.getProperty("path", "gs://cloud-vision-cdap-text-offline");
@@ -94,7 +93,7 @@ public class TextExtractorActionTest {
 
   @Test
   public void testRun() throws Exception {
-    TextExtractorActionConfig config = new TextExtractorActionConfig(
+    OfflineTextExtractorActionConfig config = new OfflineTextExtractorActionConfig(
       SERVICE_ACCOUNT_FILE_PATH,
       PDF_FILE_PATH,
       RESULT_FOLDER_PATH,
@@ -103,7 +102,7 @@ public class TextExtractorActionTest {
       null
     );
 
-    TextExtractorAction action = new TextExtractorAction(config);
+    OfflineTextExtractorAction action = new OfflineTextExtractorAction(config);
     ActionContext context = new MockActionContext();
     action.run(context);
 
@@ -144,6 +143,9 @@ public class TextExtractorActionTest {
   }
 
   private static void deleteBucket(Storage storage, Bucket bucket) {
+    if (bucket == null || bucket.list() == null) {
+      return;
+    }
     for (Blob blob : bucket.list().iterateAll()) {
       storage.delete(blob.getBlobId());
     }

@@ -40,6 +40,13 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link FullTextAnnotationSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     TextAnnotation annotation = annotateImageResponse.getFullTextAnnotation();
@@ -48,6 +55,13 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
       .build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the handwriting information from a {@link TextAnnotation} input
+   * using a {@link io.cdap.plugin.cloud.vision.transform.schema.TextAnnotationSchema}.
+   *
+   * @param annotation A {@link TextAnnotation} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractHandwritingAnnotation(TextAnnotation annotation) {
     Schema hwSchema = getHandwritingAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(hwSchema);
@@ -67,6 +81,14 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the page information from a {@link Page} input
+   * using a {@link Schema} for the mapping.
+   *
+   * @param page   The {@link Page} object containing the data.
+   * @param schema The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractPage(Page page, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextPage.TEXT_FIELD_NAME) != null) {
@@ -114,6 +136,14 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the block information from a {@link Block} input
+   * using a {@link Schema} for the mapping.
+   *
+   * @param block  The {@link Block} object containing the data.
+   * @param schema The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractBlock(Block block, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextBlock.TEXT_FIELD_NAME) != null) {
@@ -164,6 +194,14 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the paragraph information from a {@link Paragraph} input
+   * using a {@link Schema} for the mapping.
+   *
+   * @param paragraph The {@link Paragraph} object containing the data.
+   * @param schema    The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractParagraph(Paragraph paragraph, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextParagraph.TEXT_FIELD_NAME) != null) {
@@ -209,6 +247,14 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the paragraph information from a {@link Word} input
+   * using a {@link Schema} for the mapping.
+   *
+   * @param word   The {@link Word} object containing the data.
+   * @param schema The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWord(Word word, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextWord.TEXT_FIELD_NAME) != null) {
@@ -252,6 +298,14 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the paragraph information from a {@link Symbol} input
+   * using a {@link Schema} for the mapping.
+   *
+   * @param symbol The {@link Symbol} object containing the data.
+   * @param schema The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractSymbol(Symbol symbol, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(FullTextAnnotationSchema.TextSymbol.TEXT_FIELD_NAME) != null) {
@@ -284,10 +338,18 @@ public class FullTextAnnotationsToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the detected language information from a
+   * {@link TextAnnotation.DetectedLanguage} input using a {@link Schema} for the mapping.
+   *
+   * @param language The {@link Symbol} object containing the data.
+   * @param schema   The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractDetectedLanguage(TextAnnotation.DetectedLanguage language, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
-    if (schema.getField(FullTextAnnotationSchema.DetectedLanguage.CODE_FIELD_NAME) != null) {
-      builder.set(FullTextAnnotationSchema.DetectedLanguage.CODE_FIELD_NAME, language.getLanguageCode());
+    if (schema.getField(FullTextAnnotationSchema.DetectedLanguage.LANGUAGE_CODE_FIELD_NAME) != null) {
+      builder.set(FullTextAnnotationSchema.DetectedLanguage.LANGUAGE_CODE_FIELD_NAME, language.getLanguageCode());
     }
     if (schema.getField(FullTextAnnotationSchema.DetectedLanguage.CONFIDENCE_FIELD_NAME) != null) {
       builder.set(FullTextAnnotationSchema.DetectedLanguage.CONFIDENCE_FIELD_NAME, language.getConfidence());

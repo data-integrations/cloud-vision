@@ -55,27 +55,21 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   private ImageExtractorTransformConfig config;
   private Schema inputSchema;
 
-  public ImageExtractorTransform(ImageExtractorTransformConfig config) {
-    this.config = config;
-  }
-
   @Override
   public void configurePipeline(PipelineConfigurer configurer) throws IllegalArgumentException {
     super.configurePipeline(configurer);
-    inputSchema = configurer.getStageConfigurer().getInputSchema();
+
     StageConfigurer stageConfigurer = configurer.getStageConfigurer();
+    inputSchema = stageConfigurer.getInputSchema();
     FailureCollector collector = stageConfigurer.getFailureCollector();
     config.validate(collector);
     collector.getOrThrowException();
-    Schema schema = getSchema();
-    Schema configuredSchema = config.getParsedSchema();
-    if (configuredSchema == null) {
-      configurer.getStageConfigurer().setOutputSchema(schema);
-      return;
-    }
-    ExtractorTransformConfig.validateFieldsMatch(schema, configuredSchema, collector);
+
+    config.validateInputSchema(inputSchema, collector);
     collector.getOrThrowException();
-    configurer.getStageConfigurer().setOutputSchema(configuredSchema);
+
+    Schema outputSchema = getOutputSchema(inputSchema);
+    configurer.getStageConfigurer().setOutputSchema(outputSchema);
     configurer.getStageConfigurer().setErrorSchema(ExtractorTransformConfig.ERROR_SCHEMA);
   }
 
@@ -90,8 +84,8 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
   @Override
   public void initialize(TransformContext context) throws Exception {
     super.initialize(context);
-    Schema schema = context.getOutputSchema();
-    transformer = TransformerFactory.createInstance(config.getImageFeature(), config.getOutputField(), schema);
+    transformer = TransformerFactory.createInstance(config.getImageFeature(), config.getOutputField(),
+      context.getOutputSchema());
     imageAnnotatorClient = new ImageAnnotatorClient(config);
   }
 
@@ -110,13 +104,21 @@ public class ImageExtractorTransform extends Transform<StructuredRecord, Structu
     }
   }
 
-  public Schema getSchema() {
+  /**
+   * Get the output Schema to use by combining the input Schema from CDAP and add the fields needed to store the
+   * information coming back from the cloud vision API.
+   *
+   * @return {@link Schema}
+   */
+  protected Schema getOutputSchema(Schema inputSchema) {
     List<Schema.Field> fields = new ArrayList<>();
-    if (inputSchema.getFields() != null) {
+    // Add the input fields
+    if (inputSchema != null && inputSchema.getFields() != null) {
       fields.addAll(inputSchema.getFields());
     }
-
+    // Add the fields of the image feature schema
     fields.add(Schema.Field.of(config.getOutputField(), config.getImageFeature().getSchema()));
+    // Build a schema combining all
     return Schema.recordOf("record", fields);
   }
 }

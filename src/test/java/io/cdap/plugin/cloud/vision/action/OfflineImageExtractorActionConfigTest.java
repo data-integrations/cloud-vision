@@ -23,7 +23,6 @@ import io.cdap.plugin.cloud.vision.CloudVisionConstants;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -120,6 +119,30 @@ public class OfflineImageExtractorActionConfigTest {
 
     config.validate(collector);
     assertValidationFailed(collector, paramNames);
+  }
+
+  @Test
+  public void testValidateOneLanguageHint() {
+    // Those are all the language ids retrieved from 'widgets/DocumentExtractor-transform.json'
+    String[] languages = new String[]{"af", "sq", "ar", "hy", "be", "bn", "bg", "ca", "zh", "hr", "cs", "da", "nl",
+      "en", "et", "fil", "fi", "fr", "de", "el", "gu", "iw", "hu", "is", "id", "it", "ja", "kn", "km", "ko", "lo",
+      "lv", "lt", "mk", "ms", "ml", "mr", "ne", "no", "fa", "pl", "pt", "pa", "ro", "ru", "ru-PETR1708", "sr",
+      "sr-Latn", "sk", "sl", "es", "sv", "ta", "te", "th", "tr", "uk", "vi", "yi"};
+
+    MockFailureCollector collector = new MockFailureCollector(MOCK_STAGE);
+    List<List<String>> paramNames = Collections.singletonList(
+      Collections.singletonList(ActionConstants.LANGUAGE_HINTS)
+    );
+
+    // Validate the languages one by one
+    for (String language : languages) {
+      OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(VALID_CONFIG)
+        .setFeatures(ImageFeature.TEXT.getDisplayName())
+        .setLanguageHints(language)
+        .build();
+      config.validate(collector);
+    }
+    Assert.assertTrue(collector.getValidationFailures().isEmpty());
   }
 
   private void assertValidationFailed(MockFailureCollector failureCollector, List<List<String>> paramNames) {

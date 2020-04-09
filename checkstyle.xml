@@ -17,7 +17,7 @@
 
 <!DOCTYPE module PUBLIC
     "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
-    "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+    "http://checkstyle.sourceforge.net/dtds/configuration_1_3.dtd">
 
 <!-- This is a checkstyle configuration file. For descriptions of
 what the following rules do, please see the checkstyle configuration
@@ -55,7 +55,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
   </module>
 
   <module name="RegexpSingleline">
-    <!-- Checks that TODOs are named with some basic formatting. Checks for the following pattern  TODO: ( 
+    <!-- Checks that TODOs are named with some basic formatting. Checks for the following pattern  TODO: (
     -->
     <property name="format" value="((//.*)|(\*.*))TODO[^: (]" />
     <property name="message" value='All TODOs should be named.  e.g. "TODO: (ENG-123) - Refactor when v2 is released."' />
@@ -69,9 +69,6 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
   <!-- All Java AST specific tests live under TreeWalker module. -->
   <module name="TreeWalker">
-
-    <!-- required for SupressionCommentFilter and SuppressWithNearbyCommentFilter -->
-    <module name="FileContentsHolder"/>
 
     <!--
 
@@ -114,8 +111,8 @@ page at http://checkstyle.sourceforge.net/config.html -->
       <property name="max" value="300"/>
       <property name="countEmpty" value="false"/>
       <property name="severity" value="warning"/>
-   </module>
-   
+    </module>
+
     <!--
 
     JAVADOC CHECKS
@@ -385,22 +382,4 @@ page at http://checkstyle.sourceforge.net/config.html -->
     </module>
 
   </module>
-
-  <!--
-    Optional suppression filter. It is optional because when running with Maven, it should be the
-     checkstyle plugin who provides it. It is only used when this file is used in IntelliJ.
-    -->
-
-  <module name="SuppressionFilter">
-    <property name="file" value="suppressions.xml"/>
-    <property name="optional" value="true"/>
-  </module>
-
-  <module name="SuppressionCommentFilter">
-    <property name="offCommentFormat" value="CHECKSTYLE OFF: (.+)" />
-    <property name="onCommentFormat" value="CHECKSTYLE ON" />
-    <property name="checkFormat" value="Javadoc.*"/>
-    <property name="messageFormat" value="$1"/>
-  </module>
-
 </module>

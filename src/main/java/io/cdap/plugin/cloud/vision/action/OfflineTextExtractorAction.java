@@ -19,19 +19,16 @@ package io.cdap.plugin.cloud.vision.action;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.Credentials;
 import com.google.cloud.storage.Blob;
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.AsyncBatchAnnotateImagesRequest;
-import com.google.cloud.vision.v1.CropHintsParams;
+import com.google.cloud.vision.v1.AsyncAnnotateFileRequest;
+import com.google.cloud.vision.v1.AsyncBatchAnnotateFilesRequest;
 import com.google.cloud.vision.v1.Feature;
 import com.google.cloud.vision.v1.GcsDestination;
-import com.google.cloud.vision.v1.Image;
+import com.google.cloud.vision.v1.GcsSource;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.cloud.vision.v1.ImageAnnotatorSettings;
 import com.google.cloud.vision.v1.ImageContext;
-import com.google.cloud.vision.v1.ImageSource;
+import com.google.cloud.vision.v1.InputConfig;
 import com.google.cloud.vision.v1.OutputConfig;
-import com.google.cloud.vision.v1.WebDetectionParams;
-import com.google.common.base.Strings;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
@@ -44,26 +41,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import static io.cdap.plugin.cloud.vision.action.ActionConstants.MAX_NUMBER_OF_IMAGES_PER_BATCH;
 
 /**
- * Action that runs offline image extractor.
+ * Action that runs offline document text extractor.
  */
 @Plugin(type = Action.PLUGIN_TYPE)
-@Name(OfflineImageExtractorAction.PLUGIN_NAME)
-@Description("Action that runs offline image extractor.")
-public class OfflineImageExtractorAction extends Action {
-  public static final String PLUGIN_NAME = "OfflineImageExtractor";
-  private final OfflineImageExtractorActionConfig config;
-  private static final Logger LOG = LoggerFactory.getLogger(OfflineImageExtractorAction.class);
+@Name(OfflineTextExtractorAction.PLUGIN_NAME)
+@Description("Action that runs offline document text extractor")
+public class OfflineTextExtractorAction extends Action {
+  public static final String PLUGIN_NAME = "OfflineTextExtractor";
+  private final OfflineTextExtractorActionConfig config;
+  private static final Logger LOG = LoggerFactory.getLogger(OfflineTextExtractorAction.class);
 
-  public OfflineImageExtractorAction(OfflineImageExtractorActionConfig config) {
+  public OfflineTextExtractorAction(OfflineTextExtractorActionConfig config) {
     if (config.getSourcePath() != null) {
       config.setSourcePath(config.getSourcePath().trim()); // Remove whitespace
     }
     if (config.getDestinationPath() != null) {
-      config.setDestinationPath(config.getDestinationPath().trim()); // Remove whitespace
+      config.setDestinationPath(config.getDestinationPath().trim());
     }
     this.config = config;
   }
@@ -81,11 +77,11 @@ public class OfflineImageExtractorAction extends Action {
     config.validate(collector);
     collector.getOrThrowException();
 
-    Credentials credentials = CredentialsHelper.getCredentials(config.getServiceFilePath());
+    Credentials credentials = CredentialsHelper.getCredentials(config.getServiceAccountFilePath());
 
     // Destination in GCS where the results will be stored
     String destinationPath = config.getDestinationPath();
-    // Add a '/' at the end if it's not already there
+    // Add a / at the end if it's not already there
     if (!destinationPath.endsWith("/")) {
       destinationPath += "/";
     }
@@ -94,8 +90,8 @@ public class OfflineImageExtractorAction extends Action {
       .build();
 
     OutputConfig outputConfig = OutputConfig.newBuilder()
+      .setBatchSize(config.getBatchSize())
       .setGcsDestination(gcsDestination)
-      .setBatchSize(config.getBatchSizeValue())
       .build();
 
     ImageAnnotatorSettings imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder()
@@ -110,14 +106,14 @@ public class OfflineImageExtractorAction extends Action {
     }
 
     // Prepare the list of requests
-    List<AnnotateImageRequest> imageRequests = new ArrayList<>(blobs.size());
+    List<AsyncAnnotateFileRequest> requests = new ArrayList<>(blobs.size());
 
     // Feature we are going to ask for
     Feature feature = Feature.newBuilder()
-      .setType(config.getImageFeature().getFeatureType())
+      .setType(Feature.Type.DOCUMENT_TEXT_DETECTION)
       .build();
 
-    try (ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
+    try (ImageAnnotatorClient client = ImageAnnotatorClient.create(imageAnnotatorSettings)) {
       // Create batches of images to send for processing
       // We need to do this because there is a limit on the vision API that will raise an error if there are more
       // than MAX_NUMBER_OF_IMAGES_PER_BATCH in a single batch
@@ -131,56 +127,42 @@ public class OfflineImageExtractorAction extends Action {
           // Rebuild the full path of the blob
           String fullBlobPath = "gs://" + blob.getBucket() + "/" + blob.getName();
 
-          ImageSource imageSource = ImageSource.newBuilder().setImageUri(fullBlobPath).build();
+          GcsSource gcsSource = GcsSource.newBuilder()
+            .setUri(fullBlobPath)
+            .build();
 
-          Image image = Image.newBuilder().setSource(imageSource).build();
+          InputConfig inputConfig = InputConfig.newBuilder()
+            .setMimeType(config.getMimeType())
+            .setGcsSource(gcsSource)
+            .build();
 
-          AnnotateImageRequest.Builder builder =
-            AnnotateImageRequest.newBuilder().setImage(image).addFeatures(feature);
+          ImageContext context = ImageContext.newBuilder()
+            .addAllLanguageHints(config.getLanguageHintsList())
+            .build();
 
-          ImageContext imageContext = getImageContext();
-          if (imageContext != null) {
-            builder.setImageContext(imageContext);
-          }
+          AsyncAnnotateFileRequest request = AsyncAnnotateFileRequest.newBuilder()
+            .addFeatures(feature)
+            .setImageContext(context)
+            .setInputConfig(inputConfig)
+            .setOutputConfig(outputConfig)
+            .build();
 
-          AnnotateImageRequest annotateImageRequest = builder.build();
-          imageRequests.add(annotateImageRequest);
+          // Add this request to the list
+          requests.add(request);
         }
 
         // Send the requests
-        AsyncBatchAnnotateImagesRequest asyncRequest = AsyncBatchAnnotateImagesRequest.newBuilder()
-          .addAllRequests(imageRequests)
-          .setOutputConfig(outputConfig)
+        AsyncBatchAnnotateFilesRequest asyncRequest = AsyncBatchAnnotateFilesRequest.newBuilder()
+          .addAllRequests(requests)
           .build();
 
         // Wait for the future to complete
-        imageAnnotatorClient.asyncBatchAnnotateImagesAsync(asyncRequest)
+        client.asyncBatchAnnotateFilesAsync(asyncRequest)
           .getInitialFuture()
           .get();
       }
     } catch (Exception exception) {
       throw new IllegalStateException(exception);
-    }
-  }
-
-  @Nullable
-  protected ImageContext getImageContext() {
-    switch (config.getImageFeature()) {
-      case TEXT:
-        return Strings.isNullOrEmpty(config.getLanguageHints()) ? null
-          : ImageContext.newBuilder().addAllLanguageHints(config.getLanguages()).build();
-      case CROP_HINTS:
-        CropHintsParams cropHintsParams = CropHintsParams.newBuilder().addAllAspectRatios(config.getAspectRatiosList())
-          .build();
-        return Strings.isNullOrEmpty(config.getAspectRatios()) ? null
-          : ImageContext.newBuilder().setCropHintsParams(cropHintsParams).build();
-      case WEB_DETECTION:
-        WebDetectionParams webDetectionParams = WebDetectionParams.newBuilder()
-          .setIncludeGeoResults(config.getIncludeGeoResults())
-          .build();
-        return ImageContext.newBuilder().setWebDetectionParams(webDetectionParams).build();
-      default:
-        return null;
     }
   }
 }

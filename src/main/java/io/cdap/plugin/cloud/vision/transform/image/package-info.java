@@ -13,19 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.cdap.plugin.cloud.vision.exception;
 
 /**
- * Runtime Cloud Vision execution exception thrown when there were errors during execution of Cloud Vision requests.
+ * Contains classes to implement the Image Extraction Transform using the Cloud Vision API.
  */
-public class CloudVisionExecutionException extends RuntimeException {
-
-  public CloudVisionExecutionException(String message) {
-    super(message);
-  }
-
-  public CloudVisionExecutionException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-}
+package io.cdap.plugin.cloud.vision.transform.image;

@@ -71,18 +71,29 @@ public abstract class ImageAnnotationToRecordTransformer {
    */
   protected StructuredRecord.Builder getOutputRecordBuilder(StructuredRecord input) {
     Schema inputRecordSchema = input.getSchema();
+    // schema is the output schema
     StructuredRecord.Builder outputRecordBuilder = StructuredRecord.builder(schema);
-    for (Schema.Field field : schema.getFields()) {
-      if (inputRecordSchema.getField(field.getName()) == null) {
-        continue;
+    // Loop through the input fields and copy them to the output
+    for (Schema.Field inputField : inputRecordSchema.getFields()) {
+      if (schema.getField(inputField.getName()) == null) {
+        continue; // Not found at the output
       }
+
       // copy input record field values
-      outputRecordBuilder.set(field.getName(), input.get(field.getName()));
+      outputRecordBuilder.set(inputField.getName(), input.get(inputField.getName()));
     }
 
     return outputRecordBuilder;
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the vertex information from a
+   * {@link Vertex} input using a {@link Schema} for the mapping.
+   *
+   * @param vertex The {@link Vertex} object containing the data.
+   * @param schema The {@link Schema} to use for the mapping of the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   protected StructuredRecord extractVertex(Vertex vertex, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(VertexSchema.X_FIELD_NAME) != null) {

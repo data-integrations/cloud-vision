@@ -48,7 +48,6 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
   @Name(ExtractorTransformConstants.OUTPUT_FIELD)
   @Description("Field to store the extracted image features. If the specified output field name already exists " +
     "in the input record, it will be overwritten.")
-  @Macro
   private String outputField;
 
   @Name(ExtractorTransformConstants.FEATURES)
@@ -200,8 +199,8 @@ public class ExtractorTransformConfig extends CloudVisionConfig {
 
       Schema inferredFieldNonNullableSchema = isInferredFieldNullable
         ? inferredFieldSchema.getNonNullable() : inferredFieldSchema;
-      Schema providedFieldNonNullableSchema = isProvidedFieldNullable ?
-        providedFieldSchema.getNonNullable() : providedFieldSchema;
+      Schema providedFieldNonNullableSchema = isProvidedFieldNullable
+        ? providedFieldSchema.getNonNullable() : providedFieldSchema;
 
       Schema.Type inferredType = inferredFieldNonNullableSchema.getType();
       Schema.LogicalType inferredLogicalType = inferredFieldNonNullableSchema.getLogicalType();

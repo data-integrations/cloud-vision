@@ -54,12 +54,19 @@ public class LocalizedObjectAnnotationSchema {
    */
   public static final String POSITION_FIELD_NAME = "position";
 
+  /**
+   * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+   * that will be combined into a larger {@link Schema}.
+   *
+   * @param name {@link String} containing the name to give to the returned {@link Schema}.
+   * @return a {@link Schema} with the given name.
+   */
   public static final Schema SCHEMA = Schema.recordOf(
     "localized-object-annotation-component-record",
     Schema.Field.of(MID_FIELD_NAME, Schema.of(Schema.Type.STRING)),
     Schema.Field.of(LANGUAGE_CODE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
     Schema.Field.of(NAME_FIELD_NAME, Schema.of(Schema.Type.STRING)),
     Schema.Field.of(SCORE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-    Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA))
+    Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(VertexSchema.getSchema("localizedObjectAnnotation-position")))
   );
 }

@@ -33,6 +33,14 @@ public class SafeSearchAnnotationsToRecordTransformer extends ImageAnnotationToR
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link SafeSearchAnnotationSchema}. This {@link StructuredRecord} can then be turned into
+   * a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     SafeSearchAnnotation annotation = annotateImageResponse.getSafeSearchAnnotation();
@@ -41,6 +49,13 @@ public class SafeSearchAnnotationsToRecordTransformer extends ImageAnnotationToR
       .build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the safe search information from a
+   * {@link SafeSearchAnnotation} input using a {@link Schema} for the mapping.
+   *
+   * @param annotation The {@link SafeSearchAnnotation} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractSafeSearchAnnotation(SafeSearchAnnotation annotation) {
     Schema safeSearchAnnotationSchema = getSafeSearchAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(safeSearchAnnotationSchema);

@@ -43,12 +43,19 @@ public class ImageAnnotatorClient extends CloudVisionClient {
     this.config = config;
   }
 
+  /**
+   * @param gcsPath {@link String} that contains the path to a blon in GCS to use with the Cloud vision API.
+   * @return {@link AnnotateImageResponse} with the information requested from the cloud vision API.
+   * @throws Exception if there was an error sent back by the cloud vision API.
+   */
   public AnnotateImageResponse extractImageFeature(String gcsPath) throws Exception {
     try (com.google.cloud.vision.v1.ImageAnnotatorClient client = createImageAnnotatorClient()) {
       ImageSource imgSource = ImageSource.newBuilder().setGcsImageUri(gcsPath).build();
       Image img = Image.newBuilder().setSource(imgSource).build();
+
       Feature.Type featureType = config.getImageFeature().getFeatureType();
       Feature feature = Feature.newBuilder().setType(featureType).build();
+
       AnnotateImageRequest.Builder request = AnnotateImageRequest.newBuilder().addFeatures(feature).setImage(img);
       ImageContext imageContext = getImageContext();
       if (imageContext != null) {
@@ -56,13 +63,13 @@ public class ImageAnnotatorClient extends CloudVisionClient {
       }
 
       BatchAnnotateImagesResponse response = client.batchAnnotateImages(Collections.singletonList(request.build()));
+
       AnnotateImageResponse annotateImageResponse = response.getResponses(SINGLE_RESPONSE_INDEX);
       if (annotateImageResponse.hasError()) {
         String errorMessage = String.format("Unable to extract '%s' feature of image '%s' due to: '%s'", featureType,
           gcsPath, annotateImageResponse.getError().getMessage());
         throw new CloudVisionExecutionException(errorMessage);
       }
-
       return annotateImageResponse;
     }
   }

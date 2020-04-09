@@ -24,7 +24,6 @@ import io.cdap.plugin.cloud.vision.transform.schema.WebDetectionSchema;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
  * Transforms web detection of specified {@link AnnotateImageResponse} to {@link StructuredRecord} according
  * to the specified schema.
@@ -35,6 +34,13 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link WebDetectionSchema}. This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     WebDetection webDetection = annotateImageResponse.getWebDetection();
@@ -43,6 +49,13 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
       .build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web detection information from a
+   * {@link WebDetection} input using a {@link Schema} for the mapping.
+   *
+   * @param webDetection The {@link WebDetection} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebDetection(WebDetection webDetection) {
     Schema webSchema = getWebDetectionSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(webSchema);
@@ -103,6 +116,14 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web entity information from a
+   * {@link WebDetection.WebEntity} input using a {@link Schema} for the mapping.
+   *
+   * @param webEntity The {@link WebDetection.WebEntity} object containing the data.
+   * @param schema    The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractEntity(WebDetection.WebEntity webEntity, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.WebEntity.ENTITY_ID_FIELD_NAME) != null) {
@@ -118,6 +139,14 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web image information from a
+   * {@link WebDetection.WebImage} input using a {@link Schema} for the mapping.
+   *
+   * @param webImage The {@link WebDetection.WebImage} object containing the data.
+   * @param schema   The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebImage(WebDetection.WebImage webImage, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.WebImage.URL_FIELD_NAME) != null) {
@@ -130,6 +159,14 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web label information from a
+   * {@link WebDetection.WebLabel} input using a {@link Schema} for the mapping.
+   *
+   * @param webLabel The {@link WebDetection.WebLabel} object containing the data.
+   * @param schema   The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebLabel(WebDetection.WebLabel webLabel, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.BestGuessLabel.LABEL_FIELD_NAME) != null) {
@@ -142,6 +179,14 @@ public class WebDetectionToRecordTransformer extends ImageAnnotationToRecordTran
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the Web page information from a
+   * {@link WebDetection.WebPage} input using a {@link Schema} for the mapping.
+   *
+   * @param webPage The {@link WebDetection.WebPage} object containing the data.
+   * @param schema  The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractWebPage(WebDetection.WebPage webPage, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(WebDetectionSchema.WebPage.URL_FIELD_NAME) != null) {

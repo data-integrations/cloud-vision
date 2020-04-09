@@ -27,10 +27,11 @@ When running on other clusters, the file must be present on every node in the cl
 **Project ID**: Google Cloud Project ID, which uniquely identifies a project. It can be found on the Dashboard in the
 Google Cloud Platform Console.
 
-**Path Field**: Field in the input schema containing the path to the image.
+**Path Field**: Name of the field in the input schema containing the path to images in a Goggle Cloud Storage bucket.
+Usually this is 'body' when the source is reading a file that contains one path per line.
 
-**Output Field**: Field to store the extracted image features. If the specified output field name already exists in the
-input record, it will be overwritten.
+**Output Field**: Name of the field to store the extracted image features. If the specified output field name already
+exists in the input record, it will be overwritten.
 
 **Features**: Features to extract from images.
 

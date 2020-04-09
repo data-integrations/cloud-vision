@@ -43,7 +43,7 @@ public class FullTextAnnotationSchema {
   public static final String PAGES_FIELD_NAME = "pages";
 
   public static final Schema SCHEMA = Schema.recordOf(
-    "document-text-annotation-component-record",
+    "fullTextAnnotation",
     Schema.Field.of(TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
     Schema.Field.of(PAGES_FIELD_NAME, Schema.arrayOf(TextPage.SCHEMA)));
 
@@ -85,7 +85,7 @@ public class FullTextAnnotationSchema {
      * 2----3
      * |    |
      * 1----0
-     * and the vertice order will still be (0, 1, 2, 3).
+     * and the vertex order will still be (0, 1, 2, 3).
      */
     public static final String BOUNDING_BOX_FIELD_NAME = "boundingBox";
 
@@ -93,9 +93,11 @@ public class FullTextAnnotationSchema {
       "document-text-page-symbol-record",
       Schema.Field.of(TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
       Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(DetectedLanguage.SCHEMA))),
+      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
+        DetectedLanguage.getSchema("textSymbol-detectedLanguages")))),
       Schema.Field.of(DETECTED_BREAK_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))),
-      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA)));
+      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(
+        VertexSchema.getSchema("textSymbol-boundingBox"))));
   }
 
   /**
@@ -150,9 +152,11 @@ public class FullTextAnnotationSchema {
       Schema.Field.of(TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
       Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
       Schema.Field.of(SYMBOLS_FIELD_NAME, Schema.arrayOf(TextSymbol.SCHEMA)),
-      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(DetectedLanguage.SCHEMA))),
+      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
+        DetectedLanguage.getSchema("textWord-detectedLanguage")))),
       Schema.Field.of(DETECTED_BREAK_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))),
-      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA)));
+      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(
+        VertexSchema.getSchema("textWord-boundingBox"))));
   }
 
   /**
@@ -198,7 +202,7 @@ public class FullTextAnnotationSchema {
      * 2----3
      * |    |
      * 1----0
-     * and the vertice order will still be (0, 1, 2, 3).
+     * and the vertex order will still be (0, 1, 2, 3).
      */
     public static final String BOUNDING_BOX_FIELD_NAME = "boundingBox";
 
@@ -207,9 +211,11 @@ public class FullTextAnnotationSchema {
       Schema.Field.of(TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
       Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
       Schema.Field.of(WORDS_FIELD_NAME, Schema.arrayOf(TextWord.SCHEMA)),
-      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(DetectedLanguage.SCHEMA))),
+      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
+        DetectedLanguage.getSchema("textParagraph-detectedLanguages")))),
       Schema.Field.of(DETECTED_BREAK_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))),
-      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA)));
+      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(
+        VertexSchema.getSchema("textParagraph-boundingBox"))));
   }
 
   /**
@@ -260,7 +266,7 @@ public class FullTextAnnotationSchema {
      * 2----3
      * |    |
      * 1----0
-     * and the vertice order will still be (0, 1, 2, 3).
+     * and the vertex order will still be (0, 1, 2, 3).
      */
     public static final String BOUNDING_BOX_FIELD_NAME = "boundingBox";
 
@@ -270,9 +276,11 @@ public class FullTextAnnotationSchema {
       Schema.Field.of(BLOCK_TYPE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
       Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
       Schema.Field.of(PARAGRAPHS_FIELD_NAME, Schema.arrayOf(TextParagraph.SCHEMA)),
-      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(DetectedLanguage.SCHEMA))),
+      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
+        DetectedLanguage.getSchema("textBlock-detectedLanguages")))),
       Schema.Field.of(DETECTED_BREAK_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))),
-      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA)));
+      Schema.Field.of(BOUNDING_BOX_FIELD_NAME, Schema.arrayOf(
+        VertexSchema.getSchema("textBlock-boundingBox"))));
   }
 
   /**
@@ -306,6 +314,11 @@ public class FullTextAnnotationSchema {
     public static final String BLOCKS_FIELD_NAME = "blocks";
 
     /**
+     * Property section that contains detected languages.
+     */
+    public static final String PROPERTY_FIELD_NAME = "property";
+
+    /**
      * A list of detected languages together with confidence.
      */
     public static final String DETECTED_LANGUAGES_FIELD_NAME = "detectedLanguages";
@@ -318,11 +331,14 @@ public class FullTextAnnotationSchema {
     public static final Schema SCHEMA = Schema.recordOf(
       "document-text-page-record",
       Schema.Field.of(TEXT_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(WIDTH_FIELD_NAME, Schema.of(Schema.Type.INT)),
-      Schema.Field.of(HEIGHT_FIELD_NAME, Schema.of(Schema.Type.INT)),
+      Schema.Field.of(WIDTH_FIELD_NAME, Schema.of(Schema.Type.INT)),         //
+      Schema.Field.of(HEIGHT_FIELD_NAME, Schema.of(Schema.Type.INT)),        //
       Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)),
-      Schema.Field.of(BLOCKS_FIELD_NAME, Schema.arrayOf(TextBlock.SCHEMA)),
-      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(DetectedLanguage.SCHEMA))),
+      Schema.Field.of(BLOCKS_FIELD_NAME, Schema.arrayOf(TextBlock.SCHEMA)),  //
+      Schema.Field.of(PROPERTY_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
+        DetectedLanguage.getSchema("textPage-property")))),
+      Schema.Field.of(DETECTED_LANGUAGES_FIELD_NAME, Schema.nullableOf(Schema.arrayOf(
+        DetectedLanguage.getSchema("textPage-detectedLanguages")))),
       Schema.Field.of(DETECTED_BREAK_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))));
   }
 
@@ -333,19 +349,28 @@ public class FullTextAnnotationSchema {
   public static class DetectedLanguage {
 
     /**
-     * The BCP-47 language code, such as "en-US" or "sr-Latn". For more information, see
+     * The BCP-47 language code, such as "en-US" or "sr-Latin". For more information, see
      * http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
      */
-    public static final String CODE_FIELD_NAME = "code";
+    public static final String LANGUAGE_CODE_FIELD_NAME = "languageCode";
 
     /**
      * Confidence of detected language. Range [0, 1].
      */
     public static final String CONFIDENCE_FIELD_NAME = "confidence";
 
-    public static final Schema SCHEMA = Schema.recordOf(
-      "detected-language-record",
-      Schema.Field.of(CODE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-      Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
+    /**
+     * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+     * that will be combined into a larger {@link Schema}.
+     *
+     * @param name {@link String} containing the name to give to the returned {@link Schema}.
+     * @return a {@link Schema} with the given name.
+     */
+    public static Schema getSchema(String name) {
+      return Schema.recordOf(
+        name,
+        Schema.Field.of(LANGUAGE_CODE_FIELD_NAME, Schema.of(Schema.Type.STRING)),
+        Schema.Field.of(CONFIDENCE_FIELD_NAME, Schema.of(Schema.Type.FLOAT)));
+    }
   }
 }

@@ -190,7 +190,7 @@ public class FullTextAnnotationsToRecordTransformerTest extends BaseAnnotationsT
       actual.<Float>get(FullTextAnnotationSchema.DetectedLanguage.CONFIDENCE_FIELD_NAME),
       DELTA);
     Assert.assertEquals(expected.getLanguageCode(),
-      actual.get(FullTextAnnotationSchema.DetectedLanguage.CODE_FIELD_NAME));
+      actual.get(FullTextAnnotationSchema.DetectedLanguage.LANGUAGE_CODE_FIELD_NAME));
   }
 
   private void assertBlockEquals(Block expected, StructuredRecord actual) {

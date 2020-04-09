@@ -23,6 +23,7 @@ import io.cdap.cdap.api.data.schema.Schema;
  */
 public class TextAnnotationSchema {
 
+
   private TextAnnotationSchema() {
     throw new AssertionError("Should not instantiate static utility class.");
   }
@@ -47,5 +48,6 @@ public class TextAnnotationSchema {
     "text-annotation-component-record",
     Schema.Field.of(LOCALE_FIELD_NAME, Schema.nullableOf(Schema.of(Schema.Type.STRING))),
     Schema.Field.of(DESCRIPTION_FIELD_NAME, Schema.of(Schema.Type.STRING)),
-    Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(VertexSchema.SCHEMA)));
+    Schema.Field.of(POSITION_FIELD_NAME, Schema.arrayOf(VertexSchema.getSchema("textAnnotation-position")))
+  );
 }

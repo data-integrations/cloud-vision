@@ -23,6 +23,7 @@ import com.google.protobuf.util.JsonFormat;
 import io.cdap.cdap.api.annotation.Description;
 import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
+import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.transform.ExtractorTransformConfig;
@@ -133,4 +134,21 @@ public class ImageExtractorTransformConfig extends ExtractorTransformConfig {
       }
     }
   }
+
+  /**
+   * Validates input schema and checks for type compatibility.
+   *
+   * @param inputSchema input schema.
+   * @param collector   failure collector.
+   */
+  public void validateInputSchema(Schema inputSchema, FailureCollector collector) {
+    Schema.Field pathField = inputSchema.getField(getPathField());
+    if (pathField != null && !(pathField.getSchema().getType() == Schema.Type.STRING)) {
+      collector.addFailure(
+        String.format("Path field '%s' is expected to be a string", getPathField()),
+        null).withInputSchemaField(getPathField());
+    }
+  }
+
+
 }
