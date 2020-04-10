@@ -31,17 +31,10 @@ import java.util.List;
  */
 public class GcsBucketHelperTest {
   protected static final String PATH = System.getProperty("path", "gs://vision-api-pbo2/images");
-  protected static final String SERVICE_ACCOUNT_FILE_PATH = System.getProperty("serviceFilePath", "auto-detect");
+  protected static final String SERVICE_ACCOUNT_FILE_PATH = System.getProperty("serviceFilePath",
+    "auto-detect");
   // This is a limit imposed by the Cloud Vision API
   protected static final int MAX_NUMBER_OF_IMAGES_PER_BATCH = 2000;
-
-  @Before
-  public void setUp() throws Exception {
-  }
-
-  @After
-  public void tearDown() throws Exception {
-  }
 
   @Test
   public void getAllFilesInPath() throws Exception {

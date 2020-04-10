@@ -35,6 +35,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -48,8 +49,8 @@ public class OfflineImageExtractorActionTest {
   private static final String PROJECT = System.getProperty("project", CloudVisionConstants.AUTO_DETECT);
 
   private static final String SERVICE_ACCOUNT_FILE_PATH = System.getProperty("serviceFilePath",
-          CloudVisionConstants.AUTO_DETECT);
-  private static final String BUCKET_NAME = System.getProperty("path", "gs://cloud-vision-cdap-tests");
+    CloudVisionConstants.AUTO_DETECT);
+  private static final String PATH = System.getProperty("path", "gs://cloud-vision-cdap-tests");
   private static final String IMAGE_PATH_IN_BUCKET = "images";
 
   private static final String PATH_PATTERN = "%s/%s/";
@@ -70,40 +71,40 @@ public class OfflineImageExtractorActionTest {
   private static final String TEXT_IMAGE_NAME = "sign.jpg";
   private static final String WEB_DETECTION_IMAGE_NAME = "carnaval.jpg";
 
-  private static final String CROP_HINTS_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + CROP_HINTS_IMAGE_NAME;
-  private static final String FACE_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + FACE_IMAGE_NAME;
-  private static final String LABELS_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + LABELS_IMAGE_NAME;
-  private static final String LANDMARKS_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + LANDMARKS_IMAGE_NAME;
-  private static final String LOGOS_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + LOGOS_IMAGE_NAME;
-  private static final String OBJECTS_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + OBJECT_IMAGE_NAME;
-  private static final String PROPERTIES_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + PROPERTIES_IMAGE_NAME;
-  private static final String SAFE_SEARCH_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + SAFE_SEARCH_IMAGE_NAME;
-  private static final String TEXT_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET + "/"
-          + TEXT_IMAGE_NAME;
-  private static final String WEB_DETECTION_IMAGE_FILE_PATH = BUCKET_NAME + "/" + IMAGE_PATH_IN_BUCKET
-          + "/" + WEB_DETECTION_IMAGE_NAME;
+  private static final String CROP_HINTS_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + CROP_HINTS_IMAGE_NAME;
+  private static final String FACE_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + FACE_IMAGE_NAME;
+  private static final String LABELS_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + LABELS_IMAGE_NAME;
+  private static final String LANDMARKS_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + LANDMARKS_IMAGE_NAME;
+  private static final String LOGOS_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + LOGOS_IMAGE_NAME;
+  private static final String OBJECTS_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + OBJECT_IMAGE_NAME;
+  private static final String PROPERTIES_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + PROPERTIES_IMAGE_NAME;
+  private static final String SAFE_SEARCH_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + SAFE_SEARCH_IMAGE_NAME;
+  private static final String TEXT_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET + "/"
+    + TEXT_IMAGE_NAME;
+  private static final String WEB_DETECTION_IMAGE_FILE_PATH = PATH + "/" + IMAGE_PATH_IN_BUCKET
+    + "/" + WEB_DETECTION_IMAGE_NAME;
 
   private static final String RESULT_FILE_NAME = "output-1-to-1.json";
 
   private static final String BATCH_SIZE = "20";
 
   private static final OfflineImageExtractorActionConfig CONFIG = new OfflineImageExtractorActionConfig(
-          SERVICE_ACCOUNT_FILE_PATH,
-          ImageFeature.FACE.getDisplayName(),
-          null,
-          null,
-          true,
-          null,
-          null,
-          BATCH_SIZE
+    SERVICE_ACCOUNT_FILE_PATH,
+    ImageFeature.FACE.getDisplayName(),
+    null,
+    null,
+    true,
+    null,
+    null,
+    BATCH_SIZE
   );
 
   private static Storage storage;
@@ -115,9 +116,9 @@ public class OfflineImageExtractorActionTest {
     System.out.println("Creating folder: " + folderName);
     FileInputStream fileInputStream = new FileInputStream("examples/empty_file.txt");
     bucket.create(folderName + "/",
-            fileInputStream,
-            FOLDER_CONTENT_TYPE,
-            Bucket.BlobWriteOption.doesNotExist());
+      fileInputStream,
+      FOLDER_CONTENT_TYPE,
+      Bucket.BlobWriteOption.doesNotExist());
   }
 
   private static void uploadImages() throws FileNotFoundException {
@@ -139,30 +140,10 @@ public class OfflineImageExtractorActionTest {
       FileInputStream fileInputStream = new FileInputStream(localImagePath);
       System.out.println("Uploading " + localImagePath + " to " + bucket.getName());
       bucket.create(IMAGE_PATH_IN_BUCKET + "/" + imageName,
-              fileInputStream,
-              JPG_CONTENT_TYPE,
-              Bucket.BlobWriteOption.doesNotExist());
+        fileInputStream,
+        JPG_CONTENT_TYPE,
+        Bucket.BlobWriteOption.doesNotExist());
     }
-  }
-
-  private static Storage getStorage(String project, @Nullable Credentials credentials) {
-    StorageOptions.Builder builder = StorageOptions.newBuilder().setProjectId(project);
-    if (credentials != null) {
-      builder.setCredentials(credentials);
-    }
-    return builder.build().getService();
-  }
-
-  private static void deleteBucket(Storage storage, Bucket bucket) {
-    if (bucket == null || bucket.list() == null) {
-      return;
-    }
-    System.out.println("Deleting bucket: " + bucket.getName());
-    for (Blob blob : bucket.list().iterateAll()) {
-      storage.delete(blob.getBlobId());
-    }
-
-    bucket.delete(Bucket.BucketSourceOption.metagenerationMatch());
   }
 
   @Before
@@ -171,7 +152,7 @@ public class OfflineImageExtractorActionTest {
     String projectId = CredentialsHelper.getProjectId(PROJECT);
     storage = getStorage(projectId, credentials);
 
-    GCSPath path = GCSPath.from(BUCKET_NAME);
+    GCSPath path = GCSPath.from(PATH);
     String bucketName = path.getBucket();
     bucket = storage.get(bucketName);
     if (bucket != null) {
@@ -180,9 +161,9 @@ public class OfflineImageExtractorActionTest {
 
     System.out.println("Creating bucket: " + bucketName);
     BucketInfo bucketInfo = BucketInfo.newBuilder(bucketName)
-            .setStorageClass(StorageClass.STANDARD)
-            .setLocation("us-east1")
-            .build();
+      .setStorageClass(StorageClass.STANDARD)
+      .setLocation("us-east1")
+      .build();
     bucket = storage.create(bucketInfo);
     uploadImages();
   }
@@ -195,17 +176,17 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunCropHintsFeature() throws Exception {
     String folder = "crop_hints";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunCropHintsFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(CROP_HINTS_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.CROP_HINTS.getDisplayName())
-            .setAspectRatios("1.66667")
-            .build();
+      .setSourcePath(CROP_HINTS_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.CROP_HINTS.getDisplayName())
+      .setAspectRatios("1.66667")
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -217,15 +198,15 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunFaceFeature() throws Exception {
     String folder = "face";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunFaceFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(FACE_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .build();
+      .setSourcePath(FACE_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -237,16 +218,16 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunImagePropertiesFeature() throws Exception {
     String folder = "properties";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunImagePropertiesFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(PROPERTIES_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.IMAGE_PROPERTIES.getDisplayName())
-            .build();
+      .setSourcePath(PROPERTIES_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.IMAGE_PROPERTIES.getDisplayName())
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -258,16 +239,16 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunLabelsFeature() throws Exception {
     String folder = "labels";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunLabelsFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(LABELS_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.LABELS.getDisplayName())
-            .build();
+      .setSourcePath(LABELS_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.LABELS.getDisplayName())
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -279,16 +260,16 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunLandmarksFeature() throws Exception {
     String folder = "landmarks";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunLandmarksFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(LANDMARKS_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.LANDMARKS.getDisplayName())
-            .build();
+      .setSourcePath(LANDMARKS_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.LANDMARKS.getDisplayName())
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -300,16 +281,16 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunLogosFeature() throws Exception {
     String folder = "logos";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
 
     createFolder(folder);
 
     System.out.println("testRunLogosFeature() - resultFolderPath: " + resultFolderPath);
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(LOGOS_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.LOGOS.getDisplayName())
-            .build();
+      .setSourcePath(LOGOS_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.LOGOS.getDisplayName())
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -321,16 +302,16 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunObjectLocalizationFeature() throws Exception {
     String folder = "objects";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunObjectLocalizationFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(OBJECTS_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.OBJECT_LOCALIZATION.getDisplayName())
-            .build();
+      .setSourcePath(OBJECTS_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.OBJECT_LOCALIZATION.getDisplayName())
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -342,17 +323,17 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunTextFeature() throws Exception {
     String folder = "text";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunTextFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(TEXT_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.TEXT.getDisplayName())
-            .setLanguageHints("en")
-            .build();
+      .setSourcePath(TEXT_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.TEXT.getDisplayName())
+      .setLanguageHints("en")
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -364,16 +345,16 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunSafeSearchFeature() throws Exception {
     String folder = "safe";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunSafeSearchFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(SAFE_SEARCH_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.EXPLICIT_CONTENT.getDisplayName())
-            .build();
+      .setSourcePath(SAFE_SEARCH_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.EXPLICIT_CONTENT.getDisplayName())
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -385,16 +366,16 @@ public class OfflineImageExtractorActionTest {
   @Test
   public void testRunWebDetectionFeature() throws Exception {
     String folder = "web";
-    String resultFolderPath = String.format(PATH_PATTERN, BUCKET_NAME, folder);
+    String resultFolderPath = String.format(PATH_PATTERN, PATH, folder);
     System.out.println("testRunSafeSearchFeature() - resultFolderPath: " + resultFolderPath);
 
     createFolder(folder);
 
     OfflineImageExtractorActionConfig config = OfflineImageExtractorActionConfig.builder(CONFIG)
-            .setSourcePath(WEB_DETECTION_IMAGE_FILE_PATH)
-            .setDestinationPath(resultFolderPath)
-            .setFeatures(ImageFeature.WEB_DETECTION.getDisplayName())
-            .build();
+      .setSourcePath(WEB_DETECTION_IMAGE_FILE_PATH)
+      .setDestinationPath(resultFolderPath)
+      .setFeatures(ImageFeature.WEB_DETECTION.getDisplayName())
+      .build();
 
     OfflineImageExtractorAction action = new OfflineImageExtractorAction(config);
     ActionContext context = new MockActionContext();
@@ -414,15 +395,34 @@ public class OfflineImageExtractorActionTest {
     JsonParser parser = new JsonParser();
     JsonElement jsonTree = parser.parse(content);
     String uri = jsonTree.getAsJsonObject()
-            .get("responses")
-            .getAsJsonArray()
-            .get(0)
-            .getAsJsonObject()
-            .get("context")
-            .getAsJsonObject()
-            .get("uri")
-            .getAsString();
+      .get("responses")
+      .getAsJsonArray()
+      .get(0)
+      .getAsJsonObject()
+      .get("context")
+      .getAsJsonObject()
+      .get("uri")
+      .getAsString();
 
-    Assert.assertTrue(expectedUri.equals(uri));
+    Assert.assertEquals(expectedUri, uri);
+  }
+
+  private static Storage getStorage(String project, @Nullable Credentials credentials) {
+    StorageOptions.Builder builder = StorageOptions.newBuilder().setProjectId(project);
+    if (credentials != null) {
+      builder.setCredentials(credentials);
+    }
+    return builder.build().getService();
+  }
+
+  private static void deleteBucket(Storage storage, Bucket bucket) {
+    if (bucket == null || bucket.list() == null) {
+      return;
+    }
+    System.out.println("Deleting bucket: " + bucket.getName());
+    for (Blob blob : bucket.list().iterateAll()) {
+      storage.delete(blob.getBlobId());
+    }
+    bucket.delete(Bucket.BucketSourceOption.metagenerationMatch());
   }
 }

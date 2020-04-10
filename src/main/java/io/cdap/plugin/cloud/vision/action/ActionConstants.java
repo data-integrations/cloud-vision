@@ -34,8 +34,7 @@ public final class ActionConstants {
    */
   public static final String BATCH_SIZE = "batchSize";
   /**
-   * Configuration property name used to specify the features to extract
-   * from images.
+   * Configuration property name used to specify the features to extract from images.
    */
   public static final String FEATURES = "features";
   /**
