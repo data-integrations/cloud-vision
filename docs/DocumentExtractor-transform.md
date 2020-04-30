@@ -2,8 +2,8 @@
 
 Description
 -----------
-This transform plugin can detect and transcribe text from small(up to 5 pages) PDF and TIFF files stored in Cloud 
-Storage in an online manner.
+This transform plugin uses the Google Cloud Vision API to detect and transcribe text from (up to 5 pages) documents 
+(.pdf, .tiff, .gif) files stored in Google Cloud Storage.
 
 Credentials
 -----------
@@ -12,8 +12,9 @@ provided and can be set to 'auto-detect'.
 Credentials will be automatically read from the cluster environment.
 
 If the plugin is not run on a Dataproc cluster, the path to a service account key must be provided.
-The service account key can be found on the Dashboard in the Cloud Platform Console.
-Make sure the account key has permission to access Google Cloud Vision.
+The service account key can be found on the Dashboard in the Google Cloud Platform Console.
+
+Make sure the account key has permission to access the Google Cloud Vision API.
 The service account key file needs to be available on every node in your cluster and
 must be readable by all users running the job.
 
@@ -27,22 +28,24 @@ When running on other clusters, the file must be present on every node in the cl
 **Project ID**: Google Cloud Project ID, which uniquely identifies a project. It can be found on the Dashboard in the
 Google Cloud Platform Console.
 
-**Path Field**: Field in the input schema containing the path to the image.
+**Path Field**: Name of the field in the input schema containing the path to the image.
 
-**Output Field**: Field to store the extracted image features. If the specified output field name already exists in the
-input record, it will be overwritten.
+**Content Field**: Name of the field in the input schema containing the file content, represented as a stream of bytes.
 
-**Content Field**: Field in the input schema containing the file content, represented as a stream of bytes.
+Either 'Path Field' or 'Content Field' must be not null. They are mutually exclusive and cannot be both specified.
 
-**Mime Type**: The type of the file. Currently only 'application/pdf', 'image/tiff' and 'image/gif' are supported.
-Wildcards are not supported.
+**Output Field**: Name of the field to store the extracted image features into. If the specified output field name 
+already exists in the input record, it will be overwritten.
 
-**Pages**: The pages in the file to perform image annotation.
+**Mime Type**: The type of the file(s) that will be processed. Currently only 'application/pdf', 'image/tiff' and 
+'image/gif' are supported. Wildcards are not supported.
 
-**Features**: Features to extract from images.
+**Pages**: The list of pages in the file(s) to perform image annotation on. Enter the list as Comma Separated Values.
 
-**Language Hints**: Hints to detect the language of the text in the images.
+**Features**: Features to extract from the documents.
+
+**Language Hints**: Hints to detect the language of the text in the documents.
 
 **Aspect Ratios**: Ratio of the width to the height of the image. If not specified, the best possible crop is returned.
 
-**Include Geo Results**: Whether to include results derived from the geo information in the image.
+**Include Geo Results**: Whether to include results derived from the geo information in the document.

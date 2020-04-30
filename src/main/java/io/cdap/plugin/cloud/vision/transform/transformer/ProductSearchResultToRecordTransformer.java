@@ -37,6 +37,14 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link ProductSearchResultsSchema}. This {@link StructuredRecord} can then be turned into
+   * a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     ProductSearchResults productSearchResults = annotateImageResponse.getProductSearchResults();
@@ -45,6 +53,13 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
       .build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the product search information from a
+   * {@link ProductSearchResults} input using a {@link Schema} for the mapping.
+   *
+   * @param searchResults The {@link ProductSearchResults} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractProductSearchResults(ProductSearchResults searchResults) {
     Schema schema = getProductSearchResultSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
@@ -74,6 +89,13 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the search result information from a
+   * {@link ProductSearchResults.Result} input using a {@link Schema} for the mapping.
+   *
+   * @param result The {@link ProductSearchResults.Result} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractProductSearchResultRecord(ProductSearchResults.Result result, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(ProductSearchResultsSchema.Result.IMAGE_FIELD_NAME) != null) {
@@ -93,6 +115,14 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the product information from a
+   * {@link Product} input using a {@link Schema} for the mapping.
+   *
+   * @param product The {@link Product} object containing the data.
+   * @param schema  The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractProductRecord(Product product, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(ProductSearchResultsSchema.Product.NAME_FIELD_NAME) != null) {
@@ -119,6 +149,14 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the label information from a
+   * {@link Product.KeyValue} input using a {@link Schema} for the mapping.
+   *
+   * @param label  The {@link Product.KeyValue} object containing the data.
+   * @param schema The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractProductLabelRecord(Product.KeyValue label, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     if (schema.getField(ProductSearchResultsSchema.KeyValue.KEY_FIELD_NAME) != null) {
@@ -130,6 +168,14 @@ public class ProductSearchResultToRecordTransformer extends ImageAnnotationToRec
     return builder.build();
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the grouped result information from a
+   * {@link Product.KeyValue} input using a {@link Schema} for the mapping.
+   *
+   * @param result The {@link ProductSearchResults.GroupedResult} object containing the data.
+   * @param schema The {@link Schema} to use.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractProductSearchResultRecord(ProductSearchResults.GroupedResult result, Schema schema) {
     StructuredRecord.Builder builder = StructuredRecord.builder(schema);
     Schema.Field positionField = schema.getField(ProductSearchResultsSchema.GroupedResult.POSITION_FIELD_NAME);

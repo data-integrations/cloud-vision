@@ -2,7 +2,7 @@
   "metadata": {
     "spec-version": "1.5"
   },
-  "display-name": "Text Extractor Offline",
+  "display-name": "Offline Text Extractor",
   "configuration-groups": [
     {
       "label": "Basic",
@@ -33,7 +33,8 @@
             "default": "application/pdf",
             "values": [
               "application/pdf",
-              "image/tiff"
+              "image/tiff",
+              "image/gif"
             ]
           }
         },

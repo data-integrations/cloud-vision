@@ -78,6 +78,11 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
     return pages;
   }
 
+  /**
+   * Convenience method that splits a comma separated string of values and turn those into a List<Integer>.
+   *
+   * @return {@link List<Integer>}
+   */
   public List<Integer> getPagesList() {
     if (Strings.isNullOrEmpty(pages)) {
       return Collections.emptyList();
@@ -117,14 +122,17 @@ public class DocumentExtractorTransformConfig extends ExtractorTransformConfig {
    */
   public void validateInputSchema(Schema inputSchema, FailureCollector collector) {
     Schema.Field contentField = inputSchema.getField(getContentField());
-    if (contentField != null) {
-      collector.addFailure(String.format("Content field '%s' is expected to be 'bytes'", getContentField()), null)
-        .withInputSchemaField(getContentField());
-    }
     Schema.Field pathField = inputSchema.getField(getPathField());
-    if (pathField != null) {
+
+    if (pathField != null && pathField.getSchema().getType() != Schema.Type.STRING) {
       collector.addFailure(String.format("Path field '%s' is expected to be a string", getPathField()), null)
         .withInputSchemaField(getPathField());
+      return;
+    }
+
+    if (contentField != null && contentField.getSchema().getType() != Schema.Type.STRING) {
+      collector.addFailure(String.format("Content field '%s' is expected to be a string", getContentField()), null)
+        .withInputSchemaField(getContentField());
     }
   }
 

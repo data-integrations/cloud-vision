@@ -35,6 +35,14 @@ public class LocalizedObjectAnnotationsToRecordTransformer extends ImageAnnotati
     super(schema, outputFieldName);
   }
 
+  /**
+   * Extract the entire mapping of a {@link AnnotateImageResponse} object to a {@link StructuredRecord}
+   * using the {@link io.cdap.plugin.cloud.vision.transform.schema.LocalizedObjectAnnotationSchema}.
+   * This {@link StructuredRecord} can then be turned into a json document.
+   *
+   * @param input                 {@link StructuredRecord} to add to.
+   * @param annotateImageResponse {@link AnnotateImageResponse} to get the data from.
+   */
   @Override
   public StructuredRecord transform(StructuredRecord input, AnnotateImageResponse annotateImageResponse) {
     return getOutputRecordBuilder(input)
@@ -42,12 +50,26 @@ public class LocalizedObjectAnnotationsToRecordTransformer extends ImageAnnotati
       .build();
   }
 
+  /**
+   * Extract a {@link List} of {@link StructuredRecord} containing the localized object information from a
+   * {@link AnnotateImageResponse} input using a {@link Schema} for the mapping.
+   *
+   * @param annotateImageResponse The {@link AnnotateImageResponse} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private List<StructuredRecord> extractLocalizedObjectAnnotations(AnnotateImageResponse annotateImageResponse) {
     return annotateImageResponse.getLocalizedObjectAnnotationsList().stream()
       .map(this::extractLocalizedObjectAnnotationRecord)
       .collect(Collectors.toList());
   }
 
+  /**
+   * Extract a {@link StructuredRecord} containing the localized object information from a
+   * {@link LocalizedObjectAnnotation} input using a {@link Schema} for the mapping.
+   *
+   * @param annotation The {@link LocalizedObjectAnnotation} object containing the data.
+   * @return A {@link StructuredRecord} containing the data mapped.
+   */
   private StructuredRecord extractLocalizedObjectAnnotationRecord(LocalizedObjectAnnotation annotation) {
     Schema objSchema = getLocalizedObjectAnnotationSchema();
     StructuredRecord.Builder builder = StructuredRecord.builder(objSchema);

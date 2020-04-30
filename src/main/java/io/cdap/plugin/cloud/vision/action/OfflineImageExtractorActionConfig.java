@@ -24,7 +24,6 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.cloud.vision.CloudVisionConstants;
 import io.cdap.plugin.cloud.vision.transform.ImageFeature;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
- * Configuration for OfflineImageExtractorAction
+ * Configuration for OfflineImageExtractorAction.
  */
 public class OfflineImageExtractorActionConfig extends PluginConfig {
 
@@ -86,8 +85,17 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
                                            @Nullable Boolean includeGeoResults, String sourcePath,
                                            String destinationPath, @Nullable String batchSize) {
     this.serviceFilePath = serviceFilePath;
+
+    if (sourcePath != null) {
+      sourcePath = sourcePath.trim();
+    }
     this.sourcePath = sourcePath;
+
+    if (destinationPath != null) {
+      destinationPath = destinationPath.trim();
+    }
     this.destinationPath = destinationPath;
+
     this.features = features;
     this.batchSize = batchSize;
     this.languageHints = languageHints;
@@ -97,8 +105,8 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
 
   private OfflineImageExtractorActionConfig(Builder builder) {
     serviceFilePath = builder.serviceFilePath;
-    sourcePath = builder.sourcePath;
-    destinationPath = builder.destinationPath;
+    sourcePath = builder.sourcePath.trim();
+    destinationPath = builder.destinationPath.trim();
     features = builder.features;
     batchSize = builder.batchSize;
     languageHints = builder.languageHints;
@@ -106,10 +114,21 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     includeGeoResults = builder.includeGeoResults;
   }
 
+  /**
+   * Getter to retrieve a Builder object.
+   *
+   * @return a Builder object.
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * Helper function to get a Builder object based on an existing configuration.
+   *
+   * @param copy Configuration object to use as the source to copy from.
+   * @return Builer object.
+   */
   public static Builder builder(OfflineImageExtractorActionConfig copy) {
     return builder()
       .setServiceFilePath(copy.getServiceFilePath())
@@ -175,6 +194,12 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     return includeGeoResults != null ? includeGeoResults : false;
   }
 
+  /**
+   * Slit a comma separated list of properties and turn them into a List<String>.
+   *
+   * @param property Comma separated list of properties.
+   * @return A list of strings after splitting on commas.
+   */
   private List<String> convertPropertyToList(String property) {
     if (!Strings.isNullOrEmpty(property)) {
       return Arrays.asList(property.split(","));
@@ -183,6 +208,11 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     }
   }
 
+  /**
+   * Validate that the configuration is correct. If not, use the FailureCollector object passed to report errors.
+   *
+   * @param collector FailureCollector object to use to report errors.
+   */
   public void validate(FailureCollector collector) {
     ImageFeature feature = getImageFeature();
     if (feature == null) {
@@ -196,7 +226,7 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
         batch = Integer.parseInt(batchSize);
       } catch (NumberFormatException e) {
         collector.addFailure(String.format("Incorrect value '%s' for Batch Size.", batchSize),
-                             "Provide correct value.")
+          "Provide correct value.")
           .withConfigProperty(ActionConstants.BATCH_SIZE);
         return;
       }
@@ -219,8 +249,16 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     }
   }
 
+  public void setSourcePath(String sourcePath) {
+    this.sourcePath = sourcePath;
+  }
+
+  public void setDestinationPath(String destinationPath) {
+    this.destinationPath = destinationPath;
+  }
+
   /**
-   * Builder for creating a {@link OfflineImageExtractorActionConfig}
+   * Builder for creating a {@link OfflineImageExtractorActionConfig}.
    */
   public static final class Builder {
     @Nullable
@@ -241,12 +279,20 @@ public class OfflineImageExtractorActionConfig extends PluginConfig {
     }
 
     public Builder setSourcePath(String sourcePath) {
-      this.sourcePath = sourcePath;
+      if (sourcePath != null) {
+        this.sourcePath = sourcePath.trim();
+      } else {
+        this.sourcePath = sourcePath;
+      }
       return this;
     }
 
     public Builder setDestinationPath(String destinationPath) {
-      this.destinationPath = destinationPath;
+      if (destinationPath != null) {
+        this.destinationPath = destinationPath.trim();
+      } else {
+        this.destinationPath = destinationPath;
+      }
       return this;
     }
 

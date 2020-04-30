@@ -19,11 +19,14 @@ package io.cdap.plugin.cloud.vision.transform.schema;
 import io.cdap.cdap.api.data.schema.Schema;
 
 /**
- * A vertex represents a 2D point in the image. {@link com.google.cloud.vision.v1.Vertex} mapped to a record with
+ * A vertex represents a 2D point in the image. {@link com.google.cloud.vision.v1.Vertex} mapped to a record with the
  * following fields.
  */
 public class VertexSchema {
 
+  /**
+   * Prevent instantiating this class.
+   */
   private VertexSchema() {
     throw new AssertionError("Should not instantiate static utility class.");
   }
@@ -38,7 +41,16 @@ public class VertexSchema {
    */
   public static final String Y_FIELD_NAME = "y";
 
-  public static final Schema SCHEMA = Schema.recordOf("vertex-record",
-    Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
-    Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
+  /**
+   * Utility method to create a {@link Schema} with a specific name. This is useful to create uniquely named schemas
+   * that will be combined into a larger {@link Schema}.
+   *
+   * @param name {@link String} containing the name to give to the returned {@link Schema}.
+   * @return a {@link Schema} with the given name.
+   */
+  public static Schema getSchema(String name) {
+    return Schema.recordOf(name,
+      Schema.Field.of(X_FIELD_NAME, Schema.of(Schema.Type.INT)),
+      Schema.Field.of(Y_FIELD_NAME, Schema.of(Schema.Type.INT)));
+  }
 }
