@@ -84,7 +84,7 @@
     <google.protobuf.version>3.7.1</google.protobuf.version>
     <gson.version>2.8.5</gson.version>
     <guava.version>27.0.1-jre</guava.version>
-    <hadoop.version>2.3.0</hadoop.version>
+    <hadoop.version>3.2.3</hadoop.version>
     <httpcomponents.version>4.5.9</httpcomponents.version>
     <hydrator.version>2.3.0-SNAPSHOT</hydrator.version>
     <jackson.core.version>2.9.10.1</jackson.core.version>
